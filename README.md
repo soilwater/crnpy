@@ -1,13 +1,13 @@
 # CRNPy
 A Python toolbox for handling common tasks with cosmic-ray neutron probes. 
 
-The toolbox was developed using common libraries for scientific computing like Pandas, NumPy, Matplotlib, and SciPy.
+The toolbox consists of a series of python routines to help researchers and practicioners convert cosmic-ray neutron observations into volumetric water content. The package includes a routine for calibration of detectors using field observations. The toolbox was developed using common libraries for scientific computing like Pandas, NumPy, Matplotlib, and SciPy.
 
 ## Functionality
 The toolbox seamlessly integrates with Pandas DataFrames for easy tabular data handling on top of the raw sensor data. The toolbox is desgined to read raw sensor data and append additional variables to the existing DataFrame. This way, researchers can export processed files while retaining all the raw data for better reproducibility and transparency.
 
 - Helper functions for reading tabular data
-- Fill timestamps with missing neutron counts
+- Fill incomplete counts and flag spurious data
 - Filter time series of neutron counts
 - Corrections of neutron counts by atmospheric conditions and incoming neutron flux
 - Conversion of neutron counts to volumetric water content
@@ -16,6 +16,11 @@ The toolbox seamlessly integrates with Pandas DataFrames for easy tabular data h
 - Functions for calibration and validation of new detectors
 - Out-of-the-box plotting functions to generate publication-quality figures
 
+## Conventions
+
+Function documentation follows PEP 257 docstring conventions.
+
+Notation in equations follow published articles for easy referencing and future development.
 
 ## References
 These references represent peer-reviewed articles that used one or more functions included in the toolbox.
