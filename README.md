@@ -3,10 +3,17 @@ A Python toolbox for handling common tasks with cosmic-ray neutron probes.
 
 The toolbox consists of a series of python routines to help researchers and practicioners convert cosmic-ray neutron observations into volumetric water content. The package includes a routine for calibration of detectors using field observations. The toolbox was developed using common libraries for scientific computing like Pandas, NumPy, Matplotlib, and SciPy.
 
+## Why building on top of Pandas
+
+- Each sensor variable is represented by a column variable
+- Each timestamp observation is represented by a row
+- Each sensor dataset is represented by a table
+
 ## Functionality
 The toolbox seamlessly integrates with Pandas DataFrames for easy tabular data handling on top of the raw sensor data. The toolbox is desgined to read raw sensor data and append additional variables to the existing DataFrame. This way, researchers can export processed files while retaining all the raw data for better reproducibility and transparency.
 
 - Helper functions for reading tabular data
+- Helper functions to tidy datasets (e.g. fill rows with missing timestamps)
 - Fill incomplete counts and flag spurious data
 - Filter time series of neutron counts
 - Corrections of neutron counts by atmospheric conditions and incoming neutron flux
