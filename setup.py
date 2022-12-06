@@ -3,6 +3,6 @@ import setuptools
 
 setuptools.setup(
     name="crnpy",
-    version="0.1",
+    version="0.2-12",
     packages=setuptools.find_packages(),
 )
