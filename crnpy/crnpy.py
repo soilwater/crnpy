@@ -23,7 +23,7 @@ if sys.version_info < python_version:
     raise Exception(msg)
 
 
-def format_dates_df(source, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True):
+def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True):
     """Helper function to change the format and round timestamps
     
     Parameters
@@ -37,66 +37,62 @@ def format_dates_df(source, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H
     """
     
     # Change format of timestamp
-    source[col] = pd.to_datetime(source[col], format=format)
+    df[col] = pd.to_datetime(df[col], format=format)
     
     # Round timestamps to nearest frequency
     if round_time:
-        source[col] = source['timestamp'].dt.round(freq)
+        df[col] = df[col].dt.round(freq)
         
     # Fill in rows with missing timestamps
-    start_date = source[col].iloc[0]
-    end_date = source[col].iloc[-1]
+    start_date = df[col].iloc[0]
+    end_date = df[col].iloc[-1]
     date_range = pd.date_range(start_date, end_date, freq=freq)
     for date in date_range:
-        if date not in source[col].values:
+        if date not in df[col].values:
             print('Adding missing date:',date)
             new_line = pd.DataFrame({col:date}, index=[-1]) # By default fills columns with np.nan
-            source = pd.concat([source,new_line])
+            source = pd.concat([df,new_line])
                                  
-    source.sort_values(by=col, inplace=True)
-    source.reset_index(drop=True, inplace=True)
-
-    return source
+    df.sort_values(by=col, inplace=True)
+    df.reset_index(drop=True, inplace=True)
+    df.set_index(col, inplace=True)
+    return df
       
-def count_time(count_cols, time_col, col='timestamp'):
-    """Approximate counting time for each detector based on timestamp
+def count_time(df):
+    """Approximate counting time
 
     Parameters
     ----------
-    count_cols : 2D list
-        List of columns with neutron counts for each detector.
-    time_cols : 2D list
-        List of columns with timestmap for each row.
+    count_cols : DataFrame
+        Dataframe containing only the columns with neutron counts and timestamp in the index.
 
     Returns
     -------
-    2D list
-        One column with the approximate counting time for each detector.
+    DataFrame
+        Dataframe with the approximate counting time for each detector.
     """
 
+    # Check that index is a timestamp
+    if type(df.index) != pd.core.indexes.datetimes.DatetimeIndex:
+        raise ValueError('Index must be a timestamp.')
 
+    # Calculate time difference between rows
+    df['count_time'] = df.index.to_series().diff().dt.total_seconds()
 
-    if any(len(count_cols[0])!= len(i) for i in count_cols):
-        raise ValueError('Detectors have different number of readings.')
+    return df
 
-    if any(len(time_col)!= len(i) for i in count_cols):
-        raise ValueError('Timestamps length does not match number of readings.')
-
-    count_times = []
-    for k in range(len(count_cols)):
-        count_times.append([0])
-        for i in range(1,len(count_cols[k])):
-            count_time = (time_col[i]-time_col[i-1]).total_seconds()
-            count_times[k].append(count_time)
-
-    return tuple(np.round(count_times))
-
-
-def fill_counts(count_cols, cols_time, timestamp, count_time=3600, threshold=0.25):
+def fill_counts(df, count_times=None, count_time_normal=3600, threshold=0.25,  limit=3):
     """Fill missing neutron counts. Periods shorter than threshold are replaced with NaN.
 
     Parameters
     ----------
+    df : DataFrame
+        DataFrame with neutron counts, might have count_time column(s).
+
+    count_time : pd.Series or pd.DataFrame
+        Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
+    count_times_normal : int
+        Expected counting time in seconds. Default is 3600 seconds.
     threshold : float
         Minimum fraction of the neutron integration time. Default is 0.25.
 
@@ -105,91 +101,107 @@ def fill_counts(count_cols, cols_time, timestamp, count_time=3600, threshold=0.2
     DataFrame
         with linearly interpolated neutron counts.
     """
-    export1d = False
-
-    timestamp = timestamp.astype('float64')
-
-    # Add dimension if only one detector
-    if len(np.shape(count_cols)) == 1:
-        count_cols = [count_cols]
-        if len(np.shape(cols_time)) == 1:
-            cols_time = [cols_time]
-        export1d = True
 
     # Replace values below threshold with NaN
-    time_threshold = round(count_time*threshold)
-    for k in range(len(count_cols)):
-        if len(count_cols[k]) != len(cols_time[k]):
-            raise ValueError(f'Timestamps length {len(cols_time[k])} does not match number of readings {len(count_cols[k])} for detector {k+1}.')
-        idx_nan = cols_time[k] < time_threshold
-        count_cols[k][idx_nan] = np.nan
-        cols_time[k][idx_nan] = np.nan
+    time_threshold = round(count_time_normal*threshold)
 
-        # Fill missing values, new approach
-        idx_fill = cols_time[k] > time_threshold
-        count_cols[k][idx_fill] = np.round(np.interp(timestamp[idx_fill], timestamp[~np.isnan(count_cols[k])], count_cols[k][~np.isnan(count_cols[k])]))
-        count_cols[k][idx_fill] = np.round(np.interp(timestamp[k][idx_fill], timestamp[~np.isnan(cols_time[k])],cols_time[k][~np.isnan(cols_time[k])]))
+    if count_times is None and type(df.index) != pd.core.indexes.datetimes.DatetimeIndex:
+        warnings.warn("No count time columns provided. Using timestamp index to compute count time.")
+        count_times = df.index.to_series().diff().dt.total_seconds()
 
-        #source.loc[idx_fill,cols_count[k]] = (source.loc[idx_fill,cols_count[k]]*count_time/source.loc[idx_fill,cols_time[k]]).round()
-        #source.loc[idx_fill,cols_time[k]] = count_time
+    if len(df) != len(count_times):
+        raise ValueError('Count times length does not match number of readings.')
 
-    if export1d:
-        return count_cols[0], cols_time[0]
-    return count_cols, cols_time
+    if len(count_times.columns) == 1:
+        idx_nan = count_times[count_times < time_threshold].index
+        df.loc[idx_nan] = np.nan
+    else:
+        for i in range(len(count_times.columns)):
+            idx_nan = count_times[count_times.iloc[:,i] < time_threshold].index
+            df.iloc[:,i].loc[idx_nan] = np.nan
 
-def normalize_counts(cols_count, cols_time, count_time=3600):
+    # Fill missing values with linear interpolation and round to nearest integer
+    df = df.interpolate(method='linear', limit=limit, limit_direction='both')
+    df = df.round()
+    return df
+
+def normalize_counts(df, count_time=None, count_times=None):
     """Normalize neutron counts to the desired counting time.
 
     Parameters
     ----------
-    cols_count : 2D list
-        List of columns with neutron counts for each detector.
-    cols_time : 2D list
-        List of columns with timestmap for each row.
+    df : DataFrame
+        Dataframe containing only the columns with neutron counts.
+    count_times : pd.Series or pd.DataFrame
+        Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
     count_time : int
-        Integration time in seconds. Default is 3600 seconds.
+        Count time in seconds for normalization. Default is 3600 seconds.
 
     Returns
     -------
-    2D list
+    DataFrame
         Normalized neutron counts.
     """
 
-    if any(len(lst[0])!= len(i) for i in cols_count):
-        raise ValueError('Detectors have different number of readings.')
-    if any(len(cols_time)!= len(i) for i in cols_count):
-        raise ValueError('Timestamps length does not match number of readings.')
+    if count_times is None and type(df.index) != pd.core.indexes.datetimes.DatetimeIndex:
+        warnings.warn("No count time columns provided. Using timestamp index to compute count time.")
+        count_times = df.index.to_series().diff().dt.total_seconds()
 
-    for k in range(len(cols_count)):
-        cols_count[k] = cols_count[k]*count_time/cols_time[k]
-    return cols_count
+    if len(df) != len(count_times):
+        raise ValueError('Count times length does not match number of readings.')
+
+    if count_time is None:
+        raise ValueError('Count time must be provided or index must be a timestamp.')
+
+    #Normalize counts rounded to integer
+    if len(count_times.columns) == 1:
+        df = df.div(count_times, axis=0).mul(count_time).round()
+    else:
+        for i in range(len(count_times.columns)):
+            df.iloc[:,i] = df.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(count_time).round()
 
 
-def compute_total_raw_counts(cols_count):
+
+def compute_total_raw_counts(df, nan_strategy=None):
     """Compute the sum of uncorrected neutron counts for all detectors.
     
     Parameters
     ----------
-    df : This is the main DataFrame with tabular data to correct.
+    df : DataFrame
+        Dataframe containing only the columns with neutron counts.
     
-    Returns:
-    Sum of neutron counts for all detectors.
+    Returns
+    -------
+    DataFrame
+        Dataframe with the sum of uncorrected neutron counts for all detectors.
     """
-    
-    has_missing_values = False
-    for col in cols_counts:
-        if np.array(col).isna().any():
-            has_missing_values = True 
-            
-    if has_missing_values:
-        warnings.warn("One or more columns have missing values. Computing total neutron counts using columns with missing values is not recommended. Consider filling missing values with the 'fill_counts' function before computing total neutron counts.")
-            
-    # Compute total neutron counts.
-    total_counts = np.sum(cols_count, axis=0)
-    return total_counts
+
+    #Check that all columns are numeric and without NaN
+    if not (df.dtypes == np.int64 or df.dtypes == np.float64 or df.dtypes == np.int32 or df.dtypes == np.float32):
+        raise ValueError('All columns must be numeric.')
+
+    if df.isnull().values.any():
+        if nan_strategy == None
+            raise ValueError('NaN values found. Please fill missing valuesor provide a strategy.')
+        elif nan_strategy == 'interpolate':
+            warnings.warn('NaN values found. Interpolating missing values using fill_counts().')
+            if type(df.index) != pd.core.indexes.datetimes.DatetimeIndex:
+                raise ValueError('Index must be a timestamp to use interpolation strategy.')
+            df = fill_counts(df)
+        elif nan_strategy == 'average_others':
+            if len(df.columns) == 1:
+                raise ValueError('Only one column found. Cannot use average_others strategy.')
+            warnings.warn('NaN values found. Replacing missing values with average of other detectors before summing.')
+            df = df.fillna(df.mean(axis=1), axis=0)
+        else:
+            raise ValueError('Invalid strategy.')
+
+    #Compute sum of counts
+    df['total_raw_counts'] = df.sum(axis=1)
+    return df
 
 
-def is_outlier(cols_counts, window=11):
+def is_outlier(df, window=11, store_outliers=False):
     """Computation of a moving modified Z-score based on the median absolute difference.
     
     References
@@ -198,31 +210,28 @@ def is_outlier(cols_counts, window=11):
 
     Parameters
     ----------
-    cols_counts : 2D list
-        List of columns with neutron counts for each detector.
+    cols_counts : DataFrame
+        Dataframe containing only the columns with neutron counts.
     window : int
         Window size for the moving median. Default is 11.
 
     Returns
     -------
-    2D list
-        Boolean array with True for outliers and False for valid values for each detector.
+    DataFrame
+        Dataframe without outliers.
     """
-    outliers = []
-    for col in cols_counts:
-        moving_median = []
-        for i in range(len(col)):
-            if i < window:
-                moving_median.append(np.nan)
-            else:
-                moving_median.append(np.median(col[i-window:i]))
-        moving_median = np.array(moving_median)
-        abs_dev = np.abs(col - moving_median)
-        median_abs_dev = np.median(abs_dev)
-        modified_z_score = 0.6745 * abs_dev / median_abs_dev
-        idx_outliers = modified_z_score > 3.5
-        outliers.append(idx_outliers)
-    return outliers
+
+    # Compute median absolute difference
+    df['mad'] = df.iloc[:,0].rolling(window=window, center=True).median().abs().diff()
+
+    # Compute modified Z-score
+    df['mz'] = 0.6745 * df['mad'] / df.iloc[:,0].rolling(window=window, center=True).median().abs()
+
+    # Store outliers
+    if store_outliers:
+        return df[df['mz'] < 3.5], df[df['mz'] > 3.5]
+
+    return df[df['mz'] < 3.5]
 
 
 def fill_missing_atm(cols_atm, limit=24):
@@ -233,7 +242,7 @@ def fill_missing_atm(cols_atm, limit=24):
     
     Parameters
     ----------
-    col_atm : 2D list
+    col_atm : pd.Series or pd.DataFrame
         Atmospheric variables to fill.
     limit : int
         Maximum number of consecutive missing values to interpolate. Default is 24.
@@ -245,15 +254,7 @@ def fill_missing_atm(cols_atm, limit=24):
     """
 
     # Fill missing values in atmospheric variables
-    for k in range(len(cols_atm)):
-        idx_nan = np.isnan(cols_atm[k])
-        # Filter out consecutive missing values
-        for i in range(len(idx_nan)-limit):
-            if idx_nan[i:i+limit].all():
-                idx_nan[i:i+limit] = False
-        cols_atm[k] = pchip_interpolate(np.arange(len(col_atm))[~np.isnan(cols_atm[k])], col_atm[~np.isnan(cols_atm[k])], np.arange(len(col_atm))[idx_nan])
-    return cols_atm
-
+    return cols_atm.interpolate(method='pchip', limit=limit, limit_direction='both')
 
 def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neutrons=None, incoming_Ref=None):
     """Correct neutron counts for atmospheric factors and incoming neutron flux.
@@ -329,7 +330,7 @@ def get_incoming_neutron_flux(timestamps, station, utc_offset=0):
 
     Parameters
     ----------
-    timestamps : list or array
+    timestamps : pd.series or pd.DataFrame or pd.DatetimeIndex
         Timestamps to retrieve neutron flux.
     station : str
         Neutron Monitor station to retrieve data from.
@@ -350,6 +351,18 @@ def get_incoming_neutron_flux(timestamps, station, utc_offset=0):
     # Example: get_incoming_flux(station='IRKT',start_date='2020-04-10 11:00:00',end_date='2020-06-18 17:00:00')
     # Template url = 'http://nest.nmdb.eu/draw_graph.php?formchk=1&stations[]=KERG&output=ascii&tabchoice=revori&dtype=corr_for_efficiency&date_choice=bydate&start_year=2009&start_month=09&start_day=01&start_hour=00&start_min=00&end_year=2009&end_month=09&end_day=05&end_hour=23&end_min=59&yunits=0'
 
+    # if timestamps is a pd.Series
+    if isinstance(timestamps, pd.Series):
+        timestamps = timestamps.values
+    elif isinstance(timestamps, pd.DataFrame) and timestamps.shape[1] == 1:
+        timestamps = timestamps.values
+    elif isinstance(timestamps, pd.DataFrame) and timestamps.shape[1] > 1:
+        if isinstance(timestamps.index, pd.DatetimeIndex):
+            timestamps = timestamps.index.values
+    elif isinstance(timestamps, pd.DatetimeIndex):
+        timestamps = timestamps.values
+
+    # Convert timestamps to datetime objects
     start_date = timestamps[0]
     end_date = timestamps[-1]
     
@@ -395,7 +408,7 @@ def get_incoming_neutron_flux(timestamps, station, utc_offset=0):
     df_flux = pd.read_csv(io.StringIO(s2), names=['timestamp','counts'])
     
     # Check if all values from selected detector are NaN. If yes, warn the user
-    if df['incoming_counts'].isna().all():
+    if df_flux['incoming_counts'].isna().all():
         warnings.warn('Data for selected neutron detectors appears to be unavailable for the selected period')
     
 
@@ -407,7 +420,7 @@ the origin by a sentence like 'We acknowledge the NMDB database (www.nmdb.eu) fo
 (Physikalisches Institut, University of Bern, Switzerland)"""
     #print(acknowledgement)
 
-    return df_flux.values
+    return df_flux
 
 
 
