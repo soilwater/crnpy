@@ -164,12 +164,13 @@ def normalize_counts(df, count_time=3600, count_times=None):
 
     #Normalize counts rounded to integer
     if type(count_times) == pd.core.series.Series or len(count_times.columns) == 1:
-        df = df.div(count_times, axis=0).mul(count_time).round()
+        df_r = df.div(count_times, axis=0).mul(count_time).round()
+        return df_r
     else:
         for i in range(len(count_times.columns)):
             df.iloc[:,i] = df.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(count_time).round()
+        return df
 
-    return df
 
 
 def drop_invalid(df, min_counts=0, max_counts=1e6):
