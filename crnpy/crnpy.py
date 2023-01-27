@@ -81,7 +81,7 @@ def count_time(df):
 
     return count_time
 
-def fill_counts(df, count_times=None, count_time_normal=3600, threshold=0.25,  limit=3):
+def fill_counts(df, count_times=None, expected_time=False, threshold=0.25, limit=3):
     """Fill missing neutron counts. Periods shorter than threshold are replaced with NaN.
 
     Parameters
@@ -101,9 +101,7 @@ def fill_counts(df, count_times=None, count_time_normal=3600, threshold=0.25,  l
     DataFrame
         with linearly interpolated neutron counts.
     """
-
-    # Replace values below threshold with NaN
-    time_threshold = round(count_time_normal*threshold)
+    df=df.copy()
 
     if type(df.index) == pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
         warnings.warn("No count time columns provided. Using timestamp index to compute count time.")
@@ -114,6 +112,14 @@ def fill_counts(df, count_times=None, count_time_normal=3600, threshold=0.25,  l
 
     if len(df) != len(count_times):
         raise ValueError('Count times length does not match number of readings.')
+
+    if expected_time is False:
+        expected_time = count_times.median()
+        print('Using median count time as expected count time:', expected_time)
+
+    # Replace values below threshold with NaN
+    time_threshold = round(expected_time * threshold)
+
     if type(count_times) == pd.core.frame.DataFrame:
         if len(count_times.columns) == 1:
             idx_nan = count_times[count_times < time_threshold].index
@@ -152,7 +158,7 @@ def normalize_counts(df, count_time=3600, count_times=None):
     """
 
     if count_times is None and type(df.index) == pd.core.indexes.datetimes.DatetimeIndex:
-        warnings.warn("No count time columns provided. Using timestamp index to compute count time.")
+        print("No count_times columns provided. Using timestamp index to compute count time.")
         count_times = df.index.to_series().diff().dt.total_seconds()
 
     if isinstance(count_times, type(None)):
@@ -166,33 +172,12 @@ def normalize_counts(df, count_time=3600, count_times=None):
     if type(count_times) == pd.core.series.Series or len(count_times.columns) == 1:
         df = df.div(count_times, axis=0).mul(count_time).round()
     else:
+        df = df.copy()
+        count_times = count_times.copy()
         for i in range(len(count_times.columns)):
             df.iloc[:,i] = df.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(count_time).round()
-
     return df
 
-
-def drop_invalid(df, min_counts=0, max_counts=1e6):
-    """Drop invalid neutron counts.
-
-    Parameters
-    ----------
-    df : DataFrame
-        Dataframe containing only the columns with neutron counts.
-    min_counts : int
-        Minimum number of counts. Default is 0.
-    max_counts : int
-        Maximum number of counts. Default is 1e6.
-
-    Returns
-    -------
-    DataFrame
-        Dataframe with invalid neutron counts dropped.
-    """
-
-    #Drop invalid counts
-    df = df[(df >= min_counts) & (df <= max_counts)]
-    return df
 
 def compute_total_raw_counts(df, nan_strategy=None):
     """Compute the sum of uncorrected neutron counts for all detectors.
@@ -207,19 +192,20 @@ def compute_total_raw_counts(df, nan_strategy=None):
     DataFrame
         Dataframe with the sum of uncorrected neutron counts for all detectors.
     """
+    df=df.copy()
 
     if df.isnull().values.any():
         if nan_strategy is None:
             raise ValueError('NaN values found. Please fill missing values or provide a strategy. See documentation for more information.')
         elif nan_strategy == 'interpolate':
-            warnings.warn('NaN values found. Interpolating missing values using fill_counts().')
+            print('NaN values found. Interpolating missing values using fill_counts().')
             if type(df.index) != pd.core.indexes.datetimes.DatetimeIndex:
                 raise ValueError('Index must be a timestamp to use interpolation strategy.')
             df = fill_counts(df)
         elif nan_strategy == 'average':
             if len(df.columns) == 1:
                 raise ValueError('Only one detector found. Cannot use average strategy.')
-            warnings.warn('NaN values found. Replacing missing values with average of other detectors before summing.')
+            print('NaN values found. Replacing missing values with average of other detectors before summing.')
             df = df.apply(lambda x: x.fillna(df.mean(axis=1)),axis=0)
         else:
             raise ValueError('Invalid strategy.')
@@ -231,9 +217,7 @@ def compute_total_raw_counts(df, nan_strategy=None):
     return df['total_raw_counts']
 
 
-
-
-def drop_outlier(df, window=11, store_outliers=False):
+def drop_outlier(df, window=11, store_outliers=False, min_counts=None, max_counts=None):
     """Computation of a moving modified Z-score based on the median absolute difference.
     
     References
@@ -246,12 +230,26 @@ def drop_outlier(df, window=11, store_outliers=False):
         Dataframe containing only the columns with neutron counts.
     window : int
         Window size for the moving median. Default is 11.
+    store_outliers : bool
+        If True, store the outliers in a new column. Default is False.
+    min_counts : int
+        Minimum number of counts for a reading to be considered valid. Default is None.
+    max_counts : int
+        Maximum number of counts for a reading to be considered valid. Default is None.
 
     Returns
     -------
     DataFrame
         Dataframe without outliers.
     """
+    if min_counts is not None:
+        lower_count = np.sum(df < min_counts)
+        print(f"Discarded counts below {min_counts}: {lower_count}")
+        df = df[df >= min_counts]
+    if max_counts is not None:
+        upper_count = np.sum(df > max_counts)
+        print(f"Discarded counts above {max_counts}: {upper_count}")
+        df = df[df <= max_counts]
 
     # Compute median absolute difference
     median = df.rolling(window, center=True).median()
@@ -260,14 +258,13 @@ def drop_outlier(df, window=11, store_outliers=False):
 
     # Compute modified Z-score
     modified_z_score = 0.6745 * diff / mad
-
     outliers = df[modified_z_score > 3.5]
     # Drop outliers
     df = df[modified_z_score < 3.5]
 
     if store_outliers:
         return df, outliers
-
+    print(f"Discarded {len(outliers)} outliers using modified Z-score.")
     return df
 
 
@@ -303,11 +300,11 @@ def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neu
     pressure : list or array
         Atmospheric pressure readings.
     humidity : list or array
-        Atmospheric humidity readings.
+        Atmospheric humidity readings in %.
     temp : list or array
-        Atmospheric temperature readings.
+        Atmospheric temperature readings in Celsius.
     Pref : float
-        Reference atmospheric pressure.
+        Reference atmospheric pressure in millibars (mbar).
     Aref : float
         Reference absolute humidity.
     L : float
@@ -426,7 +423,7 @@ def get_incoming_neutron_flux(timestamps, station, utc_offset=0, verbose=False):
 
     url = root + '&'.join(url_par)
 
-    if verbose:
+    if verbose > 0:
         print(f"Retrieving data from {url}")
 
     r = requests.get(url).content.decode('utf-8')
@@ -437,7 +434,16 @@ def get_incoming_neutron_flux(timestamps, station, utc_offset=0, verbose=False):
     end = r.find('\n</code></pre><br>Total') - 1
     s = r[start:end]
     s2 = ''.join([row.replace(';',',') for row in s])
-    df_flux = pd.read_csv(io.StringIO(s2), names=['timestamp','counts'])
+    try:
+        df_flux = pd.read_csv(io.StringIO(s2), names=['timestamp','counts'])
+    except:
+        if verbose > -1:
+            print(f"Error retrieving data from {url}")
+        return None, None
+
+    if(len(timestamps) != len(df_flux) and verbose > -1):
+        print('Warning: The number of timestamps does not match the number of neutron flux values.')
+        print('Check time resolution, or try the interpolate_incoming_neutron_flux() method.')
 
     # Check if all values from selected detector are NaN. If yes, warn the user
     if df_flux['counts'].isna().all():
@@ -454,6 +460,35 @@ the origin by a sentence like 'We acknowledge the NMDB database (www.nmdb.eu) fo
 
     return df_flux
 
+def interpolate_incoming_flux(df_flux, timestamps):
+    """Function to interpolate incoming neutron flux.
+
+    Parameters
+    ----------
+    df_flux : pd.DataFrame
+        Dataframe returned by get_incoming_flux method.
+    timestamps : pd.series or pd.DataFrame or pd.DatetimeIndex
+        Timestamps to interpolate the incoming neutron flux.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe containing interpolated incoming neutron flux.
+    """
+
+    # Add timestamps with nan values to the dataframe
+    df_flux['timestamp'] = pd.to_datetime(df_flux['timestamp'])
+    df_flux = df_flux.set_index('timestamp')
+    for timestamp in timestamps:
+        if timestamp not in df_flux.index:
+            df_flux.loc[timestamp] = np.nan
+    df_flux = df_flux.sort_index()
+
+    # Interpolate nan values
+    df_flux = df_flux['counts'].interpolate(method='pchip')
+
+    # Retur only the values for the selected timestamps
+    return df_flux.loc[timestamps]
 
 
 def smooth_counts(df,window=11,order=3):
@@ -745,7 +780,7 @@ def cutoff_rigidity(lat,lon):
     return np.round(zq,2)
 
 
-def find_neutron_detectors(Rc):
+def find_neutron_detectors(Rc, timestamps=None):
     """
     Inputs:
         - Rc = Cutoff rigidity in GV
@@ -768,10 +803,29 @@ def find_neutron_detectors(Rc):
 
     # Sort stations by closest cutoff rigidity
     idx_R = (stations['R'] - Rc).abs().argsort()
-    
+
+    if timestamps is not None:
+        stations["Period available"] = False
+        for i in range(10):
+            station = stations.iloc[idx_R[i]]["STID"]
+            try:
+                get_incoming_neutron_flux(timestamps, station, verbose=-1)
+                stations.iloc[idx_R[i],-1] = True
+            except:
+                pass
+        if sum(stations["Period available"] == True) == 0:
+            print("No stations available for the selected period!")
+        else:
+            stations = stations[stations["Period available"] == True]
+            idx_R = (stations['R'] - Rc).abs().argsort()
+            result = stations.iloc[idx_R[:10]]
+    else:
+        result = stations.reindex(idx_R).head(10).rename_axis(None)
+
     # Print results
     print('')
     print("""Select a station with an altitude similar to that of your location. For more information go to: 'https://www.nmdb.eu/nest/help.php#helpstations""")
     print('')
-    print(stations.reindex(idx_R).head(10).rename_axis(None))
+    print(f"Your cutoff rigidity is {Rc} GV")
+    print(result)
     
