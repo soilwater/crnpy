@@ -170,13 +170,15 @@ def normalize_counts(df, count_time=3600, count_times=None):
 
     #Normalize counts rounded to integer
     if type(count_times) == pd.core.series.Series or len(count_times.columns) == 1:
-        df = df.div(count_times, axis=0).mul(count_time).round()
+        df_r = df.div(count_times, axis=0).mul(count_time).round()
+        return df_r
     else:
         df = df.copy()
         count_times = count_times.copy()
         for i in range(len(count_times.columns)):
             df.iloc[:,i] = df.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(count_time).round()
-    return df
+        return df
+
 
 
 def compute_total_raw_counts(df, nan_strategy=None):
@@ -439,7 +441,7 @@ def get_incoming_neutron_flux(timestamps, station, utc_offset=0, verbose=False):
     except:
         if verbose > -1:
             print(f"Error retrieving data from {url}")
-        return None, None
+        return None
 
     if(len(timestamps) != len(df_flux) and verbose > -1):
         print('Warning: The number of timestamps does not match the number of neutron flux values.')
@@ -809,8 +811,8 @@ def find_neutron_detectors(Rc, timestamps=None):
         for i in range(10):
             station = stations.iloc[idx_R[i]]["STID"]
             try:
-                get_incoming_neutron_flux(timestamps, station, verbose=-1)
-                stations.iloc[idx_R[i],-1] = True
+                if get_incoming_neutron_flux(timestamps, station, verbose=-1) is not None:
+                    stations.iloc[idx_R[i],-1] = True
             except:
                 pass
         if sum(stations["Period available"] == True) == 0:
