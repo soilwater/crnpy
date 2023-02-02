@@ -176,7 +176,7 @@ def normalize_counts(df, count_time=3600, count_times=None):
         df = df.copy()
         count_times = count_times.copy()
         for i in range(len(count_times.columns)):
-            df.iloc[:,i] = df.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(count_time).round()
+            df[df.columns[i]] = df.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(count_time).round()
         return df
 
 
@@ -820,7 +820,7 @@ def find_neutron_detectors(Rc, timestamps=None):
         else:
             stations = stations[stations["Period available"] == True]
             idx_R = (stations['R'] - Rc).abs().argsort()
-            result = stations.iloc[idx_R[:10]]
+            result = stations.iloc[idx_R.iloc[:10]]
     else:
         result = stations.reindex(idx_R).head(10).rename_axis(None)
 
