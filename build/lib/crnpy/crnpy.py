@@ -365,13 +365,15 @@ def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neu
 
 
 
-def get_incoming_neutron_flux(timestamps, station, utc_offset=0, verbose=False):
+def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, verbose=False):
     """Function to retrieve neutron flux from the Neutron Monitor Database.
 
     Parameters
     ----------
-    timestamps : pd.series or pd.DataFrame or pd.DatetimeIndex
-        Timestamps to retrieve neutron flux.
+    start_date : Datetime
+        Start date of the time series.
+    end_date : Datetime
+        End date of the time series.
     station : str
         Neutron Monitor station to retrieve data from.
     utc_offset : int
@@ -391,10 +393,6 @@ def get_incoming_neutron_flux(timestamps, station, utc_offset=0, verbose=False):
     # Example: get_incoming_flux(station='IRKT',start_date='2020-04-10 11:00:00',end_date='2020-06-18 17:00:00')
     # Template url = 'http://nest.nmdb.eu/draw_graph.php?formchk=1&stations[]=KERG&output=ascii&tabchoice=revori&dtype=corr_for_efficiency&date_choice=bydate&start_year=2009&start_month=09&start_day=01&start_hour=00&start_min=00&end_year=2009&end_month=09&end_day=05&end_hour=23&end_min=59&yunits=0'
 
-
-    # Convert timestamps to datetime objects
-    start_date = timestamps.min()
-    end_date = timestamps.max()
     
     # Add 1 hour to ensure the last date is included in the request.
     end_date += pd.Timedelta(hours=1)
@@ -443,10 +441,6 @@ def get_incoming_neutron_flux(timestamps, station, utc_offset=0, verbose=False):
             print(f"Error retrieving data from {url}")
         return None
 
-    if(len(timestamps) != len(df_flux) and verbose > -1):
-        print('Warning: The number of timestamps does not match the number of neutron flux values.')
-        print('Check time resolution, or try the interpolate_incoming_neutron_flux() method.')
-
     # Check if all values from selected detector are NaN. If yes, warn the user
     if df_flux['counts'].isna().all():
         warnings.warn('Data for selected neutron detectors appears to be unavailable for the selected period')
@@ -487,7 +481,7 @@ def interpolate_incoming_flux(df_flux, timestamps):
     df_flux = df_flux.sort_index()
 
     # Interpolate nan values
-    df_flux = df_flux['counts'].interpolate(method='pchip')
+    df_flux = df_flux['counts'].interpolate(method='nearest')
 
     # Retur only the values for the selected timestamps
     return df_flux.loc[timestamps]
@@ -556,20 +550,6 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.
     vwc = (a0 / (counts/N0-a1) - a2 - Wlat - Wsoc) * bulk_density
     return vwc
 
-
-def fill_missing_vwc(df,limit=24):
-    """Fill missing values in volumetric water content using a piecewise cubic Hermite 
-    interpolating polynomial (pchip method)
-
-    Keyword arguments:
-    
-    df -- This is the main DataFrame with tabular data to correct
-    limit -- Maximum number of consecutive missing values to fill
-    """
-    
-    # Interpolate rows with missing volumetric water content.
-    df.interpolate(method='pchip', limit_area='inside', limit=limit, inplace=True)
-    return df
 
 
 def sensing_depth(df,par,method='Schron_2017',dist=[1]):
@@ -830,4 +810,5 @@ def find_neutron_detectors(Rc, timestamps=None):
     print('')
     print(f"Your cutoff rigidity is {Rc} GV")
     print(result)
-    
+
+
