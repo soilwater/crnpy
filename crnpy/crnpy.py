@@ -219,7 +219,7 @@ def compute_total_raw_counts(df, nan_strategy=None):
     return df['total_raw_counts']
 
 
-def drop_outlier(df, window=11, store_outliers=False, min_counts=None, max_counts=None):
+def drop_outlier(df, window=5, store_outliers=False, min_counts=None, max_counts=None):
     """Computation of a moving modified Z-score based on the median absolute difference.
     
     References
@@ -552,18 +552,28 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.
 
 
 
-def sensing_depth(df,par,method='Schron_2017',dist=[1]):
+def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, method='Schron_2017',dist=[0.5]):
     """Function that computes the estimated sensing depth of the cosmic-ray neutron probe.
     The function offers several methods to compute the depth at which 86 % of the neutrons
     probes the soil profile.
     
     Keyword arguments:
-    
-    df -- This is the main DataFrame with tabular data to correct.
-    par -- User-defined arguments for the particular experiment or field
-    method -- 'Schron_2017' or 'Franz_2012'
-    dist -- List of radial distances at which to estimate the sensing depth. Only used for the 'Schron_2017' method.
-    
+
+    vwc : list or array
+        Estimated volumetric water content for each timestamp.
+    pressure : list or array
+        Atmospheric pressure in hPa for each timestamp.
+    p_ref : float
+        Reference pressure in hPa.
+    bulk_density : float
+        Soil bulk density.
+    Wlat : float
+        Lattice water content.
+    method : str
+        Method to compute the sensing depth. Options are 'Schron_2017' or 'Franz_2012'.
+    dist : list or array
+        List of radial distances at which to estimate the sensing depth. Only used for the 'Schron_2017' method.
+
     References:
     Franz, T.E., Zreda, M., Ferre, T.P.A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X. and Shuttleworth, W.J., 2012.
     Measurement depth of the cosmic ray soil moisture probe affected by hydrogen from various sources.
@@ -578,21 +588,21 @@ def sensing_depth(df,par,method='Schron_2017',dist=[1]):
     if method == 'Schron_2017':
         
         # See Appendix A of Schrön et al. (2017)
-        Fp = 0.4922 / (0.86 - np.exp(-1*df['pressure']/par['Pref']));
+        Fp = 0.4922 / (0.86 - np.exp(-1 * pressure / p_ref));
         Fveg = 0
-        
+        results = []
         for d in dist:
             # Compute r_star
             r_start = d/Fp 
             
             # Compute soil depth that accounts for 86% of the neutron flux
-            col_name = 'sensing_depth_D86_' + str(d) + 'm'
-            df[col_name] = 1/par['bulk_density'] * (8.321+0.14249*(0.96655 + np.exp(-0.01*r_start))*(20+(par['Wlat']+df['vwc'])) / (0.0429+(par['Wlat']+df['vwc'])))
+            D86 = 1/ bulk_density * (8.321+0.14249*(0.96655 + np.exp(-0.01*r_start))*(20+(Wlat+vwc)) / (0.0429+(Wlat+vwc)))
+            results.append(D86)
 
     elif method == 'Franz_2012':
-        df['sensing_depth_D86'] = 5.8/(par['bulk_density']*par['Wlat']+ df['vwc']+0.0829)
+        results = [5.8/(bulk_density*Wlat+vwc+0.0829)]
         
-    return df
+    return results
     
     
 def nrad_weight(h,theta,distances,depth,rhob=1.4):
@@ -669,16 +679,110 @@ def nrad_weight(h,theta,distances,depth,rhob=1.4):
 
     return weights
 
-    
+
+def haversine(lat1, lng1, lat2, lng2):
+    """Calculate the great circle distance between two points on the earth (specified in decimal degrees).
+
+    Parameters
+    ----------
+    lat1 : float
+        Latitude of the first point.
+    lng1 : float
+        Longitude of the first point.
+    lat2 : float
+        Latitude of the second point.
+    lng2 : float
+        Longitude of the second point.
+
+    Returns
+    -------
+    Distance between the two points in meters.
+
+    References
+    ----------
+    https://en.wikipedia.org/wiki/Haversine_formula
+    """
+
+    # Convert decimal degrees to radians
+    lng1, lat1, lng2, lat2 = map(np.radians, [lng1, lat1, lng2, lat2])
+
+    # Haversine formula
+    dlng = lng2 - lng1
+    dlat = lat2 - lat1
+    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlng/2)**2
+    c = 2 * np.arcsin(np.sqrt(a))
+
+    # Radius of earth in kilometers is 6371
+    km = 6371* c
+    return km*1000
+
+def spatial_smooth(sm, lat, lng, max_dist=500, min_neighbours=3, intensity=1):
+    """Spatial smoothing of soil moisture data using inverse distance weighting.
+
+    Parameters
+    ----------
+    sm : list or array
+        Soil moisture in mm of water.
+    lat : list or array
+        Latitude of the measurement points.
+    lng : list or array
+        Longitude of the measurement points.
+    max_dist : float
+        Maximum distance to consider for the spatial smoothing in meters.
+    min_neighbours : int
+        Minimum number of neighbours to consider for the spatial smoothing.
+    intensity : int
+        Intensity of the inverse distance weighting.
+
+    Returns
+    -------
+    Spatially smoothed soil moisture in mm of water.
+
+    References
+    ----------
+    """
+
+
+    sm_ini = np.array(sm)
+    sm_result = np.array(sm)
+
+    for i in range(len(lat)):
+        sm_i = np.array([])
+        for j in range(len(lat)):
+            dist = haversine(lat[i], lng[i], lat[j], lng[j])
+            if dist <= max_dist and sm_ini[j] > 0:
+                sm_i = np.append(sm_i, sm_ini[j])
+        if len(sm_i) >= min_neighbours:
+            sm_result[i] = np.average(sm_i)
+        else:
+            sm_result[i] = sm_ini[i]
+    return sm_result
+
+
+
+
+
+
+
+
+
+
+
 def storage(sm,T=1,Z_surface=150,Z_subsurface=1000):
     """Exponential filter to estimate soil moisture in the rootzone from surface observtions.
     
     Parameters
     ----------
-    df : This is the main DataFrame with tabular data to correct.
-    Zsurface : Depth of surface layer in mm. This should be an intermediate value according to the 
-                sensing depth computed using the D86 method.
-    T : Characteristic time length in the same units as the measurement interval    
+    sm : list or array
+        Soil moisture in mm of water.
+    T : float
+        Characteristic time length in the same units as the measurement interval.
+    Z_surface : float
+        Depth of surface layer in mm. This should be an intermediate value according to the
+        sensing depth computed using the D86 method.
+    Z_subsurface : float
+        Depth of subsurface layer in mm.
+
     
     Returns
     -------
@@ -762,10 +866,18 @@ def cutoff_rigidity(lat,lon):
     return np.round(zq,2)
 
 
-def find_neutron_detectors(Rc, timestamps=None):
+def find_neutron_detectors(Rc, start_date=None, end_date=None):
     """
-    Inputs:
-        - Rc = Cutoff rigidity in GV
+    Parameters
+    ----------
+
+    Rc : Cutoff rigidity in GV. Values in range 1.0 to 3.0 GV.
+
+    start_date : Datetime object. Start date for the period of interest.
+
+    end_date : Datetime object. End date for the period of interest.
+
+
         
     Outputs:
         -List of top five stations with closes cutoff rigidity. 
@@ -786,12 +898,12 @@ def find_neutron_detectors(Rc, timestamps=None):
     # Sort stations by closest cutoff rigidity
     idx_R = (stations['R'] - Rc).abs().argsort()
 
-    if timestamps is not None:
+    if start_date is not None and end_date is not None:
         stations["Period available"] = False
         for i in range(10):
             station = stations.iloc[idx_R[i]]["STID"]
             try:
-                if get_incoming_neutron_flux(timestamps, station, verbose=-1) is not None:
+                if get_incoming_neutron_flux(start_date, end_date, station, verbose=-1) is not None:
                     stations.iloc[idx_R[i],-1] = True
             except:
                 pass
@@ -810,5 +922,8 @@ def find_neutron_detectors(Rc, timestamps=None):
     print('')
     print(f"Your cutoff rigidity is {Rc} GV")
     print(result)
+
+
+
 
 
