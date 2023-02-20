@@ -487,7 +487,7 @@ def interpolate_incoming_flux(df_flux, timestamps):
     return df_flux.loc[timestamps]
 
 
-def smooth_counts(df,window=11,order=3):
+def smooth_counts(df,window=5,order=3, method='moving_median'):
     """Use a Savitzky-Golay filter to smooth the signal of corrected neutron counts.
     
     Parameters
@@ -495,7 +495,10 @@ def smooth_counts(df,window=11,order=3):
     df : DataFrame
         Dataframe containing the corrected neutron counts.
     window : int
-        Window size for the Savitzky-Golay filter. Default is 11.
+        Window size for the Savitzky-Golay filter. Default is 5.
+    method : str
+        Method to use for smoothing the data. Default is 'moving_median'.
+        Options are 'moving_average', 'moving_median' and 'savitzky_golay'.
     order : int
         Order of the Savitzky-Golay filter. Default is 3.
 
@@ -507,16 +510,21 @@ def smooth_counts(df,window=11,order=3):
     References:
     Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020. Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9. doi.org/10.3389/frwa.2020.00009
     """
-    if df.isna().all().any():
-        raise ValueError('Dataframe contains NaN values. Please remove NaN values before smoothing the data.')
+    if method == 'moving_average':
+        df = df.rolling(window=window, center=True).mean()
+    elif method == 'moving_median':
+        df = df.rolling(window=window, center=True).median()
 
-    if type(df) == pd.core.series.Series:
-        filtered = np.round(savgol_filter(df,window,order))
-        df = pd.DataFrame(filtered,columns=['counts'], index=df.index)
-    elif type(df) == pd.core.frame.DataFrame:
-        for col in df.columns:
-            df[col] = np.round(savgol_filter(df[col],window,order))
+    elif method == 'savitzky_golay':
+        if df.isna().all().any():
+            raise ValueError('Dataframe contains NaN values. Please remove NaN values before smoothing the data.')
 
+        if type(df) == pd.core.series.Series:
+            filtered = np.round(savgol_filter(df,window,order))
+            df = pd.DataFrame(filtered,columns=['counts'], index=df.index)
+        elif type(df) == pd.core.frame.DataFrame:
+            for col in df.columns:
+                df[col] = np.round(savgol_filter(df[col],window,order))
     return df
 
 def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.115):
