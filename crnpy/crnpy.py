@@ -511,9 +511,9 @@ def smooth_counts(df,window=5,order=3, method='moving_median'):
     Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020. Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9. doi.org/10.3389/frwa.2020.00009
     """
     if method == 'moving_average':
-        df = df.rolling(window=window, center=True).mean()
+        df = df.rolling(window=window, center=True, min_periods=1).mean()
     elif method == 'moving_median':
-        df = df.rolling(window=window, center=True).median()
+        df = df.rolling(window=window, center=True, min_periods=1).median()
 
     elif method == 'savitzky_golay':
         if df.isna().all().any():
@@ -724,7 +724,7 @@ def haversine(lat1, lng1, lat2, lng2):
     km = 6371* c
     return km*1000
 
-def spatial_smooth(sm, lat, lng, max_dist=500, min_neighbours=3, intensity=1):
+def spatial_smooth(sm, lat, lng, max_dist=500, min_neighbours=3):
     """Spatial smoothing of soil moisture data using inverse distance weighting.
 
     Parameters
