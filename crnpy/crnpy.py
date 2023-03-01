@@ -516,8 +516,8 @@ def smooth_counts(df,window=5,order=3, method='moving_median'):
         df = df.rolling(window=window, center=True, min_periods=1).median()
 
     elif method == 'savitzky_golay':
-        if df.isna().all().any():
-            raise ValueError('Dataframe contains NaN values. Please remove NaN values before smoothing the data.')
+        if df.isna().any():
+            print('Dataframe contains NaN values. Please remove NaN values before smoothing the data.')
 
         if type(df) == pd.core.series.Series:
             filtered = np.round(savgol_filter(df,window,order))
@@ -525,6 +525,9 @@ def smooth_counts(df,window=5,order=3, method='moving_median'):
         elif type(df) == pd.core.frame.DataFrame:
             for col in df.columns:
                 df[col] = np.round(savgol_filter(df[col],window,order))
+    else:
+        raise ValueError('Invalid method. Please select a valid filtering method., options are: moving_average, moving_median, savitzky_golay')
+    df = df.ffill(limit=window).bfill(limit=window).copy()
     return df
 
 def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.115):
