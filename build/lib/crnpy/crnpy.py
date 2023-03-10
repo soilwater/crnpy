@@ -325,16 +325,13 @@ def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neu
     COSMOS: the cosmic-ray soil moisture observing system. Hydrol. Earth Syst. Sci. 16, 4079–4099.
     doi: 10.5194/hess-16-4079-2012
     
-    Hawdon, A., McJannet, D. and Wallace, J., 2014. Calibration and correction procedures for cosmic‐ray 
-    neutron soil moisture probes located across Australia. Water Resources Research, 50(6), pp.5029-5043.
-    
     Andreasen, M., Jensen, K.H., Desilets, D., Franz, T.E., Zreda, M., Bogena, H.R. and Looms, M.C., 2017. 
     Status and perspectives on the cosmic‐ray neutron method for soil moisture estimation and other 
     environmental science applications. Vadose zone journal, 16(8), pp.1-11. doi.org/10.2136/vzj2017.04.0086
     """
        
     ### Barometric pressure factor
-    fp = np.exp((pressure - Pref) / L)
+    fp = np.exp((Pref - pressure) / L) # Andreasen et al. 2017 Eq.
 
     ### Atmospheric water vapor factor
     # Saturation vapor pressure
@@ -529,6 +526,59 @@ def smooth_counts(df,window=5,order=3, method='moving_median'):
         raise ValueError('Invalid method. Please select a valid filtering method., options are: moving_average, moving_median, savitzky_golay')
     df = df.ffill(limit=window).bfill(limit=window).copy()
     return df
+
+
+def bwe_correction(counts, bwe, r2_N0=0.05):
+    """Function to correct for biomass effects in neutron counts.
+    following the approach described in Baatz et al., 2015.
+    
+    Parameters
+    ----------
+    counts : array or pd.Series or pd.DataFrame
+        Array of ephithermal neutron counts.
+    bwe : float
+        Biomass water equivalent kg m-2.
+    r2_N0 : float
+        Ratio of the neutron counts reduction (counts kg-1) to the neutron calibration constant (N0). Default is 0.05 (Baatz et al., 2015).
+        
+    Returns
+    -------
+    Array of corrected neutron counts for biomass effects.
+    
+    References:
+    Baatz, R., H. R. Bogena, H.-J. Hendricks Franssen, J. A. Huisman, C. Montzka, and H. Vereecken (2015),
+    An empiricalvegetation correction for soil water content quantification using cosmic ray probes,
+    Water Resour. Res., 51, 2030–2046, doi:10.1002/ 2014WR016443.
+
+    """
+    return counts/(1 + bwe*r2_N0)
+
+def biomass_to_bwe(biomass_dry, biomass_wet, fWE=0.494):
+    """Function to convert biomass to biomass water equivalent.
+    
+    Parameters
+    ----------
+    biomass_dry : float
+        Dry biomass in kg m-2.
+    biomass_wet : float
+        Wet biomass in kg m-2.
+    fWE : float
+     Stoichiometric ratio of H2O to organic carbon molecules in the plant (assuming this is mostly cellulose)
+     Default is 0.494 (Wahbi & Avery, 2018).
+
+    Returns
+    -------
+    Biomass water equivalent in kg m-2.
+
+    References:
+    Wahbi, A., Avery, W. (2018). In Situ Destructive Sampling. In:
+    Cosmic Ray Neutron Sensing: Estimation of Agricultural Crop Biomass Water Equivalent.
+    Springer, Cham. https://doi.org/10.1007/978-3-319-69539-6_2
+
+    """
+    return (biomass_wet - biomass_dry)+fWE*biomass_dry
+    
+
 
 def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.115):
     """Function to convert corrected and filtered neutron counts into volumetric water content

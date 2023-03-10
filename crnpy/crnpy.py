@@ -325,16 +325,13 @@ def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neu
     COSMOS: the cosmic-ray soil moisture observing system. Hydrol. Earth Syst. Sci. 16, 4079–4099.
     doi: 10.5194/hess-16-4079-2012
     
-    Hawdon, A., McJannet, D. and Wallace, J., 2014. Calibration and correction procedures for cosmic‐ray 
-    neutron soil moisture probes located across Australia. Water Resources Research, 50(6), pp.5029-5043.
-    
     Andreasen, M., Jensen, K.H., Desilets, D., Franz, T.E., Zreda, M., Bogena, H.R. and Looms, M.C., 2017. 
     Status and perspectives on the cosmic‐ray neutron method for soil moisture estimation and other 
     environmental science applications. Vadose zone journal, 16(8), pp.1-11. doi.org/10.2136/vzj2017.04.0086
     """
        
     ### Barometric pressure factor
-    fp = np.exp((pressure - Pref) / L)
+    fp = np.exp((Pref - pressure) / L) # Andreasen et al. 2017 Eq.
 
     ### Atmospheric water vapor factor
     # Saturation vapor pressure
@@ -531,7 +528,7 @@ def smooth_counts(df,window=5,order=3, method='moving_median'):
     return df
 
 
-def biomass_correction(counts, bwe, r2_N0=0.05):
+def bwe_correction(counts, bwe, r2_N0=0.05):
     """Function to correct for biomass effects in neutron counts.
     following the approach described in Baatz et al., 2015.
     
