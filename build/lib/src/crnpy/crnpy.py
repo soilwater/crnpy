@@ -2,7 +2,8 @@
 """
 `crnpy` is a Python package for processing cosmic ray neutron data.
 
- Created by Andres Patrignani and Joaquin Peraza
+# Created by Andres Patrignani Nov-2021
+# Last edited May-2023 by Joaquin Peraza
 """
 
 
@@ -29,30 +30,17 @@ if sys.version_info < python_version:
 
 
 def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True):
+    """Helper function to change the format and round timestamps
+
+    Parameters
+    ----------
+    round_time : str or None
+        String denoting the rounding interval. 'H'=hourly, 'M'=minute, or None
+
+    Returns
+    -------
+    DataFrame with formatted timestamps and rounded time.
     """
-     Helper function to change the format and round timestamps.
-
-     Args:
-         df (pandas.DataFrame): DataFrame with timestamp in the index.
-         col (str, optional): Column with the timestamp. Default is 'timestamp'.
-         format (str, optional): Format of the timestamp. Default is '%Y-%m-%d %H:%M:%S'.
-         freq (str, optional): Rounding interval. 'H' for hourly, 'M' for minute, or None. Default is 'H'.
-         round_time (bool, optional): Whether to round timestamps to nearest frequency. Default is True.
-
-     Returns:
-         (pandas.DataFrame): DataFrame with formatted timestamps and rounded time.
-
-     Examples:
-            >>> from crnpy import crnpy
-            >>> import pandas as pd
-            >>> df = pd.DataFrame({'timestamp':['2020-01-01 00:00:00','2020-01-01 00:30:00','2020-01-01 01:00:00']})
-            >>> df = crnpy.format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True)
-            >>> df
-                            timestamp
-            0   2020-01-01 00:00:00
-            1   2020-01-01 00:00:00
-            2   2020-01-01 01:00:00
-     """
 
     # Change format of timestamp
     df[col] = pd.to_datetime(df[col], format=format)
@@ -77,23 +65,17 @@ def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', r
     return df
 
 def count_time(df):
-    """
-    Approximate counting time.
+    """Approximate counting time
 
-    Args:
-        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts and timestamp in the index.
+    Parameters
+    ----------
+    count_cols : DataFrame
+        Dataframe containing only the columns with neutron counts and timestamp in the index.
 
-    Returns:
-        (pandas.DataFrame): Dataframe with the approximate counting time for each observation.
-
-    Examples:
-        Using `count_time` in a console environment:
-
-        >>> df = pd.DataFrame(...)
-        >>> count_time(df)
-        0   3600.0
-        1   3600.0
-        2   3600.0
+    Returns
+    -------
+    DataFrame
+        Dataframe with the approximate counting time for each detector.
     """
 
     # Check that index is a timestamp
@@ -106,30 +88,25 @@ def count_time(df):
     return count_time
 
 def fill_counts(df, count_times=None, expected_time=False, threshold=0.25, limit=3):
+    """Fill missing neutron counts. Periods shorter than threshold are replaced with NaN.
 
+    Parameters
+    ----------
+    df : DataFrame
+        DataFrame with neutron counts, might have count_time column(s).
+
+    count_time : pd.Series or pd.DataFrame
+        Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
+    count_times_normal : int
+        Expected counting time in seconds. Default is 3600 seconds.
+    threshold : float
+        Minimum fraction of the neutron integration time. Default is 0.25.
+
+    Returns
+    -------
+    DataFrame
+        with linearly interpolated neutron counts.
     """
-    Fill missing neutron counts. Observation periods shorter than threshold are discarded (replaced with NaN).
-    
-    Args:
-        df (pandas.DataFrame): DataFrame with neutron counts, might have count_time column(s).
-        count_time (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
-        expected_time (int): Expected counting time in seconds. If not provided, it is calculated as the median of the counting times.
-        threshold (float): Minimum fraction of the neutron integration time. Default is 0.25.
-
-    Returns:
-        (pandas.DataFrame): DataFrame with linearly interpolated neutron counts.
-
-    Examples:
-        Using `fill_counts` in a console environment:
-
-        >>> df = pd.DataFrame({'counts':[100,105,98,102], count_time:[3600,200,3600,3600]})
-        >>> fill_counts(df, count_time=count_time, expected_time=3600, threshold=0.25)
-        0   100.0
-        1   NaN
-        2   98.0
-        3   102.0
-    """
-
     df=df.copy()
 
     if type(df.index) == pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
@@ -169,17 +146,21 @@ def fill_counts(df, count_times=None, expected_time=False, threshold=0.25, limit
     return df
 
 def normalize_counts(df, count_time=3600, count_times=None):
-    """
-    Normalize neutron counts to the desired counting time.
-    
-    Args:
-        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
-        count_time (int): Count time in seconds for normalization. Default is 3600 seconds.
-        count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
-        
-    Returns:
-        (pandas.DataFrame): Normalized neutron counts.
+    """Normalize neutron counts to the desired counting time.
 
+    Parameters
+    ----------
+    df : DataFrame
+        Dataframe containing only the columns with neutron counts.
+    count_times : pd.Series or pd.DataFrame
+        Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
+    count_time : int
+        Count time in seconds for normalization. Default is 3600 seconds.
+
+    Returns
+    -------
+    DataFrame
+        Normalized neutron counts.
     """
 
     if count_times is None and type(df.index) == pd.core.indexes.datetimes.DatetimeIndex:
@@ -207,15 +188,17 @@ def normalize_counts(df, count_time=3600, count_times=None):
 
 
 def compute_total_raw_counts(df, nan_strategy=None):
-    """
-    Compute the sum of uncorrected neutron counts for all detectors.
+    """Compute the sum of uncorrected neutron counts for all detectors.
 
-    Args:
-        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
-        nan_strategy (str): Strategy to use for NaN values. Options are 'interpolate', 'average', or None. Default is None.
+    Parameters
+    ----------
+    df : DataFrame
+        Dataframe containing only the columns with neutron counts.
 
-    Returns:
-        (pandas.DataFrame): Dataframe with the sum of uncorrected neutron counts for all detectors.
+    Returns
+    -------
+    DataFrame
+        Dataframe with the sum of uncorrected neutron counts for all detectors.
     """
     df=df.copy()
 
@@ -243,24 +226,30 @@ def compute_total_raw_counts(df, nan_strategy=None):
 
 
 def drop_outlier(df, window=5, store_outliers=False, min_counts=None, max_counts=None):
+    """Computation of a moving modified Z-score based on the median absolute difference.
+
+    References
+    ----------
+    Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
+
+    Parameters
+    ----------
+    cols_counts : DataFrame
+        Dataframe containing only the columns with neutron counts.
+    window : int
+        Window size for the moving median. Default is 11.
+    store_outliers : bool
+        If True, store the outliers in a new column. Default is False.
+    min_counts : int
+        Minimum number of counts for a reading to be considered valid. Default is None.
+    max_counts : int
+        Maximum number of counts for a reading to be considered valid. Default is None.
+
+    Returns
+    -------
+    DataFrame
+        Dataframe without outliers.
     """
-    Computation of a moving modified Z-score based on the median absolute difference.
-    
-    Args:
-        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
-        window (int): Window size for the moving median. Default is 11.
-        store_outliers (bool): If True, store the outliers in a new column. Default is False.
-        min_counts (int): Minimum number of counts for a reading to be considered valid. Default is None.
-        max_counts (int): Maximum number of counts for a reading to be considered valid. Default is None.
-
-    Returns:
-        (pandas.DataFrame): Dataframe without outliers.
-
-    References:
-        Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
-    """
-
-
     if min_counts is not None:
         lower_count = np.sum(df < min_counts)
         if lower_count > len(df) * 0.25:
@@ -291,52 +280,63 @@ def drop_outlier(df, window=5, store_outliers=False, min_counts=None, max_counts
 
 
 def fill_missing_atm(cols_atm, limit=24):
-    """
-    Fill missing values in atmospheric variables. Gap filling is performed using a
+    """Fill missing values in atmospheric variables. Gap filling is performed using a
     piecewise cubic Hermite interpolating polynomial (pchip method) that is restricted to intervals
     of missing data with a limited number of values and surrounded by valid observations.
     There is no interpolation at the end of the time series.
 
-    Args:
-        col_atm (pandas.Series or pandas.DataFrame): Atmospheric variables to fill.
-        limit (int): Maximum number of consecutive missing values to interpolate. Default is 24.
+    Parameters
+    ----------
+    col_atm : pd.Series or pd.DataFrame
+        Atmospheric variables to fill.
+    limit : int
+        Maximum number of consecutive missing values to interpolate. Default is 24.
 
-    Returns:
-        (pandas.DataFrame): Atmospheric variables with filled missing values using a piecewise cubic Hermite polynomial.
-
-    References:
-        https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.interpolate.html
+    Returns
+    -------
+    DataFrame
+        Atmospheric variables with filled missing values using a piecewise cubic Hermite polynomial.
     """
 
     # Fill missing values in atmospheric variables
     return cols_atm.interpolate(method='pchip', limit=limit, limit_direction='both')
 
 def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neutrons=None, incoming_Ref=None):
-    """
-    Correct neutron counts for atmospheric factors and incoming neutron flux.
-    
-    Args:
-        counts (list or array): Neutron counts to correct.
-        pressure (list or array): Atmospheric pressure readings.
-        humidity (list or array): Atmospheric humidity readings in %.
-        temp (list or array): Atmospheric temperature readings in Celsius.
-        Pref (float): Reference atmospheric pressure in millibars (mbar).
-        Aref (float): Reference absolute humidity.
-        L (float): Atmospheric attenuation coefficient.
-        incoming_neutrons (list or array): Incoming neutron flux. Default is None.
-        incoming_Ref (float): Reference incoming neutron flux. Default is None.
-        
-    Returns:
-        (numpy.array): Total neutron counts corrected by atmospheric conditions.
-        
-    References:
-        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., et al. (2012).
-        COSMOS: the cosmic-ray soil moisture observing system. Hydrol. Earth Syst. Sci. 16, 4079–4099.
-        doi: 10.5194/hess-16-4079-2012
+    """Correct neutron counts for atmospheric factors and incoming neutron flux.
 
-        Andreasen, M., Jensen, K.H., Desilets, D., Franz, T.E., Zreda, M., Bogena, H.R. and Looms, M.C., 2017.
-        Status and perspectives on the cosmic‐ray neutron method for soil moisture estimation and other
-        environmental science applications. Vadose zone journal, 16(8), pp.1-11. doi.org/10.2136/vzj2017.04.0086
+    Parameters
+    ----------
+    counts : list or array
+        Neutron counts to correct.
+    pressure : list or array
+        Atmospheric pressure readings.
+    humidity : list or array
+        Atmospheric humidity readings in %.
+    temp : list or array
+        Atmospheric temperature readings in Celsius.
+    Pref : float
+        Reference atmospheric pressure in millibars (mbar).
+    Aref : float
+        Reference absolute humidity.
+    L : float
+        Atmospheric attenuation coefficient.
+    incoming_neutrons : list or array
+        Incoming neutron flux. Default is None.
+    incoming_Ref : float
+        Reference incoming neutron flux. Default is None.
+
+    Returns
+    -------
+    Total neutron counts corrected by atmospheric conditions.
+
+    References:
+    Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., et al. (2012).
+    COSMOS: the cosmic-ray soil moisture observing system. Hydrol. Earth Syst. Sci. 16, 4079–4099.
+    doi: 10.5194/hess-16-4079-2012
+
+    Andreasen, M., Jensen, K.H., Desilets, D., Franz, T.E., Zreda, M., Bogena, H.R. and Looms, M.C., 2017.
+    Status and perspectives on the cosmic‐ray neutron method for soil moisture estimation and other
+    environmental science applications. Vadose zone journal, 16(8), pp.1-11. doi.org/10.2136/vzj2017.04.0086
     """
 
     ### Barometric pressure factor

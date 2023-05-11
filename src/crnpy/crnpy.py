@@ -1,5 +1,11 @@
-#!/usr/bin/env python3
-# Created by Andres Patrignani Nov-2021
+# crnpy/crnpy.py
+"""
+`crnpy` is a Python package for processing cosmic ray neutron data.
+
+ Created by Andres Patrignani and Joaquin Peraza
+"""
+
+
 
 # Import modules
 import sys
@@ -10,7 +16,6 @@ from scipy.signal import savgol_filter
 from scipy.interpolate import griddata, pchip_interpolate
 import requests
 import io, datetime, os
-
 
 
 # Define python version
@@ -24,25 +29,37 @@ if sys.version_info < python_version:
 
 
 def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True):
-    """Helper function to change the format and round timestamps
-    
-    Parameters
-    ----------
-    round_time : str or None
-        String denoting the rounding interval. 'H'=hourly, 'M'=minute, or None
+    """Helper function to change the format and round timestamps.
 
-    Returns
-    -------
-    DataFrame with formatted timestamps and rounded time.
-    """
-    
+     Args:
+         df (pandas.DataFrame): DataFrame with timestamp in the index.
+         col (str, optional): Column with the timestamp. Default is 'timestamp'.
+         format (str, optional): Format of the timestamp. Default is '%Y-%m-%d %H:%M:%S'.
+         freq (str, optional): Rounding interval. 'H' for hourly, 'M' for minute, or None. Default is 'H'.
+         round_time (bool, optional): Whether to round timestamps to nearest frequency. Default is True.
+
+     Returns:
+         (pandas.DataFrame): DataFrame with formatted timestamps and rounded time.
+
+     Examples:
+            >>> from crnpy import crnpy
+            >>> import pandas as pd
+            >>> df = pd.DataFrame({'timestamp':['2020-01-01 00:00:00','2020-01-01 00:30:00','2020-01-01 01:00:00']})
+            >>> df = crnpy.format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True)
+            >>> df
+                            timestamp
+            0   2020-01-01 00:00:00
+            1   2020-01-01 00:00:00
+            2   2020-01-01 01:00:00
+     """
+
     # Change format of timestamp
     df[col] = pd.to_datetime(df[col], format=format)
-    
+
     # Round timestamps to nearest frequency
     if round_time:
         df[col] = df[col].dt.round(freq)
-        
+
     # Fill in rows with missing timestamps
     start_date = df[col].iloc[0]
     end_date = df[col].iloc[-1]
@@ -52,24 +69,29 @@ def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', r
             print('Adding missing date:',date)
             new_line = pd.DataFrame({col:date}, index=[-1]) # By default fills columns with np.nan
             source = pd.concat([df,new_line])
-                                 
+
     df.sort_values(by=col, inplace=True)
     df.reset_index(drop=True, inplace=True)
     df.set_index(col, inplace=True)
     return df
-      
+
 def count_time(df):
-    """Approximate counting time
+    """Approximate counting time.
 
-    Parameters
-    ----------
-    count_cols : DataFrame
-        Dataframe containing only the columns with neutron counts and timestamp in the index.
+    Args:
+        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts and timestamp in the index.
 
-    Returns
-    -------
-    DataFrame
-        Dataframe with the approximate counting time for each detector.
+    Returns:
+        (pandas.DataFrame): Dataframe with the approximate counting time for each observation.
+
+    Examples:
+        Using `count_time` in a console environment:
+
+        >>> df = pd.DataFrame(...)
+        >>> count_time(df)
+        0   3600.0
+        1   3600.0
+        2   3600.0
     """
 
     # Check that index is a timestamp
@@ -82,25 +104,28 @@ def count_time(df):
     return count_time
 
 def fill_counts(df, count_times=None, expected_time=False, threshold=0.25, limit=3):
-    """Fill missing neutron counts. Periods shorter than threshold are replaced with NaN.
+    """Fill missing neutron counts. Observation periods shorter than threshold are discarded (replaced with NaN).
+    
+    Args:
+        df (pandas.DataFrame): DataFrame with neutron counts, might have count_time column(s).
+        count_time (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
+        expected_time (int): Expected counting time in seconds. If not provided, it is calculated as the median of the counting times.
+        threshold (float): Minimum fraction of the neutron integration time. Default is 0.25.
 
-    Parameters
-    ----------
-    df : DataFrame
-        DataFrame with neutron counts, might have count_time column(s).
+    Returns:
+        (pandas.DataFrame): DataFrame with linearly interpolated neutron counts.
 
-    count_time : pd.Series or pd.DataFrame
-        Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
-    count_times_normal : int
-        Expected counting time in seconds. Default is 3600 seconds.
-    threshold : float
-        Minimum fraction of the neutron integration time. Default is 0.25.
+    Examples:
+        Using `fill_counts` in a console environment:
 
-    Returns
-    -------
-    DataFrame
-        with linearly interpolated neutron counts.
+        >>> df = pd.DataFrame({'counts':[100,105,98,102], count_time:[3600,200,3600,3600]})
+        >>> fill_counts(df, count_time=count_time, expected_time=3600, threshold=0.25)
+        0   100.0
+        1   NaN
+        2   98.0
+        3   102.0
     """
+
     df=df.copy()
 
     if type(df.index) == pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
@@ -141,20 +166,15 @@ def fill_counts(df, count_times=None, expected_time=False, threshold=0.25, limit
 
 def normalize_counts(df, count_time=3600, count_times=None):
     """Normalize neutron counts to the desired counting time.
+    
+    Args:
+        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
+        count_time (int): Count time in seconds for normalization. Default is 3600 seconds.
+        count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
+        
+    Returns:
+        (pandas.DataFrame): Normalized neutron counts.
 
-    Parameters
-    ----------
-    df : DataFrame
-        Dataframe containing only the columns with neutron counts.
-    count_times : pd.Series or pd.DataFrame
-        Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
-    count_time : int
-        Count time in seconds for normalization. Default is 3600 seconds.
-
-    Returns
-    -------
-    DataFrame
-        Normalized neutron counts.
     """
 
     if count_times is None and type(df.index) == pd.core.indexes.datetimes.DatetimeIndex:
@@ -183,16 +203,13 @@ def normalize_counts(df, count_time=3600, count_times=None):
 
 def compute_total_raw_counts(df, nan_strategy=None):
     """Compute the sum of uncorrected neutron counts for all detectors.
-    
-    Parameters
-    ----------
-    df : DataFrame
-        Dataframe containing only the columns with neutron counts.
-    
-    Returns
-    -------
-    DataFrame
-        Dataframe with the sum of uncorrected neutron counts for all detectors.
+
+    Args:
+        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
+        nan_strategy (str): Strategy to use for NaN values. Options are 'interpolate', 'average', or None. Default is None.
+
+    Returns:
+        (pandas.DataFrame): Dataframe with the sum of uncorrected neutron counts for all detectors.
     """
     df=df.copy()
 
@@ -222,31 +239,27 @@ def compute_total_raw_counts(df, nan_strategy=None):
 def drop_outlier(df, window=5, store_outliers=False, min_counts=None, max_counts=None):
     """Computation of a moving modified Z-score based on the median absolute difference.
     
-    References
-    ----------
-    Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
+    Args:
+        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
+        window (int): Window size for the moving median. Default is 11.
+        store_outliers (bool): If True, store the outliers in a new column. Default is False.
+        min_counts (int): Minimum number of counts for a reading to be considered valid. Default is None.
+        max_counts (int): Maximum number of counts for a reading to be considered valid. Default is None.
 
-    Parameters
-    ----------
-    cols_counts : DataFrame
-        Dataframe containing only the columns with neutron counts.
-    window : int
-        Window size for the moving median. Default is 11.
-    store_outliers : bool
-        If True, store the outliers in a new column. Default is False.
-    min_counts : int
-        Minimum number of counts for a reading to be considered valid. Default is None.
-    max_counts : int
-        Maximum number of counts for a reading to be considered valid. Default is None.
+    Returns:
+        (pandas.DataFrame): Dataframe without outliers.
 
-    Returns
-    -------
-    DataFrame
-        Dataframe without outliers.
+    References:
+        Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
     """
+
+
     if min_counts is not None:
         lower_count = np.sum(df < min_counts)
-        print(f"Discarded counts below {min_counts}: {lower_count}")
+        if lower_count > len(df) * 0.25:
+            print(f"WARNING: Discarded {lower_count} counts below {min_counts}. This is more than 25% of the total number of readings. Consider increasing the minimum counts threshold.")
+        else:
+            print(f"Discarded counts below {min_counts}: {lower_count}")
         df = df[df >= min_counts]
     if max_counts is not None:
         upper_count = np.sum(df > max_counts)
@@ -271,22 +284,20 @@ def drop_outlier(df, window=5, store_outliers=False, min_counts=None, max_counts
 
 
 def fill_missing_atm(cols_atm, limit=24):
-    """Fill missing values in atmospheric variables. Gap filling is performed using a 
+    """Fill missing values in atmospheric variables. Gap filling is performed using a
     piecewise cubic Hermite interpolating polynomial (pchip method) that is restricted to intervals
     of missing data with a limited number of values and surrounded by valid observations.
     There is no interpolation at the end of the time series.
-    
-    Parameters
-    ----------
-    col_atm : pd.Series or pd.DataFrame
-        Atmospheric variables to fill.
-    limit : int
-        Maximum number of consecutive missing values to interpolate. Default is 24.
 
-    Returns
-    -------
-    DataFrame
-        Atmospheric variables with filled missing values using a piecewise cubic Hermite polynomial.
+    Args:
+        col_atm (pandas.Series or pandas.DataFrame): Atmospheric variables to fill.
+        limit (int): Maximum number of consecutive missing values to interpolate. Default is 24.
+
+    Returns:
+        (pandas.DataFrame): Atmospheric variables with filled missing values using a piecewise cubic Hermite polynomial.
+
+    References:
+        https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.interpolate.html
     """
 
     # Fill missing values in atmospheric variables
@@ -295,55 +306,44 @@ def fill_missing_atm(cols_atm, limit=24):
 def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neutrons=None, incoming_Ref=None):
     """Correct neutron counts for atmospheric factors and incoming neutron flux.
     
-    Parameters
-    ----------
-    counts : list or array
-        Neutron counts to correct.
-    pressure : list or array
-        Atmospheric pressure readings.
-    humidity : list or array
-        Atmospheric humidity readings in %.
-    temp : list or array
-        Atmospheric temperature readings in Celsius.
-    Pref : float
-        Reference atmospheric pressure in millibars (mbar).
-    Aref : float
-        Reference absolute humidity.
-    L : float
-        Atmospheric attenuation coefficient.
-    incoming_neutrons : list or array
-        Incoming neutron flux. Default is None.
-    incoming_Ref : float
-        Reference incoming neutron flux. Default is None.
-    
-    Returns
-    -------
-    Total neutron counts corrected by atmospheric conditions.
-    
+    Args:
+        counts (list or array): Neutron counts to correct.
+        pressure (list or array): Atmospheric pressure readings.
+        humidity (list or array): Atmospheric humidity readings in %.
+        temp (list or array): Atmospheric temperature readings in Celsius.
+        Pref (float): Reference atmospheric pressure in millibars (mbar).
+        Aref (float): Reference absolute humidity.
+        L (float): Atmospheric attenuation coefficient.
+        incoming_neutrons (list or array): Incoming neutron flux. Default is None.
+        incoming_Ref (float): Reference incoming neutron flux. Default is None.
+        
+    Returns:
+        (numpy.array): Total neutron counts corrected by atmospheric conditions.
+        
     References:
-    Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., et al. (2012). 
-    COSMOS: the cosmic-ray soil moisture observing system. Hydrol. Earth Syst. Sci. 16, 4079–4099.
-    doi: 10.5194/hess-16-4079-2012
-    
-    Andreasen, M., Jensen, K.H., Desilets, D., Franz, T.E., Zreda, M., Bogena, H.R. and Looms, M.C., 2017. 
-    Status and perspectives on the cosmic‐ray neutron method for soil moisture estimation and other 
-    environmental science applications. Vadose zone journal, 16(8), pp.1-11. doi.org/10.2136/vzj2017.04.0086
+        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., et al. (2012).
+        COSMOS: the cosmic-ray soil moisture observing system. Hydrol. Earth Syst. Sci. 16, 4079–4099.
+        doi: 10.5194/hess-16-4079-2012
+
+        Andreasen, M., Jensen, K.H., Desilets, D., Franz, T.E., Zreda, M., Bogena, H.R. and Looms, M.C., 2017.
+        Status and perspectives on the cosmic‐ray neutron method for soil moisture estimation and other
+        environmental science applications. Vadose zone journal, 16(8), pp.1-11. doi.org/10.2136/vzj2017.04.0086
     """
-       
+
     ### Barometric pressure factor
-    fp = np.exp((Pref - pressure) / L) # Andreasen et al. 2017 Eq.
+    fp = np.exp((Pref - pressure) / L) # Zreda et al. 2017 Eq 5.
 
     ### Atmospheric water vapor factor
     # Saturation vapor pressure
     e_sat = 0.611 * np.exp(17.502 * temp / (temp + 240.97)) * 1000 # in Pascals Eq. 3.8 p.41 Environmental Biophysics (Campbell and Norman)
-    
+
     # Vapor pressure Pascals
-    Pw = e_sat * humidity/100;
-    
+    Pw = e_sat * humidity/100
+
     # Absolute humidity (g/m^3)
     C = 2.16679 # g K/J;
     A = C * Pw / (temp + 273.15)
-    fw = 1 + 0.0054*(A - Aref);
+    fw = 1 + 0.0054*(A - Aref) # Zreda et al. 2017 Eq 6.
 
     ### Incoming neutron flux factor
     if incoming_neutrons is None:
@@ -355,10 +355,10 @@ def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neu
             warnings.warn('Reference incoming neutron flux not provided. Using first value of incoming neutron flux.')
 
         fi = incoming_neutrons/incoming_Ref
-        fi.fillna(1.0, inplace=True) # Use a value of 1 for days without data 
+        fi.fillna(1.0, inplace=True) # Use a value of 1 for days without data
 
     # Apply correction factors
-    return np.round(counts*(fp*fw/fi))
+    return np.round((counts*fw)/(fp*fi))
 
 
 
@@ -378,19 +378,22 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, verbo
 
     Keyword arguments:
     utc_offset -- UTC offset in hours. Default is 0.
-    
+
     Returns:
     Neutron flux in counts per hour and timestamps.
-    
+
     References:
     Documentation available:https://www.nmdb.eu/nest/help.php#howto
-    
+
+    """
+    # convert docstring to google style
+    """
     """
 
     # Example: get_incoming_flux(station='IRKT',start_date='2020-04-10 11:00:00',end_date='2020-06-18 17:00:00')
     # Template url = 'http://nest.nmdb.eu/draw_graph.php?formchk=1&stations[]=KERG&output=ascii&tabchoice=revori&dtype=corr_for_efficiency&date_choice=bydate&start_year=2009&start_month=09&start_day=01&start_hour=00&start_min=00&end_year=2009&end_month=09&end_day=05&end_hour=23&end_min=59&yunits=0'
 
-    
+
     # Add 1 hour to ensure the last date is included in the request.
     end_date += pd.Timedelta(hours=1)
 
@@ -441,7 +444,7 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, verbo
     # Check if all values from selected detector are NaN. If yes, warn the user
     if df_flux['counts'].isna().all():
         warnings.warn('Data for selected neutron detectors appears to be unavailable for the selected period')
-    
+
 
     # Print acknowledgement to inform users about restrictions and to acknowledge the NMDB database
     acknowledgement = """Data retrieved via NMDB are the property of the individual data providers. These data are free for non commercial
@@ -486,7 +489,7 @@ def interpolate_incoming_flux(df_flux, timestamps):
 
 def smooth_counts(df,window=5,order=3, method='moving_median'):
     """Use a Savitzky-Golay filter to smooth the signal of corrected neutron counts.
-    
+
     Parameters
     ----------
     df : DataFrame
@@ -531,7 +534,7 @@ def smooth_counts(df,window=5,order=3, method='moving_median'):
 def bwe_correction(counts, bwe, r2_N0=0.05):
     """Function to correct for biomass effects in neutron counts.
     following the approach described in Baatz et al., 2015.
-    
+
     Parameters
     ----------
     counts : array or pd.Series or pd.DataFrame
@@ -540,22 +543,22 @@ def bwe_correction(counts, bwe, r2_N0=0.05):
         Biomass water equivalent kg m-2.
     r2_N0 : float
         Ratio of the neutron counts reduction (counts kg-1) to the neutron calibration constant (N0). Default is 0.05 (Baatz et al., 2015).
-        
+
     Returns
     -------
     Array of corrected neutron counts for biomass effects.
-    
+
     References:
     Baatz, R., H. R. Bogena, H.-J. Hendricks Franssen, J. A. Huisman, C. Montzka, and H. Vereecken (2015),
     An empiricalvegetation correction for soil water content quantification using cosmic ray probes,
     Water Resour. Res., 51, 2030–2046, doi:10.1002/ 2014WR016443.
 
     """
-    return counts/(1 + bwe*r2_N0)
+    return counts/(1 - bwe*r2_N0)
 
 def biomass_to_bwe(biomass_dry, biomass_wet, fWE=0.494):
     """Function to convert biomass to biomass water equivalent.
-    
+
     Parameters
     ----------
     biomass_dry : float
@@ -577,7 +580,7 @@ def biomass_to_bwe(biomass_dry, biomass_wet, fWE=0.494):
 
     """
     return (biomass_wet - biomass_dry)+fWE*biomass_dry
-    
+
 
 
 def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.115):
@@ -600,13 +603,13 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.
     Keyword arguments:
 
     a0, a1, a2 -- Parameters given in Zreda et al., 2012.
-    
-    References: 
-    Desilets, D., M. Zreda, and T.P.A. Ferré. 2010. Nature’s neutron probe: 
+
+    References:
+    Desilets, D., M. Zreda, and T.P.A. Ferré. 2010. Nature’s neutron probe:
     Land surface hydrology at an elusive scale with cosmic rays. Water Resour. Res. 46:W11505.
     doi.org/10.1029/2009WR008726
     """
-    
+
     # Convert neutron counts into vwc
     vwc = (a0 / (counts/N0-a1) - a2 - Wlat - Wsoc) * bulk_density
     return vwc
@@ -617,7 +620,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, method='Schron_2017'
     """Function that computes the estimated sensing depth of the cosmic-ray neutron probe.
     The function offers several methods to compute the depth at which 86 % of the neutrons
     probes the soil profile.
-    
+
     Keyword arguments:
 
     vwc : list or array
@@ -639,64 +642,64 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, method='Schron_2017'
     Franz, T.E., Zreda, M., Ferre, T.P.A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X. and Shuttleworth, W.J., 2012.
     Measurement depth of the cosmic ray soil moisture probe affected by hydrogen from various sources.
     Water Resources Research, 48(8). doi.org/10.1029/2012WR011871
-    
-    Schrön, M., Köhli, M., Scheiffele, L., Iwema, J., Bogena, H. R., Lv, L., et al. (2017). 
-    Improving calibration and validation of cosmic-ray neutron sensors in the light of spatial sensitivity. 
+
+    Schrön, M., Köhli, M., Scheiffele, L., Iwema, J., Bogena, H. R., Lv, L., et al. (2017).
+    Improving calibration and validation of cosmic-ray neutron sensors in the light of spatial sensitivity.
     Hydrol. Earth Syst. Sci. 21, 5009–5030. doi.org/10.5194/hess-21-5009-2017
     """
-    
+
     # Determine sensing depth (D86)
     if method == 'Schron_2017':
-        
+
         # See Appendix A of Schrön et al. (2017)
         Fp = 0.4922 / (0.86 - np.exp(-1 * pressure / p_ref));
         Fveg = 0
         results = []
         for d in dist:
             # Compute r_star
-            r_start = d/Fp 
-            
+            r_start = d/Fp
+
             # Compute soil depth that accounts for 86% of the neutron flux
             D86 = 1/ bulk_density * (8.321+0.14249*(0.96655 + np.exp(-0.01*r_start))*(20+(Wlat+vwc)) / (0.0429+(Wlat+vwc)))
             results.append(D86)
 
     elif method == 'Franz_2012':
         results = [5.8/(bulk_density*Wlat+vwc+0.0829)]
-        
+
     return results
-    
-    
+
+
 def nrad_weight(h,theta,distances,depth,rhob=1.4):
     """Function to compute distance weights corresponding to each soil sample.
-    
+
     Keyword arguments:
-    
+
     h -- Air Humidity  from 0.1  to 50    in g/m^3. When h=0, the function will skip the distance weighting.
     theta -- Soil Moisture for each sample (0.02 - 0.50 m^3/m^3)
     distances -- Distances from the location of each sample to the origin (0.5 - 600 m)
     depth -- Depths for each sample (m)
     rhob -- Bulk density in g/cm^3
 
-    Example: 
+    Example:
     W = nrad_weight(5,np.array([0.25,0.25,0.25]),np.array([5,10,150]),np.array([0.05,0.05,0.05]),rhob=1.4)
-    
+
     References:
-    Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., and Zacharias, S. (2015). 
-    Footprint characteristics revised for field-scale soil moisture monitoring with cosmic-ray 
+    Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., and Zacharias, S. (2015).
+    Footprint characteristics revised for field-scale soil moisture monitoring with cosmic-ray
     neutrons. Water Resour. Res. 51, 5772–5790. doi:10.1002/2015WR017169
     """
 
 
     # Table A1. Parameters for Fi and D86
-    p10 = 8735;       p11 = 17.1758; p12 = 11720;      p13 = 0.00978;   p14 = 7045;      p15 = 0.003632;   
-    p20 = 2.7925e-2;  p21 = 5.0399;  p22 = 2.8544e-2;  p23 = 0.002455;  p24 = 6.851e-5;  p25 = 9.2926; 
-    p30 = 247970;     p31 = 17.63;   p32 = 374655;     p33 = 0.00191;   p34 = 195725; 
-    p40 = 5.4818e-2;  p41 = 15.921;  p42 = 0.6373;     p43 = 5.99e-2;   p44 = 5.425e-4; 
+    p10 = 8735;       p11 = 17.1758; p12 = 11720;      p13 = 0.00978;   p14 = 7045;      p15 = 0.003632;
+    p20 = 2.7925e-2;  p21 = 5.0399;  p22 = 2.8544e-2;  p23 = 0.002455;  p24 = 6.851e-5;  p25 = 9.2926;
+    p30 = 247970;     p31 = 17.63;   p32 = 374655;     p33 = 0.00191;   p34 = 195725;
+    p40 = 5.4818e-2;  p41 = 15.921;  p42 = 0.6373;     p43 = 5.99e-2;   p44 = 5.425e-4;
     p50 = 1383702;    p51 = 4.156;   p52 = 5325;       p53 = 0.00238;   p54 = 0.0156;    p55 = 0.130;     p56 = 1521;
     p60 = 6.031e-5;   p61 = 98.5;    p62 = 1.0466e-3;
     p70 = 11747;      p71 = 41.66;   p72 = 4521;       p73 = 0.01998;   p74 = 0.00604;   p75 = 2534;      p76 = 0.00475;
-    p80 = 1.543e-2;   p81 = 10.06;   p82 = 1.807e-2;   p83 = 0.0011;    p84 = 8.81e-5;   p85 = 0.0405;    p86 = 20.24; 
-    p90 = 8.321;      p91 = 0.14249; p92 = 0.96655;    p93 = 26.42;     p94 = 0.0567;  
+    p80 = 1.543e-2;   p81 = 10.06;   p82 = 1.807e-2;   p83 = 0.0011;    p84 = 8.81e-5;   p85 = 0.0405;    p86 = 20.24;
+    p90 = 8.321;      p91 = 0.14249; p92 = 0.96655;    p93 = 26.42;     p94 = 0.0567;
 
 
     # Numerical determination of the penetration depth (86%) (Eq. 8)
@@ -705,7 +708,7 @@ def nrad_weight(h,theta,distances,depth,rhob=1.4):
     # Depth weights (Eq. 7)
     Wd = np.exp(-2*depth/D86)
 
-    if h == 0: 
+    if h == 0:
         W = 1 # skip distance weighting
 
     elif (h >= 0.1) and (h<= 50):
@@ -724,10 +727,10 @@ def nrad_weight(h,theta,distances,depth,rhob=1.4):
         for i in range(len(distances)):
             if (distances[i]<=50) and (distances[i]>0.5):
                 W[i]=F1[i]*(np.exp(-F2[i]*distances[i]))+F3[i]*np.exp(-F4[i]*distances[i])
-                
+
             elif (distances[i]>50) and (distances[i]<600):
                 W[i]=F5[i]*(np.exp(-F6[i]*distances[i]))+F7[i]*np.exp(-F8[i]*distances[i])
-                
+
             else:
                 raise ValueError('Input distances are not valid.')
 
@@ -831,7 +834,7 @@ def spatial_smooth(sm, lat, lng, max_dist=500, min_neighbours=3):
 
 def storage(sm,T=1,Z_surface=150,Z_subsurface=1000):
     """Exponential filter to estimate soil moisture in the rootzone from surface observtions.
-    
+
     Parameters
     ----------
     sm : list or array
@@ -844,17 +847,17 @@ def storage(sm,T=1,Z_surface=150,Z_subsurface=1000):
     Z_subsurface : float
         Depth of subsurface layer in mm.
 
-    
+
     Returns
     -------
     Surface and subsurface soil water storage in mm of water.
-    
+
     References
     ----------
 - Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J.C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B. and Martin, E., 2008. From near-surface to root-zone soil moisture using an exponential filter: an assessment of the method based on in-situ observations and model simulations. Hydrology and Earth System Sciences, 12(6), pp.1323-1337.
-    
+
     - Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020. Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9.
-    
+
     - Rossini, P. and Patrignani, A., 2021. Predicting rootzone soil moisture from surface observations in cropland using an exponential filter. Soil Science Society of America Journal.
     """
 
@@ -863,11 +866,11 @@ def storage(sm,T=1,Z_surface=150,Z_subsurface=1000):
     sm_min = np.min(sm)
     sm_max = np.max(sm)
     ms = (sm-sm_min)/(sm_max-sm_min)
-    
+
     # Pre-allocate soil water index array
     SWI = np.ones_like(ms)*np.nan
     K = np.ones_like(ms)*np.nan
-    
+
     # Initial conditions
     SWI[0] = ms[0]
     K[0] = 1
@@ -882,30 +885,30 @@ def storage(sm,T=1,Z_surface=150,Z_subsurface=1000):
 
     # Surface storage
     storage_surface = sm*Z_surface
-    
+
     # Rootzone storage
     storage_subsurface = (SWI*(sm_max-sm_min) + sm_min)*Z_subsurface
-    
+
     return storage_surface, storage_subsurface
-    
-    
+
+
 def cutoff_rigidity(lat,lon):
     """Function to estimate the approximate cutoff rigidity for any point on Earth according to the
     tabulated data of Smart and Shea, 2019. Values are approximations so that users have an idea of
     what neutron detectors from the Neutron Monitor Database (NMD).
-    
+
     Inputs:
         - Geographic latitude in decimal degrees. Value in range -90 to 90
-        - Geographic longitude in decimal degrees. Values in range from 0 to 360. 
+        - Geographic longitude in decimal degrees. Values in range from 0 to 360.
           Typical negative longitudes in the west hemisphere will fall in the range 180 to 360.
-          
+
     Outputs:
         - Cutoff rigidity in GV. Error is about +/- 0.3 GV
-        
+
     Example:
         Estimate the cutoff rigidity for Newark, NJ, US
         zq = cutoff_rigidity(39.68, -75.75)
-        
+
         2.52 GV (Value from NMD is 2.40 GV)
     """
     xq = lon
@@ -923,7 +926,7 @@ def cutoff_rigidity(lat,lon):
     points = np.array( (X.flatten(), Y.flatten()) ).T
     values = Z.flatten()
     zq = griddata(points, values, (xq,yq))
-   
+
     return np.round(zq,2)
 
 
@@ -939,16 +942,16 @@ def find_neutron_detectors(Rc, start_date=None, end_date=None):
     end_date : Datetime object. End date for the period of interest.
 
 
-        
+
     Outputs:
-        -List of top five stations with closes cutoff rigidity. 
+        -List of top five stations with closes cutoff rigidity.
          User needs to select station according to site altitude.
-         
+
     Example:
         Rc = 2.40 # 2.40 Newark, NJ, US
         suggested_neutron_detectors(Rc)
-        
-         
+
+
     Source: https://www.nmdb.eu/nest/help.php#helpstations. Last accessed 20-Dec-2021
     """
     # Load file with list of neutron monitoring stations

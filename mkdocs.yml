@@ -1,0 +1,20 @@
+### Site metadata ###
+
+site_name: crnpy Documentation
+site_description: Documentation for the crnpy package.
+site_url: https://github.com/soilwater/crnpy
+repo_url: https://github.com/soilwater/crnpy
+
+### Build settings ###
+
+theme: 'material'
+
+plugins:
+- search
+- mkdocstrings:
+    handler: python
+
+nav:
+  - Home: index.md
+  - Reference: reference.md
+
