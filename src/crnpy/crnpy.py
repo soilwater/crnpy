@@ -33,7 +33,7 @@ def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', r
          col (str, optional): Column with the timestamp. Default is 'timestamp'.
          format (str, optional): Format of the timestamp. Default is '%Y-%m-%d %H:%M:%S'.
          freq (str, optional): Rounding interval. 'H' for hourly, 'M' for minute, or None. Default is 'H'.
-         round_time (bool, optional): Whether to round timestamps to nearest frequency. Default is True.
+         round_time (bool, optional): Whether to round timestamps to the nearest frequency. Default is True.
 
      Returns:
          (pandas.DataFrame): DataFrame with formatted timestamps and rounded time.
@@ -234,11 +234,11 @@ def compute_total_raw_counts(counts, nan_strategy=None):
     return total_raw_counts
 
 
-def drop_outlier(counts, window=5, store_outliers=False, min_counts=None, max_counts=None):
+def drop_outlier(raw_counts, window=5, store_outliers=False, min_counts=None, max_counts=None):
     """Computation of a moving modified Z-score based on the median absolute difference.
     
     Args:
-        counts (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
+        raw_counts (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
         window (int): Window size for the moving median. Default is 11.
         store_outliers (bool): If True, store the outliers in a new column. Default is False.
         min_counts (int): Minimum number of counts for a reading to be considered valid. Default is None.
@@ -246,6 +246,8 @@ def drop_outlier(counts, window=5, store_outliers=False, min_counts=None, max_co
 
     Returns:
         (pandas.DataFrame): Dataframe without outliers.
+        or
+        (pandas.DataFrame, pandas.DataFrame): Dataframe without outliers and dataframe with outliers.
 
     References:
         Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
@@ -253,32 +255,32 @@ def drop_outlier(counts, window=5, store_outliers=False, min_counts=None, max_co
 
 
     if min_counts is not None:
-        lower_count = np.sum(counts < min_counts)
-        if lower_count > len(counts) * 0.25:
+        lower_count = np.sum(raw_counts < min_counts)
+        if lower_count > len(raw_counts) * 0.25:
             print(f"WARNING: Discarded {lower_count} counts below {min_counts}. This is more than 25% of the total number of readings. Consider increasing the minimum counts threshold.")
         else:
             print(f"Discarded counts below {min_counts}: {lower_count}")
-        counts = counts[counts >= min_counts]
+        raw_counts = raw_counts[raw_counts >= min_counts]
     if max_counts is not None:
-        upper_count = np.sum(counts > max_counts)
+        upper_count = np.sum(raw_counts > max_counts)
         print(f"Discarded counts above {max_counts}: {upper_count}")
-        counts = counts[counts <= max_counts]
+        raw_counts = raw_counts[raw_counts <= max_counts]
 
     # Compute median absolute difference
-    median = counts.rolling(window, center=True).median()
-    diff = np.abs(counts - median)
+    median = raw_counts.rolling(window, center=True).median()
+    diff = np.abs(raw_counts - median)
     mad = diff.rolling(window, center=True).median()
 
     # Compute modified Z-score
     modified_z_score = 0.6745 * diff / mad
-    outliers = counts[modified_z_score > 3.5]
+    outliers = raw_counts[modified_z_score > 3.5]
     # Drop outliers
-    counts = counts[modified_z_score < 3.5]
+    raw_counts = raw_counts[modified_z_score < 3.5]
 
     if store_outliers:
-        return counts, outliers
+        return raw_counts, outliers
     print(f"Discarded {len(outliers)} outliers using modified Z-score.")
-    return counts
+    return raw_counts, outliers
 
 
 def fill_missing_atm(cols_atm, limit=24):
@@ -301,11 +303,11 @@ def fill_missing_atm(cols_atm, limit=24):
     # Fill missing values in atmospheric variables
     return cols_atm.interpolate(method='pchip', limit=limit, limit_direction='both')
 
-def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neutrons=None, incoming_Ref=None):
+def atm_correction(raw_counts, pressure, humidity, temp, Pref, Aref, L, incoming_neutrons=None, incoming_Ref=None):
     """Correct neutron counts for atmospheric factors and incoming neutron flux.
     
     Args:
-        counts (list or array): Neutron counts to correct.
+        raw_counts (list or array): Neutron counts to correct.
         pressure (list or array): Atmospheric pressure readings.
         humidity (list or array): Atmospheric humidity readings in %.
         temp (list or array): Atmospheric temperature readings in Celsius.
@@ -356,7 +358,7 @@ def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neu
         fi.fillna(1.0, inplace=True) # Use a value of 1 for days without data
 
     # Apply correction factors
-    return np.round((counts*fw)/(fp*fi))
+    return np.round((raw_counts*fw)/(fp*fi))
 
 
 

@@ -6,14 +6,11 @@
 """
 
 
-
 # Import modules
 import sys
 import warnings
 import numpy as np
 import pandas as pd
-from scipy.signal import savgol_filter
-from scipy.interpolate import griddata, pchip_interpolate
 import requests
 import io, datetime, os
 
@@ -53,8 +50,9 @@ def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', r
             2   2020-01-01 01:00:00
      """
 
-    # Change format of timestamp
-    df[col] = pd.to_datetime(df[col], format=format)
+    # Change format of timestamp if needed
+    if df[col].dtype != 'datetime64[ns]':
+        df[col] = pd.to_datetime(df[col], format=format)
 
     # Round timestamps to nearest frequency
     if round_time:
@@ -103,11 +101,11 @@ def count_time(df):
 
     return count_time
 
-def fill_counts(df, count_times=None, expected_time=False, threshold=0.25, limit=3):
+def fill_counts(counts, count_times=None, expected_time=False, threshold=0.25, limit=3):
     """Fill missing neutron counts. Observation periods shorter than threshold are discarded (replaced with NaN).
     
     Args:
-        df (pandas.DataFrame): DataFrame with neutron counts, might have count_time column(s).
+        counts (pandas.DataFrame): DataFrame with neutron counts, might have count_time column(s).
         count_time (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
         expected_time (int): Expected counting time in seconds. If not provided, it is calculated as the median of the counting times.
         threshold (float): Minimum fraction of the neutron integration time. Default is 0.25.
@@ -118,24 +116,24 @@ def fill_counts(df, count_times=None, expected_time=False, threshold=0.25, limit
     Examples:
         Using `fill_counts` in a console environment:
 
-        >>> df = pd.DataFrame({'counts':[100,105,98,102], count_time:[3600,200,3600,3600]})
-        >>> fill_counts(df, count_time=count_time, expected_time=3600, threshold=0.25)
+        >>> counts = pd.DataFrame({'counts':[100,105,98,102], count_time:[3600,200,3600,3600]})
+        >>> fill_counts(counts, count_time=count_time, expected_time=3600, threshold=0.25)
         0   100.0
         1   NaN
         2   98.0
         3   102.0
     """
 
-    df=df.copy()
+    counts=counts.copy()
 
-    if type(df.index) == pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
+    if type(counts.index) == pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
         warnings.warn("No count time columns provided. Using timestamp index to compute count time.")
-        count_times = df.index.to_series().diff().dt.total_seconds()
+        count_times = counts.index.to_series().diff().dt.total_seconds()
 
-    if type(df.index) != pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
+    if type(counts.index) != pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
         raise ValueError('Index must be a timestamp or count times must be provided.')
 
-    if len(df) != len(count_times):
+    if len(counts) != len(count_times):
         raise ValueError('Count times length does not match number of readings.')
 
     if expected_time is False:
@@ -148,27 +146,27 @@ def fill_counts(df, count_times=None, expected_time=False, threshold=0.25, limit
     if type(count_times) == pd.core.frame.DataFrame:
         if len(count_times.columns) == 1:
             idx_nan = count_times[count_times < time_threshold].index
-            df.loc[idx_nan] = np.nan
+            counts.loc[idx_nan] = np.nan
         else:
             for i in range(len(count_times.columns)):
                 idx_nan = count_times[count_times.iloc[:,i] < time_threshold].index
-                df.iloc[:,i].loc[idx_nan] = np.nan
+                counts.iloc[:,i].loc[idx_nan] = np.nan
     elif type(count_times) == pd.core.series.Series:
         idx_nan = count_times[count_times < time_threshold].index
-        df.loc[idx_nan] = np.nan
+        counts.loc[idx_nan] = np.nan
     elif type(count_times) == np.ndarray:
         idx_nan = np.where(count_times < time_threshold)
-        df.loc[idx_nan] = np.nan
+        counts.loc[idx_nan] = np.nan
 
     # Fill missing values with linear interpolation and round to nearest integer
-    df = df.interpolate(method='linear', limit=limit, limit_direction='both').round()
-    return df
+    counts = counts.interpolate(method='linear', limit=limit, limit_direction='both').round()
+    return counts
 
-def normalize_counts(df, count_time=3600, count_times=None):
+def normalize_counts(counts, count_time=3600, count_times=None):
     """Normalize neutron counts to the desired counting time.
     
     Args:
-        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
+        counts (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
         count_time (int): Count time in seconds for normalization. Default is 3600 seconds.
         count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
         
@@ -177,70 +175,70 @@ def normalize_counts(df, count_time=3600, count_times=None):
 
     """
 
-    if count_times is None and type(df.index) == pd.core.indexes.datetimes.DatetimeIndex:
+    if count_times is None and type(counts.index) == pd.core.indexes.datetimes.DatetimeIndex:
         print("No count_times columns provided. Using timestamp index to compute count time.")
-        count_times = df.index.to_series().diff().dt.total_seconds()
+        count_times = counts.index.to_series().diff().dt.total_seconds()
 
     if isinstance(count_times, type(None)):
         raise ValueError('Count time must be provided or index must be a timestamp.')
 
-    if len(df) != len(count_times):
+    if len(counts) != len(count_times):
         raise ValueError('Count times length does not match number of readings.')
 
 
     #Normalize counts rounded to integer
     if type(count_times) == pd.core.series.Series or len(count_times.columns) == 1:
-        df_r = df.div(count_times, axis=0).mul(count_time).round()
-        return df_r
+        normalized_counts = counts.div(count_times, axis=0).mul(count_time).round()
+        return normalized_counts
     else:
-        df = df.copy()
+        normalized_counts = counts.copy()
         count_times = count_times.copy()
         for i in range(len(count_times.columns)):
-            df[df.columns[i]] = df.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(count_time).round()
-        return df
+            normalized_counts[normalized_counts.columns[i]] = normalized_counts.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(count_time).round()
+        return normalized_counts
 
 
 
-def compute_total_raw_counts(df, nan_strategy=None):
+def compute_total_raw_counts(counts, nan_strategy=None):
     """Compute the sum of uncorrected neutron counts for all detectors.
 
     Args:
-        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
+        counts (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
         nan_strategy (str): Strategy to use for NaN values. Options are 'interpolate', 'average', or None. Default is None.
 
     Returns:
         (pandas.DataFrame): Dataframe with the sum of uncorrected neutron counts for all detectors.
     """
-    df=df.copy()
+    counts=counts.copy()
 
-    if df.isnull().values.any():
+    if counts.isnull().values.any():
         if nan_strategy is None:
             raise ValueError('NaN values found. Please fill missing values or provide a strategy. See documentation for more information.')
         elif nan_strategy == 'interpolate':
             print('NaN values found. Interpolating missing values using fill_counts().')
-            if type(df.index) != pd.core.indexes.datetimes.DatetimeIndex:
+            if type(counts.index) != pd.core.indexes.datetimes.DatetimeIndex:
                 raise ValueError('Index must be a timestamp to use interpolation strategy.')
-            df = fill_counts(df)
+            counts = fill_counts(counts)
         elif nan_strategy == 'average':
             if len(df.columns) == 1:
                 raise ValueError('Only one detector found. Cannot use average strategy.')
             print('NaN values found. Replacing missing values with average of other detectors before summing.')
-            df = df.apply(lambda x: x.fillna(df.mean(axis=1)),axis=0)
+            counts = counts.apply(lambda x: x.fillna(counts.mean(axis=1)),axis=0)
         else:
             raise ValueError('Invalid strategy.')
 
     #Compute sum of counts
-    df['total_raw_counts'] = df.sum(axis=1)
+    total_raw_counts = counts.sum(axis=1)
     # Replace zeros with NaN
-    df['total_raw_counts'] = df['total_raw_counts'].replace(0, np.nan)
-    return df['total_raw_counts']
+    total_raw_counts = total_raw_counts.replace(0, np.nan)
+    return total_raw_counts
 
 
-def drop_outlier(df, window=5, store_outliers=False, min_counts=None, max_counts=None):
+def drop_outlier(raw_counts, window=5, store_outliers=False, min_counts=None, max_counts=None):
     """Computation of a moving modified Z-score based on the median absolute difference.
     
     Args:
-        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
+        raw_counts (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
         window (int): Window size for the moving median. Default is 11.
         store_outliers (bool): If True, store the outliers in a new column. Default is False.
         min_counts (int): Minimum number of counts for a reading to be considered valid. Default is None.
@@ -248,6 +246,8 @@ def drop_outlier(df, window=5, store_outliers=False, min_counts=None, max_counts
 
     Returns:
         (pandas.DataFrame): Dataframe without outliers.
+        or
+        (pandas.DataFrame, pandas.DataFrame): Dataframe without outliers and dataframe with outliers.
 
     References:
         Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
@@ -255,32 +255,32 @@ def drop_outlier(df, window=5, store_outliers=False, min_counts=None, max_counts
 
 
     if min_counts is not None:
-        lower_count = np.sum(df < min_counts)
-        if lower_count > len(df) * 0.25:
+        lower_count = np.sum(raw_counts < min_counts)
+        if lower_count > len(raw_counts) * 0.25:
             print(f"WARNING: Discarded {lower_count} counts below {min_counts}. This is more than 25% of the total number of readings. Consider increasing the minimum counts threshold.")
         else:
             print(f"Discarded counts below {min_counts}: {lower_count}")
-        df = df[df >= min_counts]
+        raw_counts = raw_counts[raw_counts >= min_counts]
     if max_counts is not None:
-        upper_count = np.sum(df > max_counts)
+        upper_count = np.sum(raw_counts > max_counts)
         print(f"Discarded counts above {max_counts}: {upper_count}")
-        df = df[df <= max_counts]
+        raw_counts = raw_counts[raw_counts <= max_counts]
 
     # Compute median absolute difference
-    median = df.rolling(window, center=True).median()
-    diff = np.abs(df - median)
+    median = raw_counts.rolling(window, center=True).median()
+    diff = np.abs(raw_counts - median)
     mad = diff.rolling(window, center=True).median()
 
     # Compute modified Z-score
     modified_z_score = 0.6745 * diff / mad
-    outliers = df[modified_z_score > 3.5]
+    outliers = raw_counts[modified_z_score > 3.5]
     # Drop outliers
-    df = df[modified_z_score < 3.5]
+    raw_counts = raw_counts[modified_z_score < 3.5]
 
     if store_outliers:
-        return df, outliers
+        return raw_counts, outliers
     print(f"Discarded {len(outliers)} outliers using modified Z-score.")
-    return df
+    return raw_counts, outliers
 
 
 def fill_missing_atm(cols_atm, limit=24):
@@ -303,11 +303,11 @@ def fill_missing_atm(cols_atm, limit=24):
     # Fill missing values in atmospheric variables
     return cols_atm.interpolate(method='pchip', limit=limit, limit_direction='both')
 
-def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neutrons=None, incoming_Ref=None):
+def atm_correction(raw_counts, pressure, humidity, temp, Pref, Aref, L, incoming_neutrons=None, incoming_Ref=None):
     """Correct neutron counts for atmospheric factors and incoming neutron flux.
     
     Args:
-        counts (list or array): Neutron counts to correct.
+        raw_counts (list or array): Neutron counts to correct.
         pressure (list or array): Atmospheric pressure readings.
         humidity (list or array): Atmospheric humidity readings in %.
         temp (list or array): Atmospheric temperature readings in Celsius.
@@ -358,7 +358,7 @@ def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neu
         fi.fillna(1.0, inplace=True) # Use a value of 1 for days without data
 
     # Apply correction factors
-    return np.round((counts*fw)/(fp*fi))
+    return np.round((raw_counts*fw)/(fp*fi))
 
 
 
@@ -471,11 +471,11 @@ def interpolate_incoming_flux(df_flux, timestamps):
     return df_flux.loc[timestamps]
 
 
-def smooth_counts(df,window=5,order=3, method='moving_median'):
+def smooth_counts(corrected_counts,window=5,order=3, method='moving_median'):
     """Use a Savitzky-Golay filter to smooth the signal of corrected neutron counts.
 
     Args:
-        df (pd.DataFrame): Dataframe containing the corrected neutron counts.
+        corrected_counts (pd.DataFrame): Dataframe containing the corrected neutron counts.
         window (int): Window size for the Savitzky-Golay filter. Default is 5.
         method (str): Method to use for smoothing the data. Default is 'moving_median'.
             Options are 'moving_average', 'moving_median' and 'savitzky_golay'.
@@ -491,24 +491,24 @@ def smooth_counts(df,window=5,order=3, method='moving_median'):
     """
 
     if method == 'moving_average':
-        df = df.rolling(window=window, center=True, min_periods=1).mean()
+        corrected_counts = corrected_counts.rolling(window=window, center=True, min_periods=1).mean()
     elif method == 'moving_median':
-        df = df.rolling(window=window, center=True, min_periods=1).median()
+        corrected_counts = corrected_counts.rolling(window=window, center=True, min_periods=1).median()
 
     elif method == 'savitzky_golay':
-        if df.isna().any():
+        if corrected_counts.isna().any():
             print('Dataframe contains NaN values. Please remove NaN values before smoothing the data.')
 
-        if type(df) == pd.core.series.Series:
+        if type(corrected_counts) == pd.core.series.Series:
             filtered = np.round(savgol_filter(df,window,order))
-            df = pd.DataFrame(filtered,columns=['counts'], index=df.index)
-        elif type(df) == pd.core.frame.DataFrame:
-            for col in df.columns:
-                df[col] = np.round(savgol_filter(df[col],window,order))
+            corrected_counts = pd.DataFrame(filtered,columns=['counts'], index=df.index)
+        elif type(corrected_counts) == pd.core.frame.DataFrame:
+            for col in corrected_counts.columns:
+                corrected_counts[col] = np.round(savgol_filter(df[col],window,order))
     else:
         raise ValueError('Invalid method. Please select a valid filtering method., options are: moving_average, moving_median, savitzky_golay')
-    df = df.ffill(limit=window).bfill(limit=window).copy()
-    return df
+    corrected_counts = corrected_counts.ffill(limit=window).bfill(limit=window).copy()
+    return corrected_counts
 
 
 def bwe_correction(counts, bwe, r2_N0=0.05):
@@ -531,12 +531,12 @@ def bwe_correction(counts, bwe, r2_N0=0.05):
 
     return counts/(1 - bwe*r2_N0)
 
-def biomass_to_bwe(biomass_dry, biomass_wet, fWE=0.494):
+def biomass_to_bwe(biomass_dry, biomass_fresh, fWE=0.494):
     """Function to convert biomass to biomass water equivalent.
 
     Args:
-        biomass_dry (array or pd.Series or pd.DataFrame): Dry biomass in kg m-2.
-        biomass_wet (array or pd.Series or pd.DataFrame): Wet biomass in kg m-2.
+        biomass_dry (array or pd.Series or pd.DataFrame): Above ground dry biomass in kg m-2.
+        biomass_fresh (array or pd.Series or pd.DataFrame): Above ground fresh biomass in kg m-2.
         fWE (float): Stoichiometric ratio of H2O to organic carbon molecules in the plant (assuming this is mostly cellulose)
             Default is 0.494 (Wahbi & Avery, 2018).
 
@@ -548,7 +548,7 @@ def biomass_to_bwe(biomass_dry, biomass_wet, fWE=0.494):
         Cosmic Ray Neutron Sensing: Estimation of Agricultural Crop Biomass Water Equivalent.
         Springer, Cham. https://doi.org/10.1007/978-3-319-69539-6_2
     """
-    return (biomass_wet - biomass_dry)+fWE*biomass_dry
+    return (biomass_fresh - biomass_dry) + fWE * biomass_dry
 
 def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.115):
     """Function to convert corrected and filtered neutron counts into volumetric water content
@@ -936,3 +936,4 @@ def find_neutron_detectors(Rc, start_date=None, end_date=None):
     print('')
     print(f"Your cutoff rigidity is {Rc} GV")
     print(result)
+
