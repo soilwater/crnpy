@@ -228,7 +228,7 @@ def compute_total_raw_counts(df, nan_strategy=None):
 def drop_outlier(df, window=5, store_outliers=False, min_counts=None, max_counts=None):
     """Computation of a moving modified Z-score based on the median absolute difference.
 
-    References
+    Paper
     ----------
     Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
 
@@ -329,7 +329,7 @@ def atm_correction(counts, pressure, humidity, temp, Pref, Aref, L, incoming_neu
     -------
     Total neutron counts corrected by atmospheric conditions.
 
-    References:
+    Paper:
     Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., et al. (2012).
     COSMOS: the cosmic-ray soil moisture observing system. Hydrol. Earth Syst. Sci. 16, 4079–4099.
     doi: 10.5194/hess-16-4079-2012
@@ -391,7 +391,7 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, verbo
     Returns:
     Neutron flux in counts per hour and timestamps.
 
-    References:
+    Paper:
     Documentation available:https://www.nmdb.eu/nest/help.php#howto
 
     """
@@ -513,7 +513,7 @@ def smooth_counts(df,window=5,order=3, method='moving_median'):
     DataFrame with smoothed neutron counts.
 
 
-    References:
+    Paper:
     Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020. Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9. doi.org/10.3389/frwa.2020.00009
     """
     if method == 'moving_average':
@@ -554,7 +554,7 @@ def bwe_correction(counts, bwe, r2_N0=0.05):
     -------
     Array of corrected neutron counts for biomass effects.
 
-    References:
+    Paper:
     Baatz, R., H. R. Bogena, H.-J. Hendricks Franssen, J. A. Huisman, C. Montzka, and H. Vereecken (2015),
     An empiricalvegetation correction for soil water content quantification using cosmic ray probes,
     Water Resour. Res., 51, 2030–2046, doi:10.1002/ 2014WR016443.
@@ -579,7 +579,7 @@ def biomass_to_bwe(biomass_dry, biomass_wet, fWE=0.494):
     -------
     Biomass water equivalent in kg m-2.
 
-    References:
+    Paper:
     Wahbi, A., Avery, W. (2018). In Situ Destructive Sampling. In:
     Cosmic Ray Neutron Sensing: Estimation of Agricultural Crop Biomass Water Equivalent.
     Springer, Cham. https://doi.org/10.1007/978-3-319-69539-6_2
@@ -610,7 +610,7 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.
 
     a0, a1, a2 -- Parameters given in Zreda et al., 2012.
 
-    References:
+    Paper:
     Desilets, D., M. Zreda, and T.P.A. Ferré. 2010. Nature’s neutron probe:
     Land surface hydrology at an elusive scale with cosmic rays. Water Resour. Res. 46:W11505.
     doi.org/10.1029/2009WR008726
@@ -644,7 +644,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, method='Schron_2017'
     dist : list or array
         List of radial distances at which to estimate the sensing depth. Only used for the 'Schron_2017' method.
 
-    References:
+    Paper:
     Franz, T.E., Zreda, M., Ferre, T.P.A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X. and Shuttleworth, W.J., 2012.
     Measurement depth of the cosmic ray soil moisture probe affected by hydrogen from various sources.
     Water Resources Research, 48(8). doi.org/10.1029/2012WR011871
@@ -689,7 +689,7 @@ def nrad_weight(h,theta,distances,depth,rhob=1.4):
     Example:
     W = nrad_weight(5,np.array([0.25,0.25,0.25]),np.array([5,10,150]),np.array([0.05,0.05,0.05]),rhob=1.4)
 
-    References:
+    Paper:
     Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., and Zacharias, S. (2015).
     Footprint characteristics revised for field-scale soil moisture monitoring with cosmic-ray
     neutrons. Water Resour. Res. 51, 5772–5790. doi:10.1002/2015WR017169
@@ -768,7 +768,7 @@ def haversine(lat1, lng1, lat2, lng2):
     -------
     Distance between the two points in meters.
 
-    References
+    Paper
     ----------
     https://en.wikipedia.org/wiki/Haversine_formula
     """
@@ -808,7 +808,7 @@ def spatial_smooth(sm, lat, lng, max_dist=500, min_neighbours=3):
     -------
     Spatially smoothed soil moisture in mm of water.
 
-    References
+    Paper
     ----------
     """
 
@@ -858,7 +858,7 @@ def storage(sm,T=1,Z_surface=150,Z_subsurface=1000):
     -------
     Surface and subsurface soil water storage in mm of water.
 
-    References
+    Paper
     ----------
 - Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J.C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B. and Martin, E., 2008. From near-surface to root-zone soil moisture using an exponential filter: an assessment of the method based on in-situ observations and model simulations. Hydrology and Earth System Sciences, 12(6), pp.1323-1337.
 

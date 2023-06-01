@@ -2,9 +2,8 @@
 """
 `crnpy` is a Python package for processing cosmic ray neutron data.
 
- Created by Andres Patrignani and Joaquin Peraza
+ Created by Joaquin Peraza and Andres Patrignani.
 """
-
 
 # Import modules
 import sys
@@ -13,7 +12,9 @@ import numpy as np
 import pandas as pd
 import requests
 import io, datetime, os
-
+from scipy.signal import savgol_filter
+from scipy.interpolate import griddata
+import crnpy.data as data
 
 # Define python version
 python_version = (3, 7)  # tuple of (major, minor) version requirement
@@ -33,7 +34,7 @@ def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', r
          col (str, optional): Column with the timestamp. Default is 'timestamp'.
          format (str, optional): Format of the timestamp. Default is '%Y-%m-%d %H:%M:%S'.
          freq (str, optional): Rounding interval. 'H' for hourly, 'M' for minute, or None. Default is 'H'.
-         round_time (bool, optional): Whether to round timestamps to nearest frequency. Default is True.
+         round_time (bool, optional): Whether to round timestamps to the nearest frequency. Default is True.
 
      Returns:
          (pandas.DataFrame): DataFrame with formatted timestamps and rounded time.
@@ -220,7 +221,7 @@ def compute_total_raw_counts(counts, nan_strategy=None):
                 raise ValueError('Index must be a timestamp to use interpolation strategy.')
             counts = fill_counts(counts)
         elif nan_strategy == 'average':
-            if len(df.columns) == 1:
+            if len(counts.columns) == 1:
                 raise ValueError('Only one detector found. Cannot use average strategy.')
             print('NaN values found. Replacing missing values with average of other detectors before summing.')
             counts = counts.apply(lambda x: x.fillna(counts.mean(axis=1)),axis=0)
@@ -280,7 +281,7 @@ def drop_outlier(raw_counts, window=5, store_outliers=False, min_counts=None, ma
     if store_outliers:
         return raw_counts, outliers
     print(f"Discarded {len(outliers)} outliers using modified Z-score.")
-    return raw_counts, outliers
+    return raw_counts
 
 
 def fill_missing_atm(cols_atm, limit=24):
@@ -500,11 +501,11 @@ def smooth_counts(corrected_counts,window=5,order=3, method='moving_median'):
             print('Dataframe contains NaN values. Please remove NaN values before smoothing the data.')
 
         if type(corrected_counts) == pd.core.series.Series:
-            filtered = np.round(savgol_filter(df,window,order))
-            corrected_counts = pd.DataFrame(filtered,columns=['counts'], index=df.index)
+            filtered = np.round(savgol_filter(corrected_counts,window,order))
+            corrected_counts = pd.DataFrame(filtered,columns=['counts'], index=corrected_counts.index)
         elif type(corrected_counts) == pd.core.frame.DataFrame:
             for col in corrected_counts.columns:
-                corrected_counts[col] = np.round(savgol_filter(df[col],window,order))
+                corrected_counts[col] = np.round(savgol_filter(corrected_counts[col],window,order))
     else:
         raise ValueError('Invalid method. Please select a valid filtering method., options are: moving_average, moving_median, savitzky_golay')
     corrected_counts = corrected_counts.ffill(limit=window).bfill(limit=window).copy()
@@ -549,6 +550,37 @@ def biomass_to_bwe(biomass_dry, biomass_fresh, fWE=0.494):
         Springer, Cham. https://doi.org/10.1007/978-3-319-69539-6_2
     """
     return (biomass_fresh - biomass_dry) + fWE * biomass_dry
+
+
+def road_correction(counts, theta_N, road_width, road_distance=0.0, theta_road=0.12, p0=0.42, p1=0.5, p2=1.06, p3=4, p4=0.16, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
+    """Function to correct for road effects in neutron counts.
+    following the approach described in Schrön et al., 2018.
+
+    Args:
+        counts (array or pd.Series or pd.DataFrame): Array of ephithermal neutron counts.
+        theta_N (float): Volumetric water content of the soil estimated from the uncorrected neutron counts.
+        road_width (float): Width of the road in m.
+        road_distance (float): Distance of the road from the sensor in m. Default is 0.0.
+        theta_road (float): Volumetric water content of the road. Default is 0.12.
+        p0-p9 (float): Parameters of the correction function. Default values are from Schrön et al., 2018.
+
+    Returns:
+        (array or pd.Series or pd.DataFrame): Array of corrected neutron counts for road effects.
+
+    References:
+        Schrön,M.,Rosolem,R.,Köhli,M., Piussi,L.,Schröter,I.,Iwema,J.,etal. (2018).Cosmic-ray neutron rover surveys
+        of field soil moisture and the influence of roads.WaterResources Research,54,6441–6459.
+        https://doi. org/10.1029/2017WR021719
+    """
+    F1 = p0 * (1-np.exp(-p1*road_width))
+    F2 = -p2 - p3 * theta_road - ((p4 + theta_road) / (theta_N))
+    F3 = p6 * np.exp(-p7 * (road_width ** -p8) * road_distance ** 4) + (1 - p6) * np.exp(-p9 * road_distance)
+
+    C_roads = 1 + F1 * F2 * F3
+
+    corrected_counts = counts / C_roads
+
+    return corrected_counts
 
 def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.115):
     """Function to convert corrected and filtered neutron counts into volumetric water content
@@ -855,13 +887,10 @@ def cutoff_rigidity(lat,lon):
 
     if xq < 0:
         xq = xq*-1 + 180
-    this_dir, this_filename = os.path.split(__file__)
-    DATA_PATH = os.path.join(this_dir, "global_cutoff_rigidity_2015.csv")
-    Z = np.loadtxt(open(DATA_PATH, "rb"), delimiter=",", skiprows=3)
+    Z = np.array(data.cutoff_rigidity)
     x = np.linspace(0, 360, Z.shape[1])
     y = np.linspace(90, -90, Z.shape[0])
     X, Y = np.meshgrid(x, y)
-
     points = np.array( (X.flatten(), Y.flatten()) ).T
     values = Z.flatten()
     zq = griddata(points, values, (xq,yq))
@@ -905,9 +934,7 @@ def find_neutron_detectors(Rc, start_date=None, end_date=None):
     """
 
     # Load file with list of neutron monitoring stations
-    this_dir, this_filename = os.path.split(__file__)
-    DATA_PATH = os.path.join(this_dir, "global_neutron_detectors.csv")
-    stations = pd.read_csv(DATA_PATH, skiprows=1)
+    stations = pd.DataFrame(data.neutron_detectors, columns=["STID","NAME","R","Altitude_m"])
 
     # Sort stations by closest cutoff rigidity
     idx_R = (stations['R'] - Rc).abs().argsort()
@@ -936,4 +963,30 @@ def find_neutron_detectors(Rc, start_date=None, end_date=None):
     print('')
     print(f"Your cutoff rigidity is {Rc} GV")
     print(result)
+    return result
+
+
+def estimate_lattice_water(clay_content, total_carbon=None):
+    """Estimate the amount of water in the lattice of clay minerals.
+
+    ![img1](img/lattice_water_simple.png) | ![img2](img/lattice_water_multiple.png)
+    :-------------------------:|:-------------------------:
+    $\omega_{lat} = 1.241 + 0.069 * clay(\%)$ | $\omega_{lat} = -0.028 + 0.077 * clay(\%) + 0.459 * carbon(\%)$
+    Linear regression [lattice water (%) as a function of clay (%)] done with data from Soil Water Processes Lab and Dong and Ochsner (2018) |  Multiple linear regression [lattice water (%) as a function of clay (%) and soil carbon (%)] done with data from Soil Water Processes Lab.
+
+    Args:
+        clay_content (float): Clay content in the soil in percent.
+        total_carbon (float, optional): Total carbon content in the soil in percent.
+            If None, the amount of water is estimated based on clay content only.
+
+    Returns:
+        (float): Amount of water in the lattice of clay minerals in percent
+
+    """
+    if total_carbon is None:
+        lattice_water = 1.241 + 0.069 * clay_content
+    else:
+        lattice_water = -0.028 + 0.077 * clay_content + 0.459 * total_carbon
+    return lattice_water
+
 
