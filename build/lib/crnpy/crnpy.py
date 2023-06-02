@@ -982,6 +982,11 @@ def estimate_lattice_water(clay_content, total_carbon=None):
     Returns:
         (float): Amount of water in the lattice of clay minerals in percent
 
+    References:
+        Dong, J., & Ochsner, T. E. (2018). Soil texture often exerts a stronger influence than precipitation
+         on mesoscale soil moisture patterns. Water Resources Research, 54, 2199– 2211.
+         https://doi.org/10.1002/2017WR021692
+
     """
     if total_carbon is None:
         lattice_water = 1.241 + 0.069 * clay_content
