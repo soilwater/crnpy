@@ -27,10 +27,15 @@ moisture estimation. The library is designed to be user-friendly and flexible,
 accommodating a wide range of use cases and data formats.
 
 
-
 # Statement of Need
 
-Cosmic ray neutron probes are a valuable tool for estimating soil moisture at the field scale. However, processing and analyzing CRNP data can be complex and time-consuming. CRNPY simplifies this process, providing a user-friendly and efficient way to transform raw CRNP data into actionable information. The library is designed to be accessible to both researchers and practitioners, with clear documentation and examples provided.
+Cosmic ray neutron probes are a valuable tool for estimating soil moisture at the field
+scale filling the gap between accurate point level estimates and medium to high scale
+remote sensing and modelling products. However, processing and analyzing CRNP data can
+be complex and time-consuming. CRNPY simplifies this process, providing a user-friendly
+and efficient way to transform raw CRNP data into actionable information.
+The library is designed to be accessible to both researchers and practitioners, 
+with clear documentation and examples provided.
 
 # Methodology
 
