@@ -1,0 +1,13 @@
+LICENSE
+README.md
+setup.py
+src/crnpy/__init__.py
+src/crnpy/crnpy.py
+src/crnpy/data.py
+src/crnpy/global_cutoff_rigidity_2015.csv
+src/crnpy/global_neutron_detectors.csv
+src/crnpy/readers.py
+src/crnpy.egg-info/PKG-INFO
+src/crnpy.egg-info/SOURCES.txt
+src/crnpy.egg-info/dependency_links.txt
+src/crnpy.egg-info/top_level.txt

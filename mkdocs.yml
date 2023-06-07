@@ -1,0 +1,30 @@
+### Site metadata ###
+
+site_name: crnpy Documentation
+site_description: Documentation for the crnpy package.
+site_url: https://github.com/soilwater/crnpy
+repo_url: https://github.com/soilwater/crnpy
+
+### Build settings ###
+
+theme: 'material'
+
+plugins:
+- search
+- mkdocs-jupyter
+- mkdocstrings
+
+nav:
+  - Home: index.md
+  - Reference: reference.md
+  - Examples:
+      - 'Example 1': examples/example_Hydroinnova_rover.ipynb
+      - 'Example 2': examples/example_RDT_station.ipynb
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css

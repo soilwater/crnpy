@@ -1,0 +1,10 @@
+LICENSE
+README.md
+setup.py
+crnpy.egg-info/PKG-INFO
+crnpy.egg-info/SOURCES.txt
+crnpy.egg-info/dependency_links.txt
+crnpy.egg-info/top_level.txt
+src/crnpy/__init__.py
+src/crnpy/crnpy.py
+src/crnpy/readers.py
