@@ -1,4 +1,7 @@
 # Cosmic-Ray Neutron Python (CRNPY) Library
+
+<img src="img/logo/crnpy-logo.png" alt="CRNPY logo" width="200"/>
+
 ## Overview
 
 Welcome to the homepage of the CRNPY (Cosmic-Ray Neutron Python) library, an open-source Python library designed for the processing and conversion of raw neutron counts from Cosmic-Ray Neutron Probes (CRNP) into accurate field-level soil moisture data.
@@ -7,8 +10,13 @@ This library has been developed with the intent of providing a comprehensive yet
 
 ## Key Features
 - Versatility: CRNPY can handle data from various CRNP manufacturers and models. It has been successfully tested on both roving and stationary CRNP.
+- Modularity: The library is designed to be modular, allowing users to easily customize the processing workflow to their needs.
 - Accuracy: The library shows excellent agreement with ground-based measurements, making it a reliable tool for scientific research and practical applications.
 - Correction Routines: The correction functions of the library have been effectively used to represent field and watershed scale soil moisture conditions.
+
+![CRNPY Processing Workflow](img/workflow.png)
+Overview of the proposed CRNPY processing workflow. Final user can choose to use the entire workflow, part of it, or build functions on top of it depending on their needs, dashed lines indicate optional steps.
+
 
 ## Installation
 

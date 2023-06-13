@@ -11,6 +11,7 @@ theme: 'material'
 
 plugins:
 - search
+- autorefs
 - mkdocs-jupyter
 - mkdocstrings
 
@@ -18,8 +19,16 @@ nav:
   - Home: index.md
   - Reference: reference.md
   - Examples:
+<<<<<<< Updated upstream
       - 'Example 1': examples/example_Hydroinnova_rover.ipynb
       - 'Example 2': examples/example_RDT_station.ipynb
+=======
+      Usage:
+        - examples/usage.md
+        - 'Example 1': examples/stationary/example_RDT_station.ipynb
+        - 'Example 2': examples/rover/Hydroinnova_rover_example.ipynb
+      Device calibration: examples/calibration/calibration.ipynb
+>>>>>>> Stashed changes
 
 extra_javascript:
   - javascripts/katex.js
