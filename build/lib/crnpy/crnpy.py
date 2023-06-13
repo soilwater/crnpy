@@ -1118,11 +1118,14 @@ def smooth_2D(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=False):
         distances = euclidean_distance(px, py, x, y)
         idx_within_buffer = distances <= buffer
 
-        if len(distances[idx_within_buffer]) > min_neighbours:
+
+        if np.isnan(z[k]):
+            z_new_val = np.nan
+        elif len(distances[idx_within_buffer]) > min_neighbours:
             if method == 'mean':
-                z_new_val = np.mean(z[idx_within_buffer])
+                z_new_val = np.nanmean(z[idx_within_buffer])
             elif method == 'median':
-                z_new_val = np.median(z[idx_within_buffer])
+                z_new_val = np.nanmedian(z[idx_within_buffer])
             else:
                 raise f"Method {method} does not exist. Provide either 'mean' or 'median'."
         else:
