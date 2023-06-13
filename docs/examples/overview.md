@@ -1,6 +1,6 @@
-# CRNPy Usage Examples Overview
+# CRNPy Examples Overview
 
-This document provides an overview of the usage examples available for the Cosmic Ray Neutron Python (CRNPy) library. The examples demonstrate how to process and analyze neutron detection data from various detectors.
+This document provides an overview of the examples available for the Cosmic Ray Neutron Python (CRNPy) library. The examples demonstrate how to process and analyze neutron detection data from various detectors.
 
 ## [Stationary Example: RDT Station](../stationary/example_RDT_station/)
 

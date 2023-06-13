@@ -1,6 +1,6 @@
 # Cosmic-Ray Neutron Python (CRNPY) Library
 
-<img src="img/logo/crnpy-logo.png" alt="CRNPY logo" width="200"/>
+<img src="img/logo/crnpy-logo.png" alt="CRNPY logo" width="250"/>
 
 ## Overview
 

@@ -957,6 +957,10 @@ def latlon_to_utm(lat, lon, utm_zone_number, missing_values=None):
     Function only applies to non-polar coordinates.
     If further functionality is required, consider using the utm module. See references for more information.
 
+    ![UTM zones](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Universal_Transverse_Mercator_zones.svg/1920px-Universal_Transverse_Mercator_zones.svg.png)
+    UTM zones on an equirectangular world map with irregular zones in red and New York City's zone highlighted. See [UTM zones](https://en.wikipedia.org/wiki/Universal_Transverse_Mercator_coordinate_system#UTM_zones) for a full description.
+
+
     Args:
         lat (float, array): Latitude in decimal degrees.
         lon (float, array): Longitude in decimal degrees.

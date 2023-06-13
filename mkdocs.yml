@@ -7,7 +7,10 @@ repo_url: https://github.com/soilwater/crnpy
 
 ### Build settings ###
 
-theme: 'material'
+theme:
+  name: 'material'
+  logo: img/logo/crnpy-logo-mini.svg
+  favicon: img/logo/favicon.png
 
 plugins:
 - search
@@ -19,11 +22,10 @@ nav:
   - Home: index.md
   - Reference: reference.md
   - Examples:
-      Usage:
-        - examples/usage.md
-        - 'Example 1': examples/stationary/example_RDT_station.ipynb
-        - 'Example 2': examples/rover/Hydroinnova_rover_example.ipynb
-      Device calibration: examples/calibration/calibration.ipynb
+      - examples/overview.md
+      - 'Example 1': examples/stationary/example_RDT_station.ipynb
+      - 'Example 2': examples/rover/Hydroinnova_rover_example.ipynb
+      - 'Device calibration': examples/calibration/calibration.ipynb
 
 
 extra_javascript:
