@@ -485,7 +485,7 @@ def interpolate_incoming_flux(df_flux, timestamps):
     df_flux = df_flux['counts'].interpolate(method='nearest', limit_direction='both')
 
     # Retur only the values for the selected timestamps
-    return df_flux.loc[timestamps].values
+    return df_flux.loc[timestamps]
 
 
 def smooth_1D(corrected_counts,window=5,order=3, method='moving_median'):
@@ -1120,9 +1120,9 @@ def smooth_2D(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=False):
 
         if len(distances[idx_within_buffer]) > min_neighbours:
             if method == 'mean':
-                z_new_val = np.mean(z[idx_within_buffer])
+                z_new_val = np.nanmean(z[idx_within_buffer])
             elif method == 'median':
-                z_new_val = np.median(z[idx_within_buffer])
+                z_new_val = np.nanmedian(z[idx_within_buffer])
             else:
                 raise f"Method {method} does not exist. Provide either 'mean' or 'median'."
         else:

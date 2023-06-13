@@ -339,8 +339,6 @@ def atm_correction(raw_counts, pressure, humidity, temp, Pref, Aref, L, incoming
         Andreasen, M., Jensen, K.H., Desilets, D., Franz, T.E., Zreda, M., Bogena, H.R. and Looms, M.C., 2017.
         Status and perspectives on the cosmic‐ray neutron method for soil moisture estimation and other
         environmental science applications. Vadose zone journal, 16(8), pp.1-11. doi.org/10.2136/vzj2017.04.0086
-
-
     """
 
     ### Barometric pressure factor
@@ -487,7 +485,7 @@ def interpolate_incoming_flux(df_flux, timestamps):
     df_flux = df_flux['counts'].interpolate(method='nearest', limit_direction='both')
 
     # Retur only the values for the selected timestamps
-    return df_flux.loc[timestamps].values
+    return df_flux.loc[timestamps]
 
 
 def smooth_1D(corrected_counts,window=5,order=3, method='moving_median'):
