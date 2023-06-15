@@ -15,7 +15,10 @@ theme:
 plugins:
 - search
 - autorefs
-- mkdocs-jupyter
+- mkdocs-jupyter:
+    remove_tag_config:
+      remove_input_tags:
+        - hide-input
 - mkdocstrings
 
 nav:
