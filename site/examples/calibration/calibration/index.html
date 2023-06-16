@@ -1666,7 +1666,7 @@ Licensed under the Apache License, Version 2.0.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -1681,10 +1681,18 @@ Licensed under the Apache License, Version 2.0.
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">df_soil</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/soil_data.csv&quot;</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">crnpy</span> <span class="kn">import</span> <span class="n">crnpy</span>
+
+<span class="n">df_soil</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/soil_data.csv&quot;</span><span class="p">)</span>
 <span class="n">df_soil</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
-<div id="cell-1" class="clipboard-copy-txt">df_soil = pd.read_csv("https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/soil_data.csv")
+<div id="cell-1" class="clipboard-copy-txt">import pandas as pd
+import numpy as np
+from crnpy import crnpy
+
+df_soil = pd.read_csv("https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/soil_data.csv")
 df_soil.head()</div>
         
         </div>
@@ -1699,123 +1707,181 @@ df_soil.head()</div>
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
 
 
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>
-<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
-<span class="ansi-red-intense-fg ansi-bold">HTTPError</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-intense-fg ansi-bold">In[12], line 1</span>
-<span class="ansi-green-intense-fg ansi-bold">----&gt; 1</span> df_soil <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">pd</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">read_csv</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/soil_data.csv</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">      2</span> df_soil<span style="color: rgb(98,98,98)">.</span>head()
 
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\pandas\io\parsers\readers.py:912</span>, in <span class="ansi-cyan-fg">read_csv</span><span class="ansi-blue-intense-fg ansi-bold">(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, date_format, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options, dtype_backend)</span>
-<span class="ansi-green-fg">    899</span> kwds_defaults <span style="color: rgb(98,98,98)">=</span> _refine_defaults_read(
-<span class="ansi-green-fg">    900</span>     dialect,
-<span class="ansi-green-fg">    901</span>     delimiter,
-<span class="ansi-green-intense-fg ansi-bold">   (...)</span>
-<span class="ansi-green-fg">    908</span>     dtype_backend<span style="color: rgb(98,98,98)">=</span>dtype_backend,
-<span class="ansi-green-fg">    909</span> )
-<span class="ansi-green-fg">    910</span> kwds<span style="color: rgb(98,98,98)">.</span>update(kwds_defaults)
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 912</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">_read</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">filepath_or_buffer</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">kwds</span><span class="ansi-yellow-bg">)</span>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\pandas\io\parsers\readers.py:577</span>, in <span class="ansi-cyan-fg">_read</span><span class="ansi-blue-intense-fg ansi-bold">(filepath_or_buffer, kwds)</span>
-<span class="ansi-green-fg">    574</span> _validate_names(kwds<span style="color: rgb(98,98,98)">.</span>get(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">names</span><span style="color: rgb(175,0,0)">&#34;</span>, <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>))
-<span class="ansi-green-fg">    576</span> <span style="color: rgb(95,135,135)"># Create the parser.</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 577</span> parser <span style="color: rgb(98,98,98)">=</span> TextFileReader(filepath_or_buffer, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwds)
-<span class="ansi-green-fg">    579</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> chunksize <span class="ansi-bold" style="color: rgb(175,0,255)">or</span> iterator:
-<span class="ansi-green-fg">    580</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> parser
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
 
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\pandas\io\parsers\readers.py:1407</span>, in <span class="ansi-cyan-fg">TextFileReader.__init__</span><span class="ansi-blue-intense-fg ansi-bold">(self, f, engine, **kwds)</span>
-<span class="ansi-green-fg">   1404</span>     <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>options[<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">has_index_names</span><span style="color: rgb(175,0,0)">&#34;</span>] <span style="color: rgb(98,98,98)">=</span> kwds[<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">has_index_names</span><span style="color: rgb(175,0,0)">&#34;</span>]
-<span class="ansi-green-fg">   1406</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>handles: IOHandles <span style="color: rgb(98,98,98)">|</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span> <span style="color: rgb(98,98,98)">=</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>
-<span class="ansi-green-intense-fg ansi-bold">-&gt; 1407</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_engine <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_make_engine</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">f</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">engine</span><span class="ansi-yellow-bg">)</span>
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\pandas\io\parsers\readers.py:1661</span>, in <span class="ansi-cyan-fg">TextFileReader._make_engine</span><span class="ansi-blue-intense-fg ansi-bold">(self, f, engine)</span>
-<span class="ansi-green-fg">   1659</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">b</span><span style="color: rgb(175,0,0)">&#34;</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> mode:
-<span class="ansi-green-fg">   1660</span>         mode <span style="color: rgb(98,98,98)">+</span><span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">b</span><span style="color: rgb(175,0,0)">&#34;</span>
-<span class="ansi-green-intense-fg ansi-bold">-&gt; 1661</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>handles <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">get_handle</span><span class="ansi-yellow-bg">(</span>
-<span class="ansi-green-fg">   1662</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">f</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">   1663</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">   1664</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">options</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">encoding</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">None</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">   1665</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">compression</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">options</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">compression</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">None</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">   1666</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">memory_map</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">options</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">memory_map</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">False</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">   1667</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">is_text</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">is_text</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">   1668</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">errors</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">options</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">encoding_errors</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">strict</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">   1669</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">storage_options</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">options</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">get</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">storage_options</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">None</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">   1670</span> <span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">   1671</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>handles <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>
-<span class="ansi-green-fg">   1672</span> f <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>handles<span style="color: rgb(98,98,98)">.</span>handle
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\pandas\io\common.py:716</span>, in <span class="ansi-cyan-fg">get_handle</span><span class="ansi-blue-intense-fg ansi-bold">(path_or_buf, mode, encoding, compression, memory_map, is_text, errors, storage_options)</span>
-<span class="ansi-green-fg">    713</span>     codecs<span style="color: rgb(98,98,98)">.</span>lookup_error(errors)
-<span class="ansi-green-fg">    715</span> <span style="color: rgb(95,135,135)"># open URLs</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 716</span> ioargs <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">_get_filepath_or_buffer</span><span class="ansi-yellow-bg">(</span>
-<span class="ansi-green-fg">    717</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">path_or_buf</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    718</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">encoding</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    719</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">compression</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">compression</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    720</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    721</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">storage_options</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">storage_options</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    722</span> <span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">    724</span> handle <span style="color: rgb(98,98,98)">=</span> ioargs<span style="color: rgb(98,98,98)">.</span>filepath_or_buffer
-<span class="ansi-green-fg">    725</span> handles: <span style="color: rgb(0,135,0)">list</span>[BaseBuffer]
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\pandas\io\common.py:368</span>, in <span class="ansi-cyan-fg">_get_filepath_or_buffer</span><span class="ansi-blue-intense-fg ansi-bold">(filepath_or_buffer, encoding, compression, mode, storage_options)</span>
-<span class="ansi-green-fg">    366</span> <span style="color: rgb(95,135,135)"># assuming storage_options is to be interpreted as headers</span>
-<span class="ansi-green-fg">    367</span> req_info <span style="color: rgb(98,98,98)">=</span> urllib<span style="color: rgb(98,98,98)">.</span>request<span style="color: rgb(98,98,98)">.</span>Request(filepath_or_buffer, headers<span style="color: rgb(98,98,98)">=</span>storage_options)
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 368</span> <span class="ansi-bold" style="color: rgb(0,135,0)">with</span> <span class="ansi-yellow-bg">urlopen</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">req_info</span><span class="ansi-yellow-bg">)</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> req:
-<span class="ansi-green-fg">    369</span>     content_encoding <span style="color: rgb(98,98,98)">=</span> req<span style="color: rgb(98,98,98)">.</span>headers<span style="color: rgb(98,98,98)">.</span>get(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Content-Encoding</span><span style="color: rgb(175,0,0)">&#34;</span>, <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>)
-<span class="ansi-green-fg">    370</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> content_encoding <span style="color: rgb(98,98,98)">==</span> <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">gzip</span><span style="color: rgb(175,0,0)">&#34;</span>:
-<span class="ansi-green-fg">    371</span>         <span style="color: rgb(95,135,135)"># Override compression based on Content-Encoding header</span>
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\pandas\io\common.py:270</span>, in <span class="ansi-cyan-fg">urlopen</span><span class="ansi-blue-intense-fg ansi-bold">(*args, **kwargs)</span>
-<span class="ansi-green-fg">    264</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;</span>
-<span class="ansi-green-fg">    265</span> <span style="color: rgb(175,0,0)">Lazy-import wrapper for stdlib urlopen, as that imports a big chunk of</span>
-<span class="ansi-green-fg">    266</span> <span style="color: rgb(175,0,0)">the stdlib.</span>
-<span class="ansi-green-fg">    267</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;</span>
-<span class="ansi-green-fg">    268</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">urllib</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">request</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 270</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> urllib<span style="color: rgb(98,98,98)">.</span>request<span style="color: rgb(98,98,98)">.</span>urlopen(<span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs)
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\urllib\request.py:216</span>, in <span class="ansi-cyan-fg">urlopen</span><span class="ansi-blue-intense-fg ansi-bold">(url, data, timeout, cafile, capath, cadefault, context)</span>
-<span class="ansi-green-fg">    214</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
-<span class="ansi-green-fg">    215</span>     opener <span style="color: rgb(98,98,98)">=</span> _opener
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 216</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">opener</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">open</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">url</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">data</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">timeout</span><span class="ansi-yellow-bg">)</span>
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\urllib\request.py:525</span>, in <span class="ansi-cyan-fg">OpenerDirector.open</span><span class="ansi-blue-intense-fg ansi-bold">(self, fullurl, data, timeout)</span>
-<span class="ansi-green-fg">    523</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> processor <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>process_response<span style="color: rgb(98,98,98)">.</span>get(protocol, []):
-<span class="ansi-green-fg">    524</span>     meth <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">getattr</span>(processor, meth_name)
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 525</span>     response <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">meth</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">req</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">response</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">    527</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> response
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\urllib\request.py:634</span>, in <span class="ansi-cyan-fg">HTTPErrorProcessor.http_response</span><span class="ansi-blue-intense-fg ansi-bold">(self, request, response)</span>
-<span class="ansi-green-fg">    631</span> <span style="color: rgb(95,135,135)"># According to RFC 2616, &#34;2xx&#34; code indicates that the client&#39;s</span>
-<span class="ansi-green-fg">    632</span> <span style="color: rgb(95,135,135)"># request was successfully received, understood, and accepted.</span>
-<span class="ansi-green-fg">    633</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> (<span style="color: rgb(98,98,98)">200</span> <span style="color: rgb(98,98,98)">&lt;</span><span style="color: rgb(98,98,98)">=</span> code <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">300</span>):
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 634</span>     response <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">parent</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">error</span><span class="ansi-yellow-bg">(</span>
-<span class="ansi-green-fg">    635</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">http</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#39;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">request</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">response</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">code</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">msg</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">hdrs</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">    637</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> response
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\urllib\request.py:563</span>, in <span class="ansi-cyan-fg">OpenerDirector.error</span><span class="ansi-blue-intense-fg ansi-bold">(self, proto, *args)</span>
-<span class="ansi-green-fg">    561</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> http_err:
-<span class="ansi-green-fg">    562</span>     args <span style="color: rgb(98,98,98)">=</span> (<span style="color: rgb(0,135,0)">dict</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">default</span><span style="color: rgb(175,0,0)">&#39;</span>, <span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">http_error_default</span><span style="color: rgb(175,0,0)">&#39;</span>) <span style="color: rgb(98,98,98)">+</span> orig_args
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 563</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_call_chain</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">)</span>
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\urllib\request.py:496</span>, in <span class="ansi-cyan-fg">OpenerDirector._call_chain</span><span class="ansi-blue-intense-fg ansi-bold">(self, chain, kind, meth_name, *args)</span>
-<span class="ansi-green-fg">    494</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> handler <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> handlers:
-<span class="ansi-green-fg">    495</span>     func <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">getattr</span>(handler, meth_name)
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 496</span>     result <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">func</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">    497</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> result <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>:
-<span class="ansi-green-fg">    498</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> result
-
-File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\envs\crnpy\lib\urllib\request.py:643</span>, in <span class="ansi-cyan-fg">HTTPDefaultErrorHandler.http_error_default</span><span class="ansi-blue-intense-fg ansi-bold">(self, req, fp, code, msg, hdrs)</span>
-<span class="ansi-green-fg">    642</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">http_error_default</span>(<span style="color: rgb(0,135,0)">self</span>, req, fp, code, msg, hdrs):
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 643</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> HTTPError(req<span style="color: rgb(98,98,98)">.</span>full_url, code, msg, hdrs, fp)
-
-<span class="ansi-red-intense-fg ansi-bold">HTTPError</span>: HTTP Error 404: Not Found</pre>
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>field</th>
+      <th>date</th>
+      <th>core_number</th>
+      <th>distance_from_station</th>
+      <th>latitude</th>
+      <th>longitude</th>
+      <th>top_depth</th>
+      <th>bottom_depth</th>
+      <th>core_diameter</th>
+      <th>wet_mass_with_bag</th>
+      <th>...</th>
+      <th>can_number</th>
+      <th>mass_empty_can</th>
+      <th>wet_mass_with_can</th>
+      <th>dry_mass_with_can</th>
+      <th>mass_water</th>
+      <th>theta_g</th>
+      <th>volume</th>
+      <th>bulk_density</th>
+      <th>theta_v</th>
+      <th>Observation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Flickner</td>
+      <td>22-Oct</td>
+      <td>1</td>
+      <td>5</td>
+      <td>N38.23459</td>
+      <td>W97.57101</td>
+      <td>0</td>
+      <td>5</td>
+      <td>30.49</td>
+      <td>45.31</td>
+      <td>...</td>
+      <td>1</td>
+      <td>52.10</td>
+      <td>92.03</td>
+      <td>85.31</td>
+      <td>6.72</td>
+      <td>0.202</td>
+      <td>36.514864</td>
+      <td>0.909</td>
+      <td>0.184403</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Flickner</td>
+      <td>22-Oct</td>
+      <td>1</td>
+      <td>5</td>
+      <td>N38.23459</td>
+      <td>W97.57101</td>
+      <td>5</td>
+      <td>10</td>
+      <td>30.49</td>
+      <td>69.53</td>
+      <td>...</td>
+      <td>2</td>
+      <td>51.85</td>
+      <td>115.97</td>
+      <td>103.85</td>
+      <td>12.12</td>
+      <td>0.233</td>
+      <td>36.514864</td>
+      <td>1.424</td>
+      <td>0.332585</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Flickner</td>
+      <td>22-Oct</td>
+      <td>1</td>
+      <td>5</td>
+      <td>N38.23459</td>
+      <td>W97.57101</td>
+      <td>10</td>
+      <td>25</td>
+      <td>30.49</td>
+      <td>214.90</td>
+      <td>...</td>
+      <td>3</td>
+      <td>51.56</td>
+      <td>260.97</td>
+      <td>219.77</td>
+      <td>41.20</td>
+      <td>0.245</td>
+      <td>109.544592</td>
+      <td>1.536</td>
+      <td>0.376856</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Flickner</td>
+      <td>22-Oct</td>
+      <td>1</td>
+      <td>5</td>
+      <td>N38.23459</td>
+      <td>W97.57101</td>
+      <td>25</td>
+      <td>40</td>
+      <td>30.49</td>
+      <td>217.52</td>
+      <td>...</td>
+      <td>4</td>
+      <td>52.35</td>
+      <td>264.46</td>
+      <td>222.23</td>
+      <td>42.23</td>
+      <td>0.249</td>
+      <td>109.544592</td>
+      <td>1.551</td>
+      <td>0.386278</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Flickner</td>
+      <td>22-Oct</td>
+      <td>2</td>
+      <td>5</td>
+      <td>N38.23464</td>
+      <td>W97.57101</td>
+      <td>0</td>
+      <td>5</td>
+      <td>30.49</td>
+      <td>45.92</td>
+      <td>...</td>
+      <td>5</td>
+      <td>52.15</td>
+      <td>92.59</td>
+      <td>85.93</td>
+      <td>6.66</td>
+      <td>0.197</td>
+      <td>36.514864</td>
+      <td>0.925</td>
+      <td>0.182757</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 21 columns</p>
 </div>
+</div>
+
 </div>
 
 </div>
@@ -1841,7 +1907,7 @@ File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\env
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -1856,7 +1922,7 @@ File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\env
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">df_station</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;station_data.csv&quot;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">df_station</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv&quot;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
 <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_h&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">estimate_abs_humidity</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
 <span class="n">nrad_weights</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">nrad_weight</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_h&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;theta_v&#39;</span><span class="p">],</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;distance_from_station&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;bottom_depth&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;top_depth&#39;</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">rhob</span><span class="o">=</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;bulk_density&#39;</span><span class="p">])</span>
 
@@ -1864,7 +1930,7 @@ File <span class="ansi-green-intense-fg ansi-bold">~\AppData\Local\anaconda3\env
 <span class="n">field_bulk_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;bulk_density&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">nrad_weights</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Field Volumetric Water content: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">field_theta_v</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
-<div id="cell-2" class="clipboard-copy-txt">df_station = pd.read_csv("station_data.csv", skiprows=[0,2,3])
+<div id="cell-2" class="clipboard-copy-txt">df_station = pd.read_csv("https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv", skiprows=[0,2,3])
 df_station['abs_h'] = crnpy.estimate_abs_humidity(df_station['relative_humidity_Avg'], df_station['air_temperature_Avg'])
 nrad_weights = crnpy.nrad_weight(df_station['abs_h'].mean(), df_soil['theta_v'], df_soil['distance_from_station'], (df_soil['bottom_depth']+df_soil['top_depth'])/2, rhob=df_soil['bulk_density'])
 
@@ -1924,7 +1990,7 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
 
 
 
@@ -1988,18 +2054,18 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
     <tr>
       <th>2021-10-22 07:00:00</th>
       <td>2021-10-22 07:00:00</td>
-      <td>704</td>
+      <td>704.0</td>
       <td>KS003</td>
       <td>Flickner</td>
       <td>Rainfed South</td>
       <td>38.23461</td>
       <td>-97.57095</td>
-      <td>455</td>
+      <td>455.0</td>
       <td>7.232</td>
-      <td>774</td>
-      <td>796</td>
+      <td>774.0</td>
+      <td>796.0</td>
       <td>8.75</td>
-      <td>965</td>
+      <td>965.0</td>
       <td>80.20</td>
       <td>7.95</td>
       <td>8.30</td>
@@ -2007,18 +2073,18 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
     <tr>
       <th>2021-10-22 08:00:00</th>
       <td>2021-10-22 08:00:00</td>
-      <td>705</td>
+      <td>705.0</td>
       <td>KS003</td>
       <td>Flickner</td>
       <td>Rainfed South</td>
       <td>38.23461</td>
       <td>-97.57095</td>
-      <td>455</td>
+      <td>455.0</td>
       <td>10.090</td>
-      <td>753</td>
-      <td>860</td>
+      <td>753.0</td>
+      <td>860.0</td>
       <td>9.13</td>
-      <td>965</td>
+      <td>965.0</td>
       <td>79.00</td>
       <td>9.52</td>
       <td>9.10</td>
@@ -2026,18 +2092,18 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
     <tr>
       <th>2021-10-22 09:00:00</th>
       <td>2021-10-22 09:00:00</td>
-      <td>706</td>
+      <td>706.0</td>
       <td>KS003</td>
       <td>Flickner</td>
       <td>Rainfed South</td>
       <td>38.23461</td>
       <td>-97.57095</td>
-      <td>455</td>
+      <td>455.0</td>
       <td>17.330</td>
-      <td>736</td>
-      <td>796</td>
+      <td>736.0</td>
+      <td>796.0</td>
       <td>10.18</td>
-      <td>965</td>
+      <td>965.0</td>
       <td>73.95</td>
       <td>13.38</td>
       <td>11.68</td>
@@ -2045,18 +2111,18 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
     <tr>
       <th>2021-10-22 10:00:00</th>
       <td>2021-10-22 10:00:00</td>
-      <td>707</td>
+      <td>707.0</td>
       <td>KS003</td>
       <td>Flickner</td>
       <td>Rainfed South</td>
       <td>38.23461</td>
       <td>-97.57095</td>
-      <td>455</td>
+      <td>455.0</td>
       <td>22.370</td>
-      <td>744</td>
-      <td>832</td>
+      <td>744.0</td>
+      <td>832.0</td>
       <td>10.98</td>
-      <td>964</td>
+      <td>964.0</td>
       <td>64.33</td>
       <td>17.40</td>
       <td>15.10</td>
@@ -2064,18 +2130,18 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
     <tr>
       <th>2021-10-22 11:00:00</th>
       <td>2021-10-22 11:00:00</td>
-      <td>708</td>
+      <td>708.0</td>
       <td>KS003</td>
       <td>Flickner</td>
       <td>Rainfed South</td>
       <td>38.23461</td>
       <td>-97.57095</td>
-      <td>455</td>
+      <td>455.0</td>
       <td>25.880</td>
-      <td>762</td>
-      <td>838</td>
+      <td>762.0</td>
+      <td>838.0</td>
       <td>10.98</td>
-      <td>964</td>
+      <td>964.0</td>
       <td>52.10</td>
       <td>21.20</td>
       <td>18.30</td>
@@ -2109,7 +2175,7 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -2153,7 +2219,7 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -2226,7 +2292,7 @@ Using median count time as expected count time: 3600.0
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
@@ -2291,7 +2357,7 @@ Using median count time as expected count time: 3600.0
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
