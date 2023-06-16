@@ -1507,7 +1507,7 @@ import matplotlib.pyplot as plt
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Sample dataset</span>
 <span class="n">col_names</span> <span class="o">=</span> <span class="s1">&#39;RecordNum,Date Time(UTC),PTB110_mb,P4_mb,P1_mb,T1_C,RH1,T_CS215,RH_CS215,Vbat,N1Cts,N2Cts,N3Cts,N4Cts,N5Cts,N6Cts,N7Cts,N8Cts,N1ETsec,N3ETsec,N5ETsec,N7ETsec,N1T(C),N1RH,N5T(C),N5RH,GpsUTC,LatDec,LongDec,Alt,Qual,NumSats,HDOP,Speed_kmh,COG,SpeedQuality,strDate&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;gypsum_transect_01_may_2018.KSU&#39;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/rover/gypsum_transect_01_may_2018.KSU&#39;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LongDec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LongDec&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># Raw data is in absolute values</span>
 
 <span class="c1"># Parse timestamps and set as index</span>
@@ -1525,7 +1525,7 @@ import matplotlib.pyplot as plt
 </pre></div>
 <div id="cell-2" class="clipboard-copy-txt"># Sample dataset
 col_names = 'RecordNum,Date Time(UTC),PTB110_mb,P4_mb,P1_mb,T1_C,RH1,T_CS215,RH_CS215,Vbat,N1Cts,N2Cts,N3Cts,N4Cts,N5Cts,N6Cts,N7Cts,N8Cts,N1ETsec,N3ETsec,N5ETsec,N7ETsec,N1T(C),N1RH,N5T(C),N5RH,GpsUTC,LatDec,LongDec,Alt,Qual,NumSats,HDOP,Speed_kmh,COG,SpeedQuality,strDate'.split(',')
-df = pd.read_csv('gypsum_transect_01_may_2018.KSU', skiprows=20, names=col_names)
+df = pd.read_csv('https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/rover/gypsum_transect_01_may_2018.KSU', skiprows=20, names=col_names)
 df['LongDec'] = df['LongDec'] * -1 # Raw data is in absolute values
 
 # Parse timestamps and set as index
