@@ -1,7 +1,7 @@
 ### Site metadata ###
 
-site_name: crnpy Documentation
-site_description: Documentation for the crnpy package.
+site_name: CRNPy Documentation
+site_description: Documentation for the CRNPy package.
 site_url: https://github.com/soilwater/crnpy
 repo_url: https://github.com/soilwater/crnpy
 

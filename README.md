@@ -1,39 +1,30 @@
-# CRNPy
-A Python toolbox for handling common tasks with cosmic-ray neutron probes. 
+# Cosmic-Ray Neutron Python (CRNPy) Library
 
-The toolbox consists of a series of python routines to help researchers and practicioners convert cosmic-ray neutron observations into volumetric water content. The package includes a routine for calibration of detectors using field observations. The toolbox was developed using common libraries for scientific computing like Pandas, NumPy, Matplotlib, and SciPy.
+<img src="/docs/img/logo/crnpy-logo.png" alt="CRNPY logo" width="250"/>
 
-## Why building on top of Pandas
+## Overview
 
-- Each sensor variable is represented by a column variable
-- Each timestamp observation is represented by a row
-- Each sensor dataset is represented by a table
+Welcome to the homepage of the CRNPy (Cosmic-Ray Neutron Python) library, an open-source Python library designed for the processing and conversion of raw neutron counts from Cosmic-Ray Neutron Probes (CRNP) into accurate field-level soil moisture data.
 
-## Functionality
-The toolbox seamlessly integrates with Pandas DataFrames for easy tabular data handling on top of the raw sensor data. The toolbox is desgined to read raw sensor data and append additional variables to the existing DataFrame. This way, researchers can export processed files while retaining all the raw data for better reproducibility and transparency.
+This library has been developed with the intent of providing a comprehensive yet easy-to-use workflow for processing raw data from a variety of CRNP, encompassing multiple manufacturers and models.
 
-- Helper functions for reading tabular data
-- Helper functions to tidy datasets (e.g. fill rows with missing timestamps)
-- Fill incomplete counts and flag spurious data
-- Filter time series of neutron counts
-- Corrections of neutron counts by atmospheric conditions and incoming neutron flux
-- Conversion of neutron counts to volumetric water content
-- Estimate sensing depth
-- Estimate surface and sub-surface soil water storage
-- Functions for calibration and validation of new detectors
-- Out-of-the-box plotting functions to generate publication-quality figures
+## Key Features
+- Versatility: CRNPy can handle data from various CRNP manufacturers and models. It has been successfully tested on both roving and stationary CRNP.
+- Modularity: The library is designed to be modular, allowing users to easily customize the processing workflow to their needs.
+- Accuracy: The library shows excellent agreement with ground-based measurements, making it a reliable tool for scientific research and practical applications.
+- Correction Routines: The correction functions of the library have been effectively used to represent field and watershed scale soil moisture conditions.
 
-## Conventions
+![CRNPy Processing Workflow](docs/img/workflow.png)
+Overview of the proposed CRNPy processing workflow. Final user can choose to use the entire workflow, part of it, or build functions on top of it depending on their needs, dashed lines indicate optional steps.
 
-Function documentation follows PEP 257 docstring conventions.
 
-Notation in equations follow published articles for easy referencing and future development.
+## Installation
 
-## References
-These references represent peer-reviewed articles that used one or more functions included in the toolbox.
+To install the CRNPy library, you can use Python's package manager, pip. Simply open your command line or terminal and type:
 
-Dong, J., Ochsner, T.E., Zreda, M., Cosh, M.H. and Zou, C.B., 2014. Calibration and validation of the COSMOS rover for surface soil moisture measurement. Vadose Zone Journal, 13(4). doi.org/10.2136/vzj2013.08.0148
+```pip install crnpy```
 
-Patrignani, A., Ochsner, T., Montag, B. and Bellinger, S., 2021. A Novel Lithium Foil Cosmic-Ray Neutron Detector for Measuring Field-Scale Soil Moisture. Frontiers in Water, 3, p.67. doi.org/10.3389/frwa.2021.673185
+## Authors
+The CRNPy library was conceived and developed by Joaquin Peraza and Andres Patrignani in the Soil Water Processes Lab at Kansas State University. The team's passion for making soil moisture data more accessible and easier to process culminated in this powerful tool.
 
-Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020. Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9. doi.org/10.3389/frwa.2020.00009
+The Soil Water Processes Lab at Kansas State University is a leading research group focused on understanding and modeling soil water processes. The lab combines a range of experimental and computational approaches to tackle some of the most pressing issues in soil and water research. The development of the CRNPy library is a testament to the lab's commitment to pushing the boundaries of soil science through the innovative use of technology. like to acknowledge the contributions of the wider scientific community in testing and providing feedback on the library, which has been instrumental in its ongoing development.
