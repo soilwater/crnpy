@@ -128,7 +128,7 @@ def fill_counts(counts, count_times=None, expected_time=False, threshold=0.25, l
     counts=counts.copy()
 
     if type(counts.index) == pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
-        warnings.warn("No count time columns provided. Using timestamp index to compute count time.")
+        print("No count time columns provided. Using timestamp index to compute count time.")
         count_times = counts.index.to_series().diff().dt.total_seconds()
 
     if type(counts.index) != pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
@@ -460,7 +460,7 @@ the origin by a sentence like 'We acknowledge the NMDB database (www.nmdb.eu) fo
 (Physikalisches Institut, University of Bern, Switzerland)"""
     #print(acknowledgement)
 
-    return df_flux
+    return df_flux.set_index('timestamp')
 
 def interpolate_incoming_flux(df_flux, timestamps):
     """Function to interpolate incoming neutron flux to match the timestamps of the observations.
@@ -473,9 +473,10 @@ def interpolate_incoming_flux(df_flux, timestamps):
         (pd.DataFrame): Dataframe containing interpolated incoming neutron flux.
     """
 
-    # Add timestamps with nan values to the dataframe
-    df_flux['timestamp'] = pd.to_datetime(df_flux['timestamp'])
-    df_flux = df_flux.set_index('timestamp')
+    # Check that index is datetime
+    if not isinstance(df_flux.index, pd.DatetimeIndex):
+        raise ValueError('Index of df_flux must be datetime')
+
     for timestamp in timestamps:
         if timestamp not in df_flux.index:
             df_flux.loc[timestamp] = np.nan
@@ -678,12 +679,37 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, method='Schron_2017'
 
     return results
 
+def estimate_abs_humidity(RH, temp):
+    """
+    Compute the actual vapor pressure (e) in g m^-3 using RH (%) and current temperature (c) observations.
+
+    Args:
+        RH (float): relative humidity (%)
+        temp (float): temperature (Celsius)
+
+    Returns:
+        float: actual vapor pressure (g m^-3)
+    """
+
+    ### Atmospheric water vapor factor
+    # Saturation vapor pressure
+    e_sat = 0.611 * np.exp(17.502 * temp / (
+                temp + 240.97)) * 1000  # in Pascals Eq. 3.8 p.41 Environmental Biophysics (Campbell and Norman)
+
+    # Vapor pressure Pascals
+    Pw = e_sat * RH / 100
+
+    # Absolute humidity (g/m^3)
+    C = 2.16679  # g K/J;
+    abs_h = C * Pw / (temp + 273.15)
+    return abs_h
+
 
 def nrad_weight(h,theta,distances,depth,rhob=1.4):
     """Function to compute distance weights corresponding to each soil sample.
 
     Args:
-        h (float): Air Humidity  from 0.1  to 50    in g/m^3. When h=0, the function will skip the distance weighting.
+        h (float): Air Humidity  from 0.1  to 50 in g/m^3. When h=0, the function will skip the distance weighting.
         theta (array or pd.Series or pd.DataFrame): Soil Moisture for each sample (0.02 - 0.50 m^3/m^3)
         distances (array or pd.Series or pd.DataFrame): Distances from the location of each sample to the origin (0.5 - 600 m)
         depth (array or pd.Series or pd.DataFrame): Depths for each sample (m)
