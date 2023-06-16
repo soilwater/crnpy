@@ -23,12 +23,13 @@ plugins:
 
 nav:
   - Home: index.md
-  - Reference: reference.md
+  - Correction routines: correction_routines.md
   - Examples:
       - examples/overview.md
       - 'Example 1': examples/stationary/example_RDT_station.ipynb
       - 'Example 2': examples/rover/Hydroinnova_rover_example.ipynb
       - 'Device calibration': examples/calibration/calibration.ipynb
+  - Reference: reference.md
 
 
 extra_javascript:

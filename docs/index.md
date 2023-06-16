@@ -11,7 +11,7 @@ This library has been developed with the intent of providing a comprehensive yet
 ## Key Features
 - Versatility: CRNPy can handle data from various CRNP manufacturers and models. It has been successfully tested on both roving and stationary CRNP.
 - Modularity: The library is designed to be modular, allowing users to easily customize the processing workflow to their needs.
-- Accuracy: The library shows excellent agreement with ground-based measurements, making it a reliable tool for scientific research and practical applications.
+- Instrument agnostic: It can be used with any CRNP, allowing users to process data from multiple instruments with their own workflow.
 - Correction Routines: The correction functions of the library have been effectively used to represent field and watershed scale soil moisture conditions.
 
 ![CRNPy Processing Workflow](img/workflow.png)
@@ -25,6 +25,12 @@ To install the CRNPy library, you can use Python's package manager, pip. Simply 
 ```pip install crnpy```
 
 ## Authors
-The CRNPy library was conceived and developed by Joaquin Peraza and Andres Patrignani in the Soil Water Processes Lab at Kansas State University. The team's passion for making soil moisture data more accessible and easier to process culminated in this powerful tool.
 
-The Soil Water Processes Lab at Kansas State University is a leading research group focused on understanding and modeling soil water processes. The lab combines a range of experimental and computational approaches to tackle some of the most pressing issues in soil and water research. The development of the CRNPy library is a testament to the lab's commitment to pushing the boundaries of soil science through the innovative use of technology. like to acknowledge the contributions of the wider scientific community in testing and providing feedback on the library, which has been instrumental in its ongoing development.
+The CRNPy library was developed by:
+
+- Joaquin Peraza
+- Andres Patrignani
+
+in the Soil Water Processes Lab at Kansas State University. The team's passion for making soil moisture data more accessible and easier to process culminated in this powerful tool.
+
+The Soil Water Processes Lab at Kansas State University is a leading research group focused on understanding and modeling soil water processes. The lab combines a range of experimental and computational approaches to tackle some of the most pressing issues in soil and water research. The development of the CRNPy library is a testament to the lab's commitment to pushing the boundaries of soil science through the innovative use of technology. The authors would like to acknowledge the contributions of the wider scientific community in testing and providing feedback on the library, which has been instrumental in its ongoing development.

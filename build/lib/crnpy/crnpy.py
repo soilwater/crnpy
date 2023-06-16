@@ -235,7 +235,7 @@ def compute_total_raw_counts(counts, nan_strategy=None):
     return total_raw_counts
 
 
-def drop_outlier(raw_counts, window=5, store_outliers=False, min_counts=None, max_counts=None):
+def drop_outliers(raw_counts, window=5, store_outliers=False, min_counts=None, max_counts=None):
     """Computation of a moving modified Z-score based on the median absolute difference.
     
     Args:
@@ -631,7 +631,7 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.
 
 
 
-def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, method='Schron_2017',dist=[0.5]):
+def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist, method='Schron_2017'):
     # Convert docstring to google format
     """Function that computes the estimated sensing depth of the cosmic-ray neutron probe.
     The function offers several methods to compute the depth at which 86 % of the neutrons
@@ -949,7 +949,7 @@ def find_neutron_detectors(Rc, start_date=None, end_date=None):
 
 
 def estimate_lattice_water(clay_content, total_carbon=None):
-    """Estimate the amount of water in the lattice of clay minerals.
+    r"""Estimate the amount of water in the lattice of clay minerals.
 
     ![img1](img/lattice_water_simple.png) | ![img2](img/lattice_water_multiple.png)
     :-------------------------:|:-------------------------:
@@ -1063,36 +1063,6 @@ def latlon_to_utm(lat, lon, utm_zone_number, missing_values=None):
         northing += 10_000_000
 
     return easting, northing
-
-def haversine_distance(lat1, lng1, lat2, lng2):
-    """Calculate the great circle distance between two points on the earth (specified in decimal degrees).
-
-    Args:
-        lat1 (float): Latitude of the first point.
-        lng1 (float): Longitude of the first point.
-        lat2 (float): Latitude of the second point.
-        lng2 (float): Longitude of the second point.
-
-    Returns:
-        (float): Distance between the two points in meters.
-
-    References:
-        https://en.wikipedia.org/wiki/Haversine_formula
-    """
-
-    # Convert decimal degrees to radians
-    lng1, lat1, lng2, lat2 = map(np.radians, [lng1, lat1, lng2, lat2])
-
-    # Haversine formula
-    dlng = lng2 - lng1
-    dlat = lat2 - lat1
-    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlng/2)**2
-    c = 2 * np.arcsin(np.sqrt(a))
-
-    # Radius of earth in kilometers is 6371
-    km = 6371* c
-    return km*1000
-
 
 def euclidean_distance(px, py, x, y):
     """Function that computes the Euclidean distance between one point
@@ -1232,6 +1202,15 @@ def interpolate_2D(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
     References:
         [https://soilwater.github.io/pynotes-agriscience/notebooks/interpolation.html](https://soilwater.github.io/pynotes-agriscience/notebooks/interpolation.html)
     """
+
+    # Drop NaN values in x y and z
+    idx_nan = np.isnan(x) | np.isnan(y) | np.isnan(z)
+    x = x[~idx_nan]
+    y = y[~idx_nan]
+    z = z[~idx_nan]
+
+    if idx_nan.any():
+        print(f"WARNING: {np.isnan(x).sum()}, {np.isnan(y).sum()}, and {np.isnan(z).sum()} NaN values were dropped from x, y, and z.")
 
     # Create 2D grid for interpolation
     Nx = round((np.max(x) - np.min(x)) / dx) + 1
