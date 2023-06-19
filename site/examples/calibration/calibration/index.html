@@ -410,9 +410,22 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#incomming-neutron-flux" class="md-nav__link">
+    Incomming neutron flux
+  </a>
+  
+    <nav class="md-nav" aria-label="Incomming neutron flux">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#atmospheric-correction" class="md-nav__link">
     Atmospheric correction
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -555,9 +568,22 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#incomming-neutron-flux" class="md-nav__link">
+    Incomming neutron flux
+  </a>
+  
+    <nav class="md-nav" aria-label="Incomming neutron flux">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#atmospheric-correction" class="md-nav__link">
     Atmospheric correction
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1923,16 +1949,28 @@ df_soil.head()</div>
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">df_station</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv&quot;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_h&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">estimate_abs_humidity</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
-<span class="n">nrad_weights</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">nrad_weight</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_h&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;theta_v&#39;</span><span class="p">],</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;distance_from_station&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;bottom_depth&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;top_depth&#39;</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">rhob</span><span class="o">=</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;bulk_density&#39;</span><span class="p">])</span>
+
+<span class="c1">#  Parse dates</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">])</span>
+
+<span class="c1"># Filter data matching the sampling date</span>
+<span class="n">df_station_calib</span> <span class="o">=</span> <span class="n">df_station</span><span class="p">[(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="s2">&quot;2021-10-22 08:00&quot;</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="s2">&quot;2021-10-22 16:00&quot;</span><span class="p">))]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_station_calib</span><span class="p">[</span><span class="s1">&#39;abs_h&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">estimate_abs_humidity</span><span class="p">(</span><span class="n">df_station_calib</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df_station_calib</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
+<span class="n">nrad_weights</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">nrad_weight</span><span class="p">(</span><span class="n">df_station_calib</span><span class="p">[</span><span class="s1">&#39;abs_h&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;theta_v&#39;</span><span class="p">],</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;distance_from_station&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;bottom_depth&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;top_depth&#39;</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">rhob</span><span class="o">=</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;bulk_density&#39;</span><span class="p">])</span>
 
 <span class="n">field_theta_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;theta_v&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">nrad_weights</span><span class="p">)</span>
 <span class="n">field_bulk_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">&#39;bulk_density&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">nrad_weights</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Field Volumetric Water content: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">field_theta_v</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 <div id="cell-2" class="clipboard-copy-txt">df_station = pd.read_csv("https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv", skiprows=[0,2,3])
-df_station['abs_h'] = crnpy.estimate_abs_humidity(df_station['relative_humidity_Avg'], df_station['air_temperature_Avg'])
-nrad_weights = crnpy.nrad_weight(df_station['abs_h'].mean(), df_soil['theta_v'], df_soil['distance_from_station'], (df_soil['bottom_depth']+df_soil['top_depth'])/2, rhob=df_soil['bulk_density'])
+
+#  Parse dates
+df_station['TIMESTAMP'] = pd.to_datetime(df_station['TIMESTAMP'])
+
+# Filter data matching the sampling date
+df_station_calib = df_station[(df_station['TIMESTAMP'] > pd.to_datetime("2021-10-22 08:00")) & (df_station['TIMESTAMP'] < pd.to_datetime("2021-10-22 16:00"))].copy()
+df_station_calib['abs_h'] = crnpy.estimate_abs_humidity(df_station_calib['relative_humidity_Avg'], df_station_calib['air_temperature_Avg'])
+nrad_weights = crnpy.nrad_weight(df_station_calib['abs_h'].mean(), df_soil['theta_v'], df_soil['distance_from_station'], (df_soil['bottom_depth']+df_soil['top_depth'])/2, rhob=df_soil['bulk_density'])
 
 field_theta_v = np.sum(df_soil['theta_v']*nrad_weights)
 field_bulk_density = np.sum(df_soil['bulk_density']*nrad_weights)
@@ -2000,15 +2038,13 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv&quot;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-<span class="c1"># Parse timestamps and set as index</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">])</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">df_station_calib</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="c1"># Set timestamp as index</span>
 <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
-<div id="cell-3" class="clipboard-copy-txt">df = pd.read_csv("https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv", skiprows=[0,2,3]).dropna()
-# Parse timestamps and set as index
-df['TIMESTAMP'] = pd.to_datetime(df['TIMESTAMP'])
+<div id="cell-3" class="clipboard-copy-txt">df = df_station_calib.copy()
+# Set timestamp as index
 df.set_index(df['TIMESTAMP'], inplace=True)
 df.head()</div>
         
@@ -2057,17 +2093,27 @@ df.head()</div>
       <th>latitude</th>
       <th>longitude</th>
       <th>altitude</th>
+      <th>battery_voltage_Min</th>
       <th>PTemp_Avg</th>
-      <th>counts_1_Tot</th>
-      <th>counts_2_Tot</th>
+      <th>...</th>
+      <th>wind_speed_gust_Max</th>
+      <th>air_temperature_Avg</th>
       <th>vapor_pressure_Avg</th>
       <th>barometric_pressure_Avg</th>
       <th>relative_humidity_Avg</th>
       <th>humidity_sensor_temperature_Avg</th>
-      <th>air_temperature_Avg</th>
+      <th>tilt_north_south_Avg</th>
+      <th>tilt_west_east_Avg</th>
+      <th>NDVI_Avg</th>
+      <th>abs_h</th>
     </tr>
     <tr>
       <th>TIMESTAMP</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -2088,102 +2134,128 @@ df.head()</div>
   </thead>
   <tbody>
     <tr>
-      <th>2021-10-22 07:00:00</th>
-      <td>2021-10-22 07:00:00</td>
-      <td>704.0</td>
-      <td>KS003</td>
-      <td>Flickner</td>
-      <td>Rainfed South</td>
-      <td>38.23461</td>
-      <td>-97.57095</td>
-      <td>455.0</td>
-      <td>7.232</td>
-      <td>774.0</td>
-      <td>796.0</td>
-      <td>8.75</td>
-      <td>965.0</td>
-      <td>80.20</td>
-      <td>7.95</td>
-      <td>8.30</td>
-    </tr>
-    <tr>
-      <th>2021-10-22 08:00:00</th>
-      <td>2021-10-22 08:00:00</td>
-      <td>705.0</td>
-      <td>KS003</td>
-      <td>Flickner</td>
-      <td>Rainfed South</td>
-      <td>38.23461</td>
-      <td>-97.57095</td>
-      <td>455.0</td>
-      <td>10.090</td>
-      <td>753.0</td>
-      <td>860.0</td>
-      <td>9.13</td>
-      <td>965.0</td>
-      <td>79.00</td>
-      <td>9.52</td>
-      <td>9.10</td>
-    </tr>
-    <tr>
       <th>2021-10-22 09:00:00</th>
       <td>2021-10-22 09:00:00</td>
-      <td>706.0</td>
+      <td>706</td>
       <td>KS003</td>
       <td>Flickner</td>
       <td>Rainfed South</td>
       <td>38.23461</td>
       <td>-97.57095</td>
-      <td>455.0</td>
-      <td>17.330</td>
-      <td>736.0</td>
-      <td>796.0</td>
+      <td>455</td>
+      <td>13.77</td>
+      <td>17.33</td>
+      <td>...</td>
+      <td>8.17</td>
+      <td>11.68</td>
       <td>10.18</td>
-      <td>965.0</td>
+      <td>965</td>
       <td>73.95</td>
       <td>13.38</td>
-      <td>11.68</td>
+      <td>-0.775</td>
+      <td>0.975</td>
+      <td>0.26</td>
+      <td>7.719789</td>
     </tr>
     <tr>
       <th>2021-10-22 10:00:00</th>
       <td>2021-10-22 10:00:00</td>
-      <td>707.0</td>
+      <td>707</td>
       <td>KS003</td>
       <td>Flickner</td>
       <td>Rainfed South</td>
       <td>38.23461</td>
       <td>-97.57095</td>
-      <td>455.0</td>
-      <td>22.370</td>
-      <td>744.0</td>
-      <td>832.0</td>
+      <td>455</td>
+      <td>13.66</td>
+      <td>22.37</td>
+      <td>...</td>
+      <td>7.58</td>
+      <td>15.10</td>
       <td>10.98</td>
-      <td>964.0</td>
+      <td>964</td>
       <td>64.33</td>
       <td>17.40</td>
-      <td>15.10</td>
+      <td>-0.775</td>
+      <td>1.250</td>
+      <td>0.266</td>
+      <td>8.293183</td>
     </tr>
     <tr>
       <th>2021-10-22 11:00:00</th>
       <td>2021-10-22 11:00:00</td>
-      <td>708.0</td>
+      <td>708</td>
       <td>KS003</td>
       <td>Flickner</td>
       <td>Rainfed South</td>
       <td>38.23461</td>
       <td>-97.57095</td>
-      <td>455.0</td>
-      <td>25.880</td>
-      <td>762.0</td>
-      <td>838.0</td>
+      <td>455</td>
+      <td>13.60</td>
+      <td>25.88</td>
+      <td>...</td>
+      <td>8.05</td>
+      <td>18.30</td>
       <td>10.98</td>
-      <td>964.0</td>
+      <td>964</td>
       <td>52.10</td>
       <td>21.20</td>
-      <td>18.30</td>
+      <td>-0.850</td>
+      <td>1.150</td>
+      <td>0.265</td>
+      <td>8.140162</td>
+    </tr>
+    <tr>
+      <th>2021-10-22 12:00:00</th>
+      <td>2021-10-22 12:00:00</td>
+      <td>709</td>
+      <td>KS003</td>
+      <td>Flickner</td>
+      <td>Rainfed South</td>
+      <td>38.23461</td>
+      <td>-97.57095</td>
+      <td>455</td>
+      <td>13.58</td>
+      <td>27.63</td>
+      <td>...</td>
+      <td>8.10</td>
+      <td>20.75</td>
+      <td>10.85</td>
+      <td>963</td>
+      <td>44.40</td>
+      <td>23.80</td>
+      <td>-0.800</td>
+      <td>1.000</td>
+      <td>0.262</td>
+      <td>8.010780</td>
+    </tr>
+    <tr>
+      <th>2021-10-22 13:00:00</th>
+      <td>2021-10-22 13:00:00</td>
+      <td>710</td>
+      <td>KS003</td>
+      <td>Flickner</td>
+      <td>Rainfed South</td>
+      <td>38.23461</td>
+      <td>-97.57095</td>
+      <td>455</td>
+      <td>13.59</td>
+      <td>27.94</td>
+      <td>...</td>
+      <td>10.00</td>
+      <td>21.83</td>
+      <td>11.10</td>
+      <td>962</td>
+      <td>42.25</td>
+      <td>24.93</td>
+      <td>-1.575</td>
+      <td>1.650</td>
+      <td>0.256</td>
+      <td>8.114954</td>
     </tr>
   </tbody>
 </table>
+<p>5 rows × 28 columns</p>
 </div>
 </div>
 
@@ -2238,19 +2310,19 @@ df.head()</div>
 
 </div>
 </div>
-<div id="cell-id=a73864ba-d086-4ea0-9722-f1995d72e345" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div id="cell-id=3477b8ce-46e0-4cfd-a3da-116b199d79dc" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h4 id="atmospheric-correction">Atmospheric correction<a class="anchor-link" href="#atmospheric-correction">&#182;</a></h4><p>The atmospheric correction factors will correct neutron counts for atmospheric pressure, and absolute humidity changes.</p>
+<h3 id="incomming-neutron-flux">Incomming neutron flux<a class="anchor-link" href="#incomming-neutron-flux">&#182;</a></h3><p>Download the neutron flux for all the experiment, setting the reference value as the value when the station was deployed.</p>
 
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div id="cell-id=6a146046-a47d-4018-91e9-213075a70da9" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=729d0291-94d2-469b-a599-356cf7977a2c" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2270,17 +2342,103 @@ df.head()</div>
                     </div>
                 </clipboard-copy>
             </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Find stations with cutoff rigidity similar to estimated by lat,lon, </span>
+<span class="c1"># filtering the time window from experiment setup to the end of the calibration</span>
+<span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_detectors</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="mf">39.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">96.6</span><span class="p">),</span> <span class="n">start_date</span> <span class="o">=</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">end_date</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1">#Download data for one of the similar stations and add to df</span>
+<span class="n">incoming_neutrons</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">get_incoming_neutron_flux</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;DRBS&quot;</span><span class="p">,</span> <span class="n">utc_offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_incoming_flux</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">])</span>
+<span class="n">ref_incomming_flux</span> <span class="o">=</span> <span class="n">incoming_neutrons</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+<div id="cell-5" class="clipboard-copy-txt"># Find stations with cutoff rigidity similar to estimated by lat,lon, 
+# filtering the time window from experiment setup to the end of the calibration
+crnpy.find_neutron_detectors(crnpy.cutoff_rigidity(39.1, -96.6), start_date = df_station['TIMESTAMP'].iloc[0], end_date = df['TIMESTAMP'].iloc[-1])
+
+#Download data for one of the similar stations and add to df
+incoming_neutrons = crnpy.get_incoming_neutron_flux(df_station['TIMESTAMP'].iloc[0], df['TIMESTAMP'].iloc[-1], station="DRBS", utc_offset=-5)
+df['incoming_flux']=crnpy.interpolate_incoming_flux(incoming_neutrons, timestamps=df['TIMESTAMP'])
+ref_incomming_flux = incoming_neutrons.iloc[0]</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>
+Select a station with an altitude similar to that of your location. For more information go to: &#39;https://www.nmdb.eu/nest/help.php#helpstations
+
+Your cutoff rigidity is 2.87 GV
+     STID     NAME     R  Altitude_m  Period available
+13   DRBS  Dourbes  3.18         225              True
+40   NEWK   Newark  2.40          50              True
+28  KIEL2   KielRT  2.36          54              True
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+<div id="cell-id=a73864ba-d086-4ea0-9722-f1995d72e345" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="atmospheric-correction">Atmospheric correction<a class="anchor-link" href="#atmospheric-correction">&#182;</a></h4><p>The atmospheric correction factors will correct neutron counts for atmospheric pressure, and absolute humidity changes.</p>
+
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=6a146046-a47d-4018-91e9-213075a70da9" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-6">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Fill NaN values in atmospheric data</span>
 <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;pressure&#39;</span><span class="p">,</span> <span class="s1">&#39;RH&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">fill_missing_atm</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]])</span>
 <span class="c1"># Correct count by atmospheric variables and incoming flux</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">fill_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">])</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">atm_correction</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">],</span> <span class="n">humidity</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;RH&#39;</span><span class="p">],</span> <span class="n">temp</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">],</span> <span class="n">Pref</span><span class="o">=</span><span class="mi">976</span><span class="p">,</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">atm_correction</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">],</span> <span class="n">humidity</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;RH&#39;</span><span class="p">],</span> <span class="n">temp</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">],</span> <span class="n">Pref</span><span class="o">=</span><span class="mi">976</span><span class="p">,</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span> <span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">],</span> <span class="n">incoming_Ref</span> <span class="o">=</span> <span class="n">ref_incomming_flux</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 </pre></div>
-<div id="cell-5" class="clipboard-copy-txt"># Fill NaN values in atmospheric data
+<div id="cell-6" class="clipboard-copy-txt"># Fill NaN values in atmospheric data
 df[['pressure', 'RH', 'T']] = crnpy.fill_missing_atm(df[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']])
 # Correct count by atmospheric variables and incoming flux
 df['total_counts']=crnpy.fill_counts(df['total_counts'])
-df['corrected']=crnpy.atm_correction(df['total_counts'], pressure=df['pressure'], humidity=df['RH'], temp=df['T'], Pref=976, Aref=0, L=130).dropna()</div>
+df['corrected']=crnpy.atm_correction(df['total_counts'], pressure=df['pressure'], humidity=df['RH'], temp=df['T'], Pref=976, Aref=0, L=130, incoming_neutrons=df['incoming_flux'], incoming_Ref = ref_incomming_flux).dropna()</div>
         
         </div>
     </div>
@@ -2305,17 +2463,6 @@ Using median count time as expected count time: 3600.0
 </pre>
 </div>
 </div>
-<div class="jp-OutputArea-child">
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>C:\Users\jperaza\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\crnpy\crnpy.py:362: UserWarning: Ignoring incoming neutron flux correction factor (using value fi=1)
-  warnings.warn(&#34;Ignoring incoming neutron flux correction factor (using value fi=1)&#34;)
-</pre>
-</div>
-</div>
 
 </div>
 
@@ -2328,12 +2475,12 @@ Using median count time as expected count time: 3600.0
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-6">
+                <clipboard-copy for="cell-7">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -2345,7 +2492,7 @@ Using median count time as expected count time: 3600.0
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean corrected neutron count during sampling: </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
-<div id="cell-6" class="clipboard-copy-txt">print(f"Mean corrected neutron count during sampling: {df['corrected'].mean().round()}")</div>
+<div id="cell-7" class="clipboard-copy-txt">print(f"Mean corrected neutron count during sampling: {df['corrected'].mean().round()}")</div>
         
         </div>
     </div>
@@ -2393,12 +2540,12 @@ Using median count time as expected count time: 3600.0
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
         
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-7">
+                <clipboard-copy for="cell-8">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -2423,7 +2570,7 @@ Using median count time as expected count time: 3600.0
 <span class="c1"># Print the solution</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The solved value for N0 is: </span><span class="si">{</span><span class="n">sol</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
-<div id="cell-7" class="clipboard-copy-txt">from scipy.optimize import root
+<div id="cell-8" class="clipboard-copy-txt">from scipy.optimize import root
 
 # Define the function for which we want to find the roots
 def func(N0):

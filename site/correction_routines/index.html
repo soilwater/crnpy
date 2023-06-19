@@ -284,6 +284,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#additional-corrections" class="md-nav__link">
+    Additional corrections
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -450,6 +457,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#additional-corrections" class="md-nav__link">
+    Additional corrections
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -500,7 +514,7 @@ Overview of the proposed CRNPy processing workflow. Final user can choose to use
 <p>See  <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.cutoff_rigidity">crnpy.crnpy.cutoff_rigidity</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.find_neutron_detectors">crnpy.crnpy.find_neutron_detectors</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.get_incoming_neutron_flux">crnpy.crnpy.get_incoming_neutron_flux</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.interpolate_incoming_flux">crnpy.crnpy.interpolate_incoming_flux</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.atm_correction">crnpy.crnpy.atm_correction</a> documentation for the implementation details.</p>
 </div>
 <h3 id="atmospheric-corrections">Atmospheric corrections</h3>
-<p>The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013; Zreda et al., 2012). Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could impact cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content (<code>estimate_lattice_water()</code>) based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas combined with data published by Dong &amp; Ochsner (2018)</p>
+<p>The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013; Zreda et al., 2012).</p>
 <table>
 <thead>
 <tr>
@@ -591,6 +605,12 @@ Overview of the proposed CRNPy processing workflow. Final user can choose to use
 <div class="admonition info">
 <p class="admonition-title">Implementation</p>
 <p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.road_correction">crnpy.crnpy.road_correction</a> documentation for the implementation details.</p>
+</div>
+<h3 id="additional-corrections">Additional corrections</h3>
+<p>Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could impact cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content (<code>estimate_lattice_water()</code>) based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas combined with data published by Dong &amp; Ochsner (2018)</p>
+<div class="admonition info">
+<p class="admonition-title">Implementation</p>
+<p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.estimate_lattice_water">crnpy.crnpy.estimate_lattice_water</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.counts_to_vwc">crnpy.crnpy.counts_to_vwc</a> documentation for the implementation details.</p>
 </div>
 <p>References:</p>
 <p>Klein, K.-L., Steigies, C., &amp; Nmdb Team. (2009). WWW.NMDB.EU: The real-time Neutron Monitor database. EGU General Assembly Conference Abstracts, 5633.</p>
