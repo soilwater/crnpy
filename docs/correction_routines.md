@@ -16,7 +16,7 @@ The crnPy package includes a complete set of methods for correcting the raw obse
     See  [crnpy.crnpy.cutoff_rigidity][], [crnpy.crnpy.find_neutron_detectors][], [crnpy.crnpy.get_incoming_neutron_flux][], [crnpy.crnpy.interpolate_incoming_flux][] and [crnpy.crnpy.atm_correction][] documentation for the implementation details.
 
 ### Atmospheric corrections
-The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013; Zreda et al., 2012). Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could impact cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content (`estimate_lattice_water()`) based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas combined with data published by Dong & Ochsner (2018)
+The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013; Zreda et al., 2012).
 
 | Pressure correction | Atmospheric water correction |
 |---------------------|------------------------------|
@@ -58,6 +58,16 @@ Due to the known high sensibility closer to the detector, use cases like rover s
 !!! info "Implementation"
 
     See [crnpy.crnpy.road_correction][] documentation for the implementation details.
+
+### Additional corrections
+
+Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could impact cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content (`estimate_lattice_water()`) based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas combined with data published by Dong & Ochsner (2018)
+
+!!! info "Implementation"
+
+    See [crnpy.crnpy.estimate_lattice_water][] and [crnpy.crnpy.counts_to_vwc][] documentation for the implementation details.
+
+
 
 References:
 
