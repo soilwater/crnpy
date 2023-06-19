@@ -68,6 +68,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#incoming-neutron-flux" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -229,9 +234,59 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Correction routines
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Correction routines
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#incoming-neutron-flux" class="md-nav__link">
+    Incoming neutron flux
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#atmospheric-corrections" class="md-nav__link">
+    Atmospheric corrections
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#biomass-correction" class="md-nav__link">
+    Biomass correction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#road-correction" class="md-nav__link">
+    Road correction
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -361,6 +416,42 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#incoming-neutron-flux" class="md-nav__link">
+    Incoming neutron flux
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#atmospheric-corrections" class="md-nav__link">
+    Atmospheric corrections
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#biomass-correction" class="md-nav__link">
+    Biomass correction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#road-correction" class="md-nav__link">
+    Road correction
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -381,12 +472,126 @@
 
 <p><img alt="CRNPy Processing Workflow" src="../img/workflow.png" />
 Overview of the proposed CRNPy processing workflow. Final user can choose to use the entire workflow, part of it, or build functions on top of it depending on their needs, dashed lines indicate optional steps.</p>
-<ul>
-<li>Incoming neutron flux: The crnPy package includes a complete set of methods for correcting the raw observed neutron counts by natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea &amp; Smart, 2019; Smart &amp; Shea, 2001)..</li>
-<li>Atmospheric corrections: The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013; Zreda et al., 2012). Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could impact cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content (<code>estimate_lattice_water()</code>) based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas combined with data published by Dong &amp; Ochsner (2018).</li>
-<li>Biomass correction: The library provides a function for correcting neutron counts for the effects of above-ground biomass by combining an approach for estimating biomass water equivalent (BWE) from in-situ biomass samples (Wahbi et al., 2018) and the BWE correction factor described in Baatz et al. (2015).</li>
-<li>Road correction: Due to the known high sensibility closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content, crnPy implements the methodology proposed by Schrön et al. (2018).</li>
-</ul>
+<h3 id="incoming-neutron-flux">Incoming neutron flux</h3>
+<p>The crnPy package includes a complete set of methods for correcting the raw observed neutron counts by natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea &amp; Smart, 2019; Smart &amp; Shea, 2001).</p>
+<table>
+<thead>
+<tr>
+<th>Incoming neutron flux correction factor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$fi = \frac{I_{m}}{I_{0}}$</td>
+</tr>
+<tr>
+<td>$ fi $: Incoming neutron flux correction factor</td>
+</tr>
+<tr>
+<td>$ I_{m} $: Measured incoming neutron flux</td>
+</tr>
+<tr>
+<td>$ I_{0} $: Reference incoming neutron flux at a given time.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">Implementation</p>
+<p>See  <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.cutoff_rigidity">crnpy.crnpy.cutoff_rigidity</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.find_neutron_detectors">crnpy.crnpy.find_neutron_detectors</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.get_incoming_neutron_flux">crnpy.crnpy.get_incoming_neutron_flux</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.interpolate_incoming_flux">crnpy.crnpy.interpolate_incoming_flux</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.atm_correction">crnpy.crnpy.atm_correction</a> documentation for the implementation details.</p>
+</div>
+<h3 id="atmospheric-corrections">Atmospheric corrections</h3>
+<p>The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013; Zreda et al., 2012). Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could impact cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content (<code>estimate_lattice_water()</code>) based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas combined with data published by Dong &amp; Ochsner (2018)</p>
+<table>
+<thead>
+<tr>
+<th>Pressure correction</th>
+<th>Atmospheric water correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$fp = exp(\frac{P_{0} - P}{L})$</td>
+<td>$fw = 1 + 0.0054*(A - Aref)$</td>
+</tr>
+<tr>
+<td>$fp$: Atmospheric pressure correction factor</td>
+<td>$fw$: Atmospheric water correction factor</td>
+</tr>
+<tr>
+<td>$P_{0}$: Reference atmospheric pressure (for e.g. long-term average)</td>
+<td>$A$: Atmospheric water content</td>
+</tr>
+<tr>
+<td>$P$: Measured atmospheric pressure</td>
+<td>$Aref$: Reference atmospheric water content</td>
+</tr>
+<tr>
+<td>$L$: Mass attenuation factor for high-energy neutrons in air</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">Implementation</p>
+<p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.atm_correction">crnpy.crnpy.atm_correction</a> documentation for the implementation details.</p>
+</div>
+<h3 id="biomass-correction">Biomass correction</h3>
+<p>The library provides a function for correcting neutron counts for the effects of above-ground biomass by combining an approach for estimating biomass water equivalent (BWE) from in-situ biomass samples (Wahbi et al., 2018) and the BWE correction factor described in Baatz et al. (2015).</p>
+<table>
+<thead>
+<tr>
+<th>Biomass correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$fb = 1 - bwe*r2_N0$</td>
+</tr>
+<tr>
+<td>$fb$: Biomass correction factor</td>
+</tr>
+<tr>
+<td>$bwe$: Biomass water equivalent</td>
+</tr>
+<tr>
+<td>$r2_N0$: Ratio of the neutron counts reduction (counts kg-1) to the neutron calibration constant (N0)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">Implementation</p>
+<p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.bwe_correction">crnpy.crnpy.bwe_correction</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.biomass_to_bwe">crnpy.crnpy.biomass_to_bwe</a> documentation for the implementation details.</p>
+</div>
+<h3 id="road-correction">Road correction</h3>
+<p>Due to the known high sensibility closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content, crnPy implements the methodology proposed by Schrön et al. (2018).</p>
+<table>
+<thead>
+<tr>
+<th>Road correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$fr = 1 + F1<em>F2</em>F3$</td>
+</tr>
+<tr>
+<td>$fr$: Road correction factor</td>
+</tr>
+<tr>
+<td>$F1$: Road geometry term</td>
+</tr>
+<tr>
+<td>$F2$: Road moisture term</td>
+</tr>
+<tr>
+<td>$F3$: Road distance term</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">Implementation</p>
+<p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.road_correction">crnpy.crnpy.road_correction</a> documentation for the implementation details.</p>
+</div>
 <p>References:</p>
 <p>Klein, K.-L., Steigies, C., &amp; Nmdb Team. (2009). WWW.NMDB.EU: The real-time Neutron Monitor database. EGU General Assembly Conference Abstracts, 5633.</p>
 <p>Shea, M., &amp; Smart, D. (2019). Re-examination of the first five ground-level events. International Cosmic Ray Conference (ICRC2019), 36, 1149.</p>
@@ -398,6 +603,7 @@ Overview of the proposed CRNPy processing workflow. Final user can choose to use
 <p>Wahbi, A., Heng, L., Dercon, G., Wahbi, A., &amp; Avery, W. (2018). In situ destructive sampling. Cosmic Ray Neutron Sensing: Estimation of Agricultural Crop Biomass Water Equivalent, 5–9.</p>
 <p>Baatz, R., Bogena, H., Hendricks Franssen, H.-J., Huisman, J., Montzka, C., &amp; Vereecken, H. (2015). An empirical vegetation correction for soil water content quantification using cosmic ray probes. Water Resources Research, 51(4), 2030–2046.</p>
 <p>Schrön, M., Rosolem, R., Köhli, M., Piussi, L., Schröter, I., Iwema, J., Kögler, S., Oswald, S. E., Wollschläger, U., Samaniego, L., &amp; others. (2018). Cosmic-ray neutron rover surveys of field soil moisture and the influence of roads. Water Resources Research, 54(9), 6441–6459.</p>
+<p>Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System, Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.</p>
 
 
 
