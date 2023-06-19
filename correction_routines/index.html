@@ -485,9 +485,9 @@
   <h1>Correction routines</h1>
 
 <p><img alt="CRNPy Processing Workflow" src="../img/workflow.png" />
-Overview of the proposed CRNPy processing workflow. Final user can choose to use the entire workflow, part of it, or build functions on top of it depending on their needs, dashed lines indicate optional steps.</p>
+Overview of the proposed CRNPy processing workflow. Final user can choose to use the entire workflow, part of it, or build functions on top of it depending on their needs. Dashed lines indicate optional steps.</p>
 <h3 id="incoming-neutron-flux">Incoming neutron flux</h3>
-<p>The crnPy package includes a complete set of methods for correcting the raw observed neutron counts by natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea &amp; Smart, 2019; Smart &amp; Shea, 2001).</p>
+<p>The CRNPy package includes a complete set of methods for correcting the raw observed neutron counts for natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea &amp; Smart, 2019; Smart &amp; Shea, 2001).</p>
 <table>
 <thead>
 <tr>
@@ -568,7 +568,7 @@ Overview of the proposed CRNPy processing workflow. Final user can choose to use
 <td>$bwe$: Biomass water equivalent</td>
 </tr>
 <tr>
-<td>$r2_N0$: Ratio of the neutron counts reduction (counts kg-1) to the neutron calibration constant (N0)</td>
+<td>$r2_N0$: Ratio of the neutron counts reduction ($counts kg^-1$) to the neutron calibration constant (N0)</td>
 </tr>
 </tbody>
 </table>
@@ -577,7 +577,7 @@ Overview of the proposed CRNPy processing workflow. Final user can choose to use
 <p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.bwe_correction">crnpy.crnpy.bwe_correction</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.biomass_to_bwe">crnpy.crnpy.biomass_to_bwe</a> documentation for the implementation details.</p>
 </div>
 <h3 id="road-correction">Road correction</h3>
-<p>Due to the known high sensibility closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content, crnPy implements the methodology proposed by Schrön et al. (2018).</p>
+<p>Due to the known high sensitivity closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content, crnPy implements the methodology proposed by Schrön et al. (2018).</p>
 <table>
 <thead>
 <tr>
@@ -607,12 +607,13 @@ Overview of the proposed CRNPy processing workflow. Final user can choose to use
 <p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.road_correction">crnpy.crnpy.road_correction</a> documentation for the implementation details.</p>
 </div>
 <h3 id="additional-corrections">Additional corrections</h3>
-<p>Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could impact cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content (<code>estimate_lattice_water()</code>) based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas combined with data published by Dong &amp; Ochsner (2018)</p>
+<p>Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could affect cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas combined with data published by Dong &amp; Ochsner (2018)</p>
 <div class="admonition info">
 <p class="admonition-title">Implementation</p>
 <p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.estimate_lattice_water">crnpy.crnpy.estimate_lattice_water</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.counts_to_vwc">crnpy.crnpy.counts_to_vwc</a> documentation for the implementation details.</p>
 </div>
-<p>References:</p>
+<div class="admonition note">
+<p class="admonition-title">References</p>
 <p>Klein, K.-L., Steigies, C., &amp; Nmdb Team. (2009). WWW.NMDB.EU: The real-time Neutron Monitor database. EGU General Assembly Conference Abstracts, 5633.</p>
 <p>Shea, M., &amp; Smart, D. (2019). Re-examination of the first five ground-level events. International Cosmic Ray Conference (ICRC2019), 36, 1149.</p>
 <p>Smart, D., &amp; Shea, M. (2001). Geomagnetic cutoff rigidity computer program: Theory, software description and example.</p>
@@ -624,6 +625,7 @@ Overview of the proposed CRNPy processing workflow. Final user can choose to use
 <p>Baatz, R., Bogena, H., Hendricks Franssen, H.-J., Huisman, J., Montzka, C., &amp; Vereecken, H. (2015). An empirical vegetation correction for soil water content quantification using cosmic ray probes. Water Resources Research, 51(4), 2030–2046.</p>
 <p>Schrön, M., Rosolem, R., Köhli, M., Piussi, L., Schröter, I., Iwema, J., Kögler, S., Oswald, S. E., Wollschläger, U., Samaniego, L., &amp; others. (2018). Cosmic-ray neutron rover surveys of field soil moisture and the influence of roads. Water Resources Research, 54(9), 6441–6459.</p>
 <p>Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System, Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.</p>
+</div>
 
 
 

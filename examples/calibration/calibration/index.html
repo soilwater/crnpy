@@ -1663,7 +1663,7 @@ Licensed under the Apache License, Version 2.0.
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="crnp-field-calibration-of-n0-device-specific-parameter">CRNP field calibration of N0 device-specific parameter.<a class="anchor-link" href="#crnp-field-calibration-of-n0-device-specific-parameter">&#182;</a></h1><h2 id="n_0-parameter-calibration">$N_0$ Parameter Calibration<a class="anchor-link" href="#n_0-parameter-calibration">&#182;</a></h2><p>The calibration of a Cosmic-Ray Neutron Probe (CRNP) is an essential step to ensure accurate soil moisture measurements. The CRNP operates by counting fast neutrons produced from cosmic rays, which are predominantly moderated by water molecules in the soil. The parameter $N_0$ is a device-specific constant that signifies the neutron count rate under zero soil moisture conditions.</p>
 <p>$\theta(N) =\frac{a_0}{(\frac{N}{N_0}) - a_1} - a_2 $ (Desilets et al., 2010).</p>
-<h2 id="determining-field-soil-moisture">Determining field soil moisture<a class="anchor-link" href="#determining-field-soil-moisture">&#182;</a></h2><h3 id="soil-sampling-layout">Soil sampling layout<a class="anchor-link" href="#soil-sampling-layout">&#182;</a></h3><p>14 cores were collected from different distances. In this example each soil sample was splitted into four depth segments: 0-5 cm, 5-10 cm, 10-25 cm, and 25-40 cm. Soil samples were processed and soil mositure was determined using the thermo-gravimetric method.</p>
+<h2 id="determining-field-soil-moisture">Determining field soil moisture<a class="anchor-link" href="#determining-field-soil-moisture">&#182;</a></h2><h3 id="soil-sampling-layout">Soil sampling layout<a class="anchor-link" href="#soil-sampling-layout">&#182;</a></h3><p>14 cores were collected from different distances. In this example each soil sample was split into four depth segments: 0-5 cm, 5-10 cm, 10-25 cm, and 25-40 cm. Soil samples were processed and soil moisture was determined using the thermo-gravimetric method.</p>
 <img src="../../../img/layout.png" style="max-width:500px">
 <img src="../../../img/core.png" style="padding:50px;max-height:500px ">
 <p>Figure 1. Horizontal layout and vertical layout used in this particular example calibration, it can be customized by the user depending on their needs.</p>
@@ -1680,7 +1680,7 @@ Licensed under the Apache License, Version 2.0.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="sample-processing">Sample processing<a class="anchor-link" href="#sample-processing">&#182;</a></h3><p>For each sample is required to know the bulk density ($\rho_\beta$) and the volumetric water content ($\theta_v$). See the details of the calculation used on the <a href="https://github.com/soilwater/crnpy/blob/main/docs/examples/calibration/soil_data.csv">filled example</a>.</p>
+<h3 id="sample-processing">Sample processing<a class="anchor-link" href="#sample-processing">&#182;</a></h3><p>For each sample it is required to know the bulk density ($\rho_\beta$) and the volumetric water content ($\theta_v$). See the details of the calculation used in the <a href="https://github.com/soilwater/crnpy/blob/main/docs/examples/calibration/soil_data.csv">filled example</a>.</p>
 <h3 id="field-average">Field average<a class="anchor-link" href="#field-average">&#182;</a></h3><p>Load the soil samples data using pandas, and using the function <a href="../../../reference/#crnpy.crnpy.nrad_weight"><code>nrad_weight()</code></a> the weights corresponding to each soil sample will be computed considering air-humidity, sample depth, distance from station and bulk density.</p>
 
 </div>
@@ -1922,7 +1922,7 @@ df_soil.head()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Loading station data it is necessary to calculate the absolute humidty from temperature an relative humidity data with <a href="../../../reference/#crnpy.crnpy.estimate_abs_humidity"><code>estimate_abs_humidity()</code></a>.</p>
+<p>Loading station data is necessary to calculate the absolute humidty from temperature an relative humidity data with <a href="../../../reference/#crnpy.crnpy.estimate_abs_humidity"><code>estimate_abs_humidity()</code></a>.</p>
 
 </div>
 </div>
@@ -2349,7 +2349,7 @@ df.head()</div>
 <span class="c1">#Download data for one of the similar stations and add to df</span>
 <span class="n">incoming_neutrons</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">get_incoming_neutron_flux</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;DRBS&quot;</span><span class="p">,</span> <span class="n">utc_offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_incoming_flux</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">])</span>
-<span class="n">ref_incomming_flux</span> <span class="o">=</span> <span class="n">incoming_neutrons</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ref_incoming_flux</span> <span class="o">=</span> <span class="n">incoming_neutrons</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 <div id="cell-5" class="clipboard-copy-txt"># Find stations with cutoff rigidity similar to estimated by lat,lon, 
 # filtering the time window from experiment setup to the end of the calibration
@@ -2358,7 +2358,7 @@ crnpy.find_neutron_detectors(crnpy.cutoff_rigidity(39.1, -96.6), start_date = df
 #Download data for one of the similar stations and add to df
 incoming_neutrons = crnpy.get_incoming_neutron_flux(df_station['TIMESTAMP'].iloc[0], df['TIMESTAMP'].iloc[-1], station="DRBS", utc_offset=-5)
 df['incoming_flux']=crnpy.interpolate_incoming_flux(incoming_neutrons, timestamps=df['TIMESTAMP'])
-ref_incomming_flux = incoming_neutrons.iloc[0]</div>
+ref_incoming_flux = incoming_neutrons.iloc[0]</div>
         
         </div>
     </div>
@@ -2402,7 +2402,7 @@ Your cutoff rigidity is 2.87 GV
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h4 id="atmospheric-correction">Atmospheric correction<a class="anchor-link" href="#atmospheric-correction">&#182;</a></h4><p>The atmospheric correction factors will correct neutron counts for atmospheric pressure, and absolute humidity changes.</p>
+<h4 id="atmospheric-correction">Atmospheric correction<a class="anchor-link" href="#atmospheric-correction">&#182;</a></h4><p>The atmospheric correction factors will correct neutron counts for atmospheric pressure and absolute humidity changes.</p>
 
 </div>
 </div>
@@ -2432,13 +2432,13 @@ Your cutoff rigidity is 2.87 GV
 <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;pressure&#39;</span><span class="p">,</span> <span class="s1">&#39;RH&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">fill_missing_atm</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]])</span>
 <span class="c1"># Correct count by atmospheric variables and incoming flux</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">fill_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">])</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">atm_correction</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">],</span> <span class="n">humidity</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;RH&#39;</span><span class="p">],</span> <span class="n">temp</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">],</span> <span class="n">Pref</span><span class="o">=</span><span class="mi">976</span><span class="p">,</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span> <span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">],</span> <span class="n">incoming_Ref</span> <span class="o">=</span> <span class="n">ref_incomming_flux</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">atm_correction</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">],</span> <span class="n">humidity</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;RH&#39;</span><span class="p">],</span> <span class="n">temp</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">],</span> <span class="n">Pref</span><span class="o">=</span><span class="mi">976</span><span class="p">,</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span> <span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">],</span> <span class="n">incoming_Ref</span> <span class="o">=</span> <span class="n">ref_incoming_flux</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 </pre></div>
 <div id="cell-6" class="clipboard-copy-txt"># Fill NaN values in atmospheric data
 df[['pressure', 'RH', 'T']] = crnpy.fill_missing_atm(df[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']])
 # Correct count by atmospheric variables and incoming flux
 df['total_counts']=crnpy.fill_counts(df['total_counts'])
-df['corrected']=crnpy.atm_correction(df['total_counts'], pressure=df['pressure'], humidity=df['RH'], temp=df['T'], Pref=976, Aref=0, L=130, incoming_neutrons=df['incoming_flux'], incoming_Ref = ref_incomming_flux).dropna()</div>
+df['corrected']=crnpy.atm_correction(df['total_counts'], pressure=df['pressure'], humidity=df['RH'], temp=df['T'], Pref=976, Aref=0, L=130, incoming_neutrons=df['incoming_flux'], incoming_Ref = ref_incoming_flux).dropna()</div>
         
         </div>
     </div>
@@ -2529,7 +2529,7 @@ Using median count time as expected count time: 3600.0
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="solving-the-equation-for-n_0">Solving the equation for $N_0$<a class="anchor-link" href="#solving-the-equation-for-n_0">&#182;</a></h2><p>Previous steps estimated the a field volumetric water content of <code>0.256</code> and an average neutron count of <code>1540</code>. The function <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html">scipy.optimize.root()</a> estiamtes the $N_0$ given the observed value of $\theta_v$ and neutron count.</p>
+<h2 id="solving-the-equation-for-n_0">Solving the equation for $N_0$<a class="anchor-link" href="#solving-the-equation-for-n_0">&#182;</a></h2><p>Previous steps estimated the a field volumetric water content of <code>0.256</code> and an average neutron count of <code>1540</code>. Using <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html">scipy.optimize.root()</a> $N_0$ is estimated given the observed value of $\theta_v$ and neutron counts.</p>
 
 </div>
 </div>
