@@ -1896,7 +1896,7 @@ df_soil.head()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Loading station data it is necessary to calculate the absolute humidty from temperature an relative humidity data.</p>
+<p>Loading station data it is necessary to calculate the absolute humidty from temperature an relative humidity data with <a href="../../../reference/#crnpy.crnpy.estimate_abs_humidity"><code>estimate_abs_humidity()</code></a>.</p>
 
 </div>
 </div>
@@ -1979,8 +1979,44 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell    celltag_hide-input">
-<div id="cell-id=18744d32-f52d-4db7-bfbb-a78a343243a1" class="jp-Cell jp-CodeCell jp-Notebook-cell    celltag_hide-input">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div id="cell-id=18744d32-f52d-4db7-bfbb-a78a343243a1" class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+        
+        
+        <div class="CodeMirror cm-s-jupyter">
+            <div class="zeroclipboard-container">
+                <clipboard-copy for="cell-3">
+                <div>
+                    <span class="notice" hidden>Copied!</span>
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
+                        <path fill="currentColor" fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path>
+                        <path fill="currentColor" fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
+                    </svg>
+                    </div>
+                </clipboard-copy>
+            </div>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv&quot;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="c1"># Parse timestamps and set as index</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+<div id="cell-3" class="clipboard-copy-txt">df = pd.read_csv("https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv", skiprows=[0,2,3]).dropna()
+# Parse timestamps and set as index
+df['TIMESTAMP'] = pd.to_datetime(df['TIMESTAMP'])
+df.set_index(df['TIMESTAMP'], inplace=True)
+df.head()</div>
+        
+        </div>
+    </div>
+
+</div>
+</div>
 
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
@@ -2180,7 +2216,7 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-3">
+                <clipboard-copy for="cell-4">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -2192,7 +2228,7 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">compute_total_raw_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;counts_1_Tot&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2_Tot&#39;</span><span class="p">]],</span> <span class="n">nan_strategy</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">)</span>
 </pre></div>
-<div id="cell-3" class="clipboard-copy-txt">df['total_counts'] = crnpy.compute_total_raw_counts(df[['counts_1_Tot','counts_2_Tot']], nan_strategy='average')</div>
+<div id="cell-4" class="clipboard-copy-txt">df['total_counts'] = crnpy.compute_total_raw_counts(df[['counts_1_Tot','counts_2_Tot']], nan_strategy='average')</div>
         
         </div>
     </div>
@@ -2208,7 +2244,7 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h4 id="atmospheric-correction">Atmospheric correction<a class="anchor-link" href="#atmospheric-correction">&#182;</a></h4><p>The atmospheric correction factors will correct neutron counts for atmospheric pressure, and absolute humidity changes using the method described in Zreda et al. (2012) and Anderson et al. (2017).</p>
+<h4 id="atmospheric-correction">Atmospheric correction<a class="anchor-link" href="#atmospheric-correction">&#182;</a></h4><p>The atmospheric correction factors will correct neutron counts for atmospheric pressure, and absolute humidity changes.</p>
 
 </div>
 </div>
@@ -2224,7 +2260,7 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-4">
+                <clipboard-copy for="cell-5">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -2240,7 +2276,7 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">fill_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">])</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">atm_correction</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;pressure&#39;</span><span class="p">],</span> <span class="n">humidity</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;RH&#39;</span><span class="p">],</span> <span class="n">temp</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">],</span> <span class="n">Pref</span><span class="o">=</span><span class="mi">976</span><span class="p">,</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 </pre></div>
-<div id="cell-4" class="clipboard-copy-txt"># Fill NaN values in atmospheric data
+<div id="cell-5" class="clipboard-copy-txt"># Fill NaN values in atmospheric data
 df[['pressure', 'RH', 'T']] = crnpy.fill_missing_atm(df[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']])
 # Correct count by atmospheric variables and incoming flux
 df['total_counts']=crnpy.fill_counts(df['total_counts'])
@@ -2297,7 +2333,7 @@ Using median count time as expected count time: 3600.0
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-5">
+                <clipboard-copy for="cell-6">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -2309,7 +2345,7 @@ Using median count time as expected count time: 3600.0
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean corrected neutron count during sampling: </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
-<div id="cell-5" class="clipboard-copy-txt">print(f"Mean corrected neutron count during sampling: {df['corrected'].mean().round()}")</div>
+<div id="cell-6" class="clipboard-copy-txt">print(f"Mean corrected neutron count during sampling: {df['corrected'].mean().round()}")</div>
         
         </div>
     </div>
@@ -2362,7 +2398,7 @@ Using median count time as expected count time: 3600.0
         
         <div class="CodeMirror cm-s-jupyter">
             <div class="zeroclipboard-container">
-                <clipboard-copy for="cell-6">
+                <clipboard-copy for="cell-7">
                 <div>
                     <span class="notice" hidden>Copied!</span>
                     <svg aria-hidden="true" width="20" height="20" viewBox="0 0 16 16" version="1.1"  data-view-component="true" class="clipboard-copy-icon">
@@ -2387,7 +2423,7 @@ Using median count time as expected count time: 3600.0
 <span class="c1"># Print the solution</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The solved value for N0 is: </span><span class="si">{</span><span class="n">sol</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
-<div id="cell-6" class="clipboard-copy-txt">from scipy.optimize import root
+<div id="cell-7" class="clipboard-copy-txt">from scipy.optimize import root
 
 # Define the function for which we want to find the roots
 def func(N0):
