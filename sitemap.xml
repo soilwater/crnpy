@@ -6,12 +6,32 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://github.com/soilwater/crnpy/correction_routines/</loc>
+         <lastmod>2023-06-20</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://github.com/soilwater/crnpy/reference/</loc>
          <lastmod>2023-06-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://github.com/soilwater/crnpy/examples/example_Hydroinnova_rover/</loc>
+         <loc>https://github.com/soilwater/crnpy/examples/overview/</loc>
+         <lastmod>2023-06-20</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://github.com/soilwater/crnpy/examples/calibration/calibration/</loc>
+         <lastmod>2023-06-20</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://github.com/soilwater/crnpy/examples/rover/Hydroinnova_rover_example-Copy1/</loc>
+         <lastmod>2023-06-20</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://github.com/soilwater/crnpy/examples/rover/Hydroinnova_rover_example/</loc>
          <lastmod>2023-06-20</lastmod>
          <changefreq>daily</changefreq>
     </url>
