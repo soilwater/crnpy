@@ -1,7 +1,7 @@
 ### Site metadata ###
 
 site_name: CRNPy Documentation
-site_description: CRNPy is a Python package for the estimation of soil moisture from cosmic-ray neutron data. It provides routines for the correction of neutron counts for environmental effects, the calculation of soil moisture from corrected neutron counts, and the calibration of cosmic-ray neutron probes.
+site_description: CRNPy is a Python package for the estimation and processing of soil moisture data from cosmic-ray neutron counts.
 site_url: https://soilwater.github.io/crnpy/
 repo_url: https://github.com/soilwater/crnpy
 
@@ -9,12 +9,13 @@ repo_url: https://github.com/soilwater/crnpy
 
 theme:
   name: 'material'
-  logo: img/logo/crnpy-logo-mini.svg
+  logo: img/logo/crnpy-logo.svg
   favicon: img/logo/favicon.png
 
 plugins:
 - search
 - autorefs
+- social
 - mkdocs-jupyter:
     remove_tag_config:
       remove_input_tags:
