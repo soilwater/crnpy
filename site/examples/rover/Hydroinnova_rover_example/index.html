@@ -1427,7 +1427,7 @@ Licensed under the Apache License, Version 2.0.
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="processing-and-analyzing-hydroinnova-rover-data-with-crnpy">Processing and Analyzing Hydroinnova Rover Data with CRNPy<a class="anchor-link" href="#processing-and-analyzing-hydroinnova-rover-data-with-crnpy">&#182;</a></h1><p>This tutorial demonstrates how to process and analyze data from a rover using the Cosmic Ray Neutron Python (CRNPy) library. The steps include loading the data, converting geographical coordinates to Cartesian coordinates, normalizing neutron counts, correcting for atmospheric effects, and visualizing the results.</p>
 <p><img src="../../../img/workflow_hydroinnova.png" alt="CRNPy Processing Workflow" />
-Overview of the example worflow.</p>
+Overview of the example workflow.</p>
 <p>First import the required packages.</p>
 
 </div>
@@ -1851,7 +1851,7 @@ df['total_counts'] = crnpy.compute_total_raw_counts(df[counts_colums])</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Find stations with a cutoff rigidity similar to the estimated value based on the latitude and longitude, ensuring that the reference station is under a similar earth electromagnetic field. Note that the station is hardcoded in the second line (<code>station=&quot;NEWK&quot;</code>) being required that the user manually define this after considering the potential options suggested.</p>
+<p>Find stations with a cutoff rigidity similar to the estimated value based on the latitude and longitude, ensuring that the reference station is under a similar earth electromagnetic field. Note that the station is hardcoded in the second line as <code>station=&quot;NEWK&quot;</code>. The user is required to manually define this after considering the potential options suggested.</p>
 
 </div>
 </div>
@@ -1934,7 +1934,7 @@ Your cutoff rigidity is 2.99 GV
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>The incoming neutron flux is interpolated to match the measured timestamps. This is necessary to align the incoming neutron flux data with the rover data.</p>
+<p>The incoming neutron flux is interpolated to match the measured timestamps, which is necessary to align the incoming neutron flux data with the rover data.</p>
 
 </div>
 </div>
@@ -1980,7 +1980,7 @@ df['incoming_flux']=crnpy.interpolate_incoming_flux(incoming_neutrons, timestamp
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>NaN values in the atmospheric data are filled. The neutron counts are then corrected for atmospheric variables and the incoming neutron flux, you can optionally pass a <code>incoming_Ref</code> parameter in <a href="../../../reference/#crnpy.crnpy.atm_correction"><code>atm_correction()</code></a> to fix a desired value as the reference incomming count for the reference station.</p>
+<p>NaN values in the atmospheric data are filled. The neutron counts are then corrected for atmospheric variables and the incoming neutron flux. Optionally it is possible to pass <code>incoming_Ref</code> parameter in <a href="../../../reference/#crnpy.crnpy.atm_correction"><code>atm_correction()</code></a> to fix a desired value as the reference incoming count for the reference station.</p>
 
 </div>
 </div>
@@ -2134,7 +2134,7 @@ X_pred, Y_pred, Z_pred = crnpy.interpolate_2D(df['x'],
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>A gridded map of the VWC is created using the interpolated x, y, and VWC values.</p>
+<p>A gridded map of the Volumetric Water Content (VWC) is created using the interpolated x, y, and VWC values.</p>
 
 </div>
 </div>

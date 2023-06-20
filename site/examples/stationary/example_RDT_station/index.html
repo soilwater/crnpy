@@ -1425,9 +1425,9 @@ Licensed under the Apache License, Version 2.0.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="processing-and-analyzing-rdt-stationary-detector-observations-with-crnpy">Processing and Analyzing RDT stationary detector observations with CRNPy<a class="anchor-link" href="#processing-and-analyzing-rdt-stationary-detector-observations-with-crnpy">&#182;</a></h1><p>This tutorial, demostrate how to process and analyze neutron detection data from 3 Radiation Detection Technologies, Inc (RDT) neutron detectors using the Cosmic Ray Neutron Python (CRNPy) library. The tutorial covers steps including data loading, count data processing, normalization, outlier removal, atmospheric correction, and conversion of neutron counts to Volumetric Water Content (VWC).</p>
+<h1 id="processing-and-analyzing-rdt-stationary-detector-observations-with-crnpy">Processing and Analyzing RDT stationary detector observations with CRNPy<a class="anchor-link" href="#processing-and-analyzing-rdt-stationary-detector-observations-with-crnpy">&#182;</a></h1><p>This tutorial, demonstrates how to process and analyze neutron detection data from 3 Radiation Detection Technologies, Inc (RDT) neutron detectors using the Cosmic Ray Neutron Python (CRNPy) library. The tutorial covers steps including data loading, count data processing, normalization, outlier removal, atmospheric correction, and conversion of neutron counts to Volumetric Water Content (VWC).</p>
 <p><img src="../../../img/workflow_rdt.png" alt="CRNPy Processing Workflow" />
-Overview of the example worflow.</p>
+Overview of the example workflow.</p>
 <p>Firstly, import the required Python libraries, load the data from the <a href="https://github.com/soilwater/crnpy/tree/main/docs/examples/stationary">.csv file</a>. Converting the 'timestamp' column to datetime format is essential for time-based operations. Lastly, setting 'timestamp' as the DataFrame index simplifies the time series analysis.</p>
 
 </div>
@@ -1518,7 +1518,7 @@ df.set_index(df['timestamp'], inplace=True)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Count times are computed from timestamp, if 'NaN' values are present, the <a href="../../../reference/#crnpy.crnpy.fill_counts"><code>fill_counts()</code></a> function will replace them. Recheck for 'NaN' values to confirm that they've been adequately filled.</p>
+<p>Count times are computed from timestamp. If 'NaN' values are present, the <a href="../../../reference/#crnpy.crnpy.fill_counts"><code>fill_counts()</code></a> function will replace them. Recheck for 'NaN' values to confirm that they've been adequately filled.</p>
 
 </div>
 </div>
@@ -1916,7 +1916,7 @@ class="
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Find similar stations based on cutoff rigidity, which is estimated using latitude and longitude values. See <a href="../../../reference/#crnpy.crnpy.get_incoming_neutron_flux"><code>get_incoming_neutron_flux()</code></a> and <a href="../../../reference/#crnpy.crnpy.find_neutron_detectors"><code>find_neutron_detectors()</code></a>. Note that the station is hardcoded in the second line (<code>station=&quot;IRKT&quot;</code>) being required that the user manually define this after considering the potential options suggested.</p>
+<p>Find similar stations based on cutoff rigidity, which is estimated using latitude and longitude values. See <a href="../../../reference/#crnpy.crnpy.get_incoming_neutron_flux"><code>get_incoming_neutron_flux()</code></a> and <a href="../../../reference/#crnpy.crnpy.find_neutron_detectors"><code>find_neutron_detectors()</code></a>. Note that the station is hardcoded in the second line as <code>station=&quot;IRKT&quot;</code>. The user is required to manually define this after considering the potential options suggested.</p>
 
 </div>
 </div>
@@ -1999,7 +1999,7 @@ Your cutoff rigidity is 2.87 GV
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>This section is about correcting the atmospheric variables and incoming neutron flux. First, fill the missing values in the atmospheric data, then correct the count by atmospheric variables and incoming flux using <a href="../../../reference/#crnpy.crnpy.atm_correction"><code>atm_correction()</code></a>.</p>
+<p>This section is about correcting the atmospheric variables and incoming neutron flux. First, fill the missing values in the atmospheric data, then correct the count for atmospheric variables and incoming flux using <a href="../../../reference/#crnpy.crnpy.atm_correction"><code>atm_correction()</code></a>.</p>
 
 </div>
 </div>
