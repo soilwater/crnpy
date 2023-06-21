@@ -17,7 +17,6 @@ This library has been developed with the intent of providing a comprehensive yet
 - Versatility: CRNPy can handle data from various CRNP manufacturers and models. It has been successfully tested on both roving and stationary CRNP.
 - Modularity: The library is designed to be modular, allowing users to easily customize the processing workflow to their needs.
 - Instrument agnostic: It can be used with any CRNP, allowing users to process data from multiple instruments with their own workflow.
-- Correction Routines: The correction functions of the library have been effectively used to represent field and watershed scale soil moisture conditions.
 
 ![CRNPy Processing Workflow](https://raw.githubusercontent.com/soilwater/crnpy/main/docs/img/workflow.png)
 Overview of the proposed CRNPy processing workflow. Final user can choose to use the entire workflow, part of it, or build functions on top of it depending on their needs, dashed lines indicate optional steps.
