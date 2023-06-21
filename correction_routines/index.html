@@ -16,7 +16,7 @@
         <link rel="prev" href="..">
       
       
-        <link rel="next" href="../examples/overview/">
+        <link rel="next" href="../examples/stationary/example_RDT_station/">
       
       <link rel="icon" href="../img/logo/favicon.png">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
@@ -95,7 +95,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#incoming-neutron-flux" class="md-skip">
+        <a href="#overview" class="md-skip">
           Skip to content
         </a>
       
@@ -283,6 +283,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#incoming-neutron-flux" class="md-nav__link">
     Incoming neutron flux
   </a>
@@ -353,20 +360,6 @@
           Examples
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../examples/overview/" class="md-nav__link">
-        CRNPy Examples Overview
-      </a>
-    </li>
-  
-
-            
           
             
               
@@ -456,6 +449,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#incoming-neutron-flux" class="md-nav__link">
     Incoming neutron flux
   </a>
@@ -510,8 +510,11 @@
 
   <h1>Correction routines</h1>
 
-<p><img alt="CRNPy Processing Workflow" src="../img/workflow.png" />
-Overview of the proposed CRNPy processing workflow. Final user can choose to use the entire workflow, part of it, or build functions on top of it depending on their needs. Dashed lines indicate optional steps.</p>
+<h3 id="overview">Overview</h3>
+<p><img alt="CRNPy Processing Workflow" src="../img/workflow_rdt.png" />
+Suggested steps for processing raw neutron counts from a roving CRNP. Dashed lines indicate optional steps.</p>
+<p><img alt="CRNPy Processing Workflow" src="../img/workflow_hydroinnova.png" />
+Suggested steps for processing raw neutron counts from a stationary CRNP. Dashed lines indicate optional steps.</p>
 <h3 id="incoming-neutron-flux">Incoming neutron flux</h3>
 <p>The CRNPy package includes a complete set of methods for correcting the raw observed neutron counts for natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea &amp; Smart, 2019; Smart &amp; Shea, 2001).</p>
 <table>
@@ -612,7 +615,7 @@ Overview of the proposed CRNPy processing workflow. Final user can choose to use
 </thead>
 <tbody>
 <tr>
-<td>$fr = 1 + F1<em>F2</em>F3$</td>
+<td>$fr = 1 + F1 \cdot F2 \cdot F3$</td>
 </tr>
 <tr>
 <td>$fr$: Road correction factor</td>
