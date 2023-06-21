@@ -1,5 +1,15 @@
-![CRNPy Processing Workflow](img/workflow.png)
-Overview of the proposed CRNPy processing workflow. Final user can choose to use the entire workflow, part of it, or build functions on top of it depending on their needs. Dashed lines indicate optional steps.
+### Overview
+
+#### Stationary CRNP processing
+
+![CRNPy Processing Workflow](img/workflow_rdt.png)
+Suggested steps for processing raw neutron counts from a roving CRNP. Dashed lines indicate optional steps. See the complete [example notebook](../examples/stationary/example_RDT_station/).
+
+
+#### Roving CRNP processing
+
+![CRNPy Processing Workflow](img/workflow_hydroinnova.png)
+Suggested steps for processing raw neutron counts from a stationary CRNP. Dashed lines indicate optional steps. See the complete [example notebook](../examples/rover/Hydroinnova_rover_example/).
 
 ### Incoming neutron flux
 The CRNPy package includes a complete set of methods for correcting the raw observed neutron counts for natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea & Smart, 2019; Smart & Shea, 2001).
@@ -49,7 +59,7 @@ Due to the known high sensitivity closer to the detector, use cases like rover s
 
 | Road correction |
 |-----------------|
-|$fr = 1 + F1*F2*F3$ |
+|$fr = 1 + F1 \cdot F2 \cdot F3$ |
 |$fr$: Road correction factor |
 |$F1$: Road geometry term |
 |$F2$: Road moisture term |

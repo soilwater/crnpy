@@ -5,3 +5,6 @@
 */.idea/*
 */.pytest_cache/*
 */.cache/*
+site/*
+.cache/*
+.pytest_cache/*
