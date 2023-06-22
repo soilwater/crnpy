@@ -489,7 +489,7 @@ def interpolate_incoming_flux(df_flux, timestamps):
     return df_flux.loc[timestamps]
 
 
-def smooth_1D(corrected_counts,window=5,order=3, method='moving_median'):
+def smooth_1d(corrected_counts, window=5, order=3, method='moving_median'):
     """Use a Savitzky-Golay filter to smooth the signal of corrected neutron counts or another one-dimensional array (e.g. computed volumetric water content).
 
     Args:
@@ -1081,7 +1081,7 @@ def euclidean_distance(px, py, x, y):
     return d
 
 
-def smooth_2D(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=False):
+def smooth_2d(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=False):
     """Moving buffer filter to smooth georeferenced two-dimensional data.
 
     Args:
@@ -1182,7 +1182,7 @@ def idw(x, y, z, X_pred, Y_pred, neighborhood=1000, p=1):
     return np.reshape(Z_pred, s)
 
 
-def interpolate_2D(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
+def interpolate_2d(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
     """Function for interpolating irregular spatial data into a regular grid.
 
     Args:

@@ -1,5 +1,7 @@
 ### Overview
 
+The correction routines are slightly different depending on the detector type. The correction of the neutron counts from the stationary and roving detectors has some similarities and differences. This library provides the end user with the tools to correct neutron counts and process the data in both, the temporal and spatial domains. Below are two flowcharts describing the typical steps in the conversion of raw neutron counts to volumetric water content.
+
 #### Stationary CRNP processing
 
 ![CRNPy Processing Workflow](img/workflow_rdt.png)
@@ -41,7 +43,7 @@ The package also provides functions for correcting raw neutron counts for atmosp
     See [crnpy.crnpy.atm_correction][] documentation for the implementation details.
 
 ### Biomass correction
-The library provides a function for correcting neutron counts for the effects of above-ground biomass by combining an approach for estimating biomass water equivalent (BWE) from in-situ biomass samples (Wahbi et al., 2018) and the BWE correction factor described in Baatz et al. (2015).
+The library provides a function for correcting neutron counts for the effects of above-ground biomass by combining an approach for estimating biomass water equivalent (BWE) from in-situ biomass samples (Wahbi et al., 2018) and the BWE correction factor (Baatz et al., 2015).
 
 | Biomass correction |
 |--------------------|
@@ -55,7 +57,7 @@ The library provides a function for correcting neutron counts for the effects of
     See [crnpy.crnpy.bwe_correction][] and [crnpy.crnpy.biomass_to_bwe][] documentation for the implementation details.
 
 ### Road correction
-Due to the known high sensitivity closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content, crnPy implements the methodology proposed by Schrön et al. (2018).
+Due to the known high sensitivity closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content, CRNPy implements the methodology proposed by Schrön et al. (2018).
 
 | Road correction |
 |-----------------|
@@ -71,12 +73,12 @@ Due to the known high sensitivity closer to the detector, use cases like rover s
 
 ### Additional corrections
 
-Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could affect cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas combined with data published by Dong & Ochsner (2018)
+Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could affect cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas.
+
 
 !!! info "Implementation"
 
     See [crnpy.crnpy.estimate_lattice_water][] and [crnpy.crnpy.counts_to_vwc][] documentation for the implementation details.
-
 
 
 !!! note "References"

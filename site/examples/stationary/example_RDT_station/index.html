@@ -2095,7 +2095,7 @@ Using median count time as expected count time: 3600.0
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Smooth the corrected data using the Savitzky-Golay filter with the <a href="../../../reference/#crnpy.crnpy.smooth_1D"><code>smooth_1D()</code></a> function.</p>
+<p>Smooth the corrected data using the Savitzky-Golay filter with the <a href="../../../reference/#crnpy.crnpy.smooth_1D"><code>smooth_1d()</code></a> function.</p>
 
 </div>
 </div>
@@ -2122,12 +2122,12 @@ Using median count time as expected count time: 3600.0
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Filter using the Savitzky-Golay filter</span>
-<span class="n">df_filtered</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">smooth_1D</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">window</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;savitzky_golay&quot;</span><span class="p">)</span>
+<span class="n">df_filtered</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">smooth_1d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">window</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;savitzky_golay&quot;</span><span class="p">)</span>
 
 <span class="n">df_filtered</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 <div id="cell-8" class="clipboard-copy-txt"># Filter using the Savitzky-Golay filter
-df_filtered = crnpy.smooth_1D(df['corrected'].dropna(), window=11, order=3, method="savitzky_golay")
+df_filtered = crnpy.smooth_1d(df['corrected'].dropna(), window=11, order=3, method="savitzky_golay")
 
 df_filtered.plot()</div>
         

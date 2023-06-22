@@ -24,6 +24,7 @@ plugins:
 
 nav:
   - Home: index.md
+  - Sensor description: sensor_description.md
   - Correction routines: correction_routines.md
   - Examples:
       - 'Example 1': examples/stationary/example_RDT_station.ipynb

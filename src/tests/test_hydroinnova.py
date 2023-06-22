@@ -54,7 +54,7 @@ def hydroinnova_example_mean_value():
                                                   incoming_neutrons=df['incoming_flux'])
 
     # Smooth variable
-    df['corrected_smoothed'] = crnpy.smooth_2D(df['x'],
+    df['corrected_smoothed'] = crnpy.smooth_2d(df['x'],
                                                df['y'],
                                                df['corrected_counts'],
                                                buffer=800, method='median', rnd=True)
@@ -66,7 +66,7 @@ def hydroinnova_example_mean_value():
     df = df.dropna(subset=['VWC'])
 
     # Interpolate variable
-    X_pred, Y_pred, Z_pred = crnpy.interpolate_2D(df['x'],
+    X_pred, Y_pred, Z_pred = crnpy.interpolate_2d(df['x'],
                                                   df['y'],
                                                   df['VWC'],
                                                   dx=250, dy=250, method='cubic')

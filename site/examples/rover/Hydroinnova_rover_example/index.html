@@ -2093,7 +2093,7 @@ df['corrected_counts']=crnpy.atm_correction(df['total_counts'], pressure=df['PTB
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Smooth variable</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_smoothed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">smooth_2D</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_smoothed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">smooth_2d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_counts&#39;</span><span class="p">],</span>
                                         <span class="n">buffer</span><span class="o">=</span> <span class="mi">800</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="n">rnd</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2105,13 +2105,13 @@ df['corrected_counts']=crnpy.atm_correction(df['total_counts'], pressure=df['PTB
 <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;VWC&#39;</span><span class="p">])</span>
 
 <span class="c1"># Interpolate variable</span>
-<span class="n">X_pred</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">,</span> <span class="n">Z_pred</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_2D</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="n">X_pred</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">,</span> <span class="n">Z_pred</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_2d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;VWC&#39;</span><span class="p">],</span>
                                         <span class="n">dx</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
 </pre></div>
 <div id="cell-8" class="clipboard-copy-txt"># Smooth variable
-df['corrected_smoothed'] = crnpy.smooth_2D(df['x'],
+df['corrected_smoothed'] = crnpy.smooth_2d(df['x'],
                                         df['y'],
                                         df['corrected_counts'],
                                         buffer= 800, method='median', rnd=True)
@@ -2123,7 +2123,7 @@ df['VWC']=crnpy.counts_to_vwc(df['corrected_smoothed'], N0=550, bulk_density=1.3
 df = df.dropna(subset=['VWC'])
 
 # Interpolate variable
-X_pred, Y_pred, Z_pred = crnpy.interpolate_2D(df['x'],
+X_pred, Y_pred, Z_pred = crnpy.interpolate_2d(df['x'],
                                         df['y'],
                                         df['VWC'],
                                         dx=250, dy=250, method='cubic')
