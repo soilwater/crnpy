@@ -6,22 +6,22 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentation for the crnpy package.">
+        <meta name="description" content="CRNPy is a Python package for the estimation and processing of soil moisture data from cosmic-ray neutron counts.">
       
       
       
-        <link rel="canonical" href="https://github.com/soilwater/crnpy/">
+        <link rel="canonical" href="https://soilwater.github.io/crnpy/">
       
       
       
-        <link rel="next" href="reference/">
+        <link rel="next" href="correction_routines/">
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="img/logo/favicon.png">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
     
     
       
-        <title>crnpy Documentation</title>
+        <title>CRNPy Documentation</title>
       
     
     
@@ -50,6 +50,32 @@
       
 
     
+    
+      
+        <meta  property="og:type"  content="website" >
+      
+        <meta  property="og:title"  content="Home" >
+      
+        <meta  property="og:description"  content="CRNPy is a Python package for the estimation and processing of soil moisture data from cosmic-ray neutron counts." >
+      
+        <meta  property="og:image"  content="https://soilwater.github.io/crnpy/assets/images/social/index.png" >
+      
+        <meta  property="og:image:type"  content="image/png" >
+      
+        <meta  property="og:image:width"  content="1200" >
+      
+        <meta  property="og:image:height"  content="630" >
+      
+        <meta  property="og:url"  content="https://soilwater.github.io/crnpy/" >
+      
+        <meta  name="twitter:card"  content="summary_large_image" >
+      
+        <meta  name="twitter:title"  content="Home" >
+      
+        <meta  name="twitter:description"  content="CRNPy is a Python package for the estimation and processing of soil moisture data from cosmic-ray neutron counts." >
+      
+        <meta  name="twitter:image"  content="https://soilwater.github.io/crnpy/assets/images/social/index.png" >
+      
     
     
   </head>
@@ -83,10 +109,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="crnpy Documentation" class="md-header__button md-logo" aria-label="crnpy Documentation" data-md-component="logo">
+    <a href="." title="CRNPy Documentation" class="md-header__button md-logo" aria-label="CRNPy Documentation" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <img src="img/logo/crnpy-logo.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -96,7 +121,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            crnpy Documentation
+            CRNPy Documentation
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -181,13 +206,12 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="crnpy Documentation" class="md-nav__button md-logo" aria-label="crnpy Documentation" data-md-component="logo">
+    <a href="." title="CRNPy Documentation" class="md-nav__button md-logo" aria-label="CRNPy Documentation" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <img src="img/logo/crnpy-logo.svg" alt="logo">
 
     </a>
-    crnpy Documentation
+    CRNPy Documentation
   </label>
   
     <div class="md-nav__source">
@@ -282,8 +306,8 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/" class="md-nav__link">
-        Reference
+      <a href="correction_routines/" class="md-nav__link">
+        Correction routines
       </a>
     </li>
   
@@ -324,8 +348,8 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/example_Hydroinnova_rover/" class="md-nav__link">
-        Example 1
+      <a href="examples/stationary/example_RDT_station/" class="md-nav__link">
+        Processing and Analyzing RDT stationary detector observations with CRNPy
       </a>
     </li>
   
@@ -338,8 +362,22 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/stationary/example_RDT_station/" class="md-nav__link">
-        Cosmic Ray Neutron Soil mositure sensing with CRNPy and RDT Detectors
+      <a href="examples/rover/Hydroinnova_rover_example/" class="md-nav__link">
+        Processing and Analyzing Hydroinnova Rover Data with CRNPy
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/calibration/calibration/" class="md-nav__link">
+        CRNP field calibration of N0 device-specific parameter.
       </a>
     </li>
   
@@ -348,6 +386,21 @@
           
         </ul>
       </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="reference/" class="md-nav__link">
+        Reference
+      </a>
     </li>
   
 
@@ -417,21 +470,30 @@
   
 
 
-<h1 id="cosmic-ray-neutron-python-crnpy-library">Cosmic-Ray Neutron Python (CRNPY) Library</h1>
-<p>Welcome to the homepage of the CRNPY (Cosmic-Ray Neutron Python) library, an open-source Python library designed for the processing and conversion of raw neutron counts from Cosmic-Ray Neutron Probes (CRNP) into accurate field-level soil moisture data.</p>
+<h1 id="cosmic-ray-neutron-python-crnpy-library">Cosmic-Ray Neutron Python (CRNPy) Library</h1>
+<p><img alt="GitHub Workflow Status (building)" src="https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-package.yml" />
+<img alt="GitHub Workflow Status (publish)" src="https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-publish.yml?label=publish" />
+<a href="https://pypi.org/project/crnpy/"><img alt="PyPI - Status" src="https://img.shields.io/pypi/v/crnpy" /></a>
+<img alt="GitHub commits since latest release (by SemVer including pre-releases)" src="https://img.shields.io/github/commits-since/soilwater/crnpy/latest/main" /></p>
+<p>Welcome to the homepage of the CRNPy (Cosmic-Ray Neutron Python) library, an open-source Python library designed for the processing and conversion of raw neutron counts from Cosmic-Ray Neutron Probes (CRNP) into accurate field-level soil moisture data.</p>
 <p>This library has been developed with the intent of providing a comprehensive yet easy-to-use workflow for processing raw data from a variety of CRNP, encompassing multiple manufacturers and models.</p>
 <h2 id="key-features">Key Features</h2>
 <ul>
-<li>Versatility: CRNPY can handle data from various CRNP manufacturers and models. It has been successfully tested on both roving and stationary CRNP.</li>
-<li>Accuracy: The library shows excellent agreement with ground-based measurements, making it a reliable tool for scientific research and practical applications.</li>
-<li>Correction Routines: The correction functions of the library have been effectively used to represent field and watershed scale soil moisture conditions.</li>
+<li>Versatility: CRNPy can handle data from various CRNP manufacturers and models. It has been successfully tested on both roving and stationary CRNP.</li>
+<li>Modularity: The library is designed to be modular, allowing users to easily customize the processing workflow to their needs.</li>
+<li>Instrument agnostic: It can be used with any CRNP, allowing users to process data from multiple instruments with their own workflow.</li>
 </ul>
 <h2 id="installation">Installation</h2>
-<p>To install the CRNPY library, you can use Python's package manager, pip. Simply open your command line or terminal and type:</p>
+<p>To install the CRNPy library, you can use Python's package manager, pip. Simply open your command line or terminal and type:</p>
 <p><code>pip install crnpy</code></p>
 <h2 id="authors">Authors</h2>
-<p>The CRNPY library was conceived and developed by Joaquin Peraza and Andres Patrignani in the Soil Water Processes Lab at Kansas State University. The team's passion for making soil moisture data more accessible and easier to process culminated in this powerful tool.</p>
-<p>The Soil Water Processes Lab at Kansas State University is a leading research group focused on understanding and modeling soil water processes. The lab combines a range of experimental and computational approaches to tackle some of the most pressing issues in soil and water research. The development of the CRNPY library is a testament to the lab's commitment to pushing the boundaries of soil science through the innovative use of technology. like to acknowledge the contributions of the wider scientific community in testing and providing feedback on the library, which has been instrumental in its ongoing development.</p>
+<p>The CRNPy library was developed by:</p>
+<ul>
+<li>Joaquin Peraza</li>
+<li>Andres Patrignani</li>
+</ul>
+<p>in the Soil Water Processes Lab at Kansas State University. The team's passion for making soil moisture data more accessible and easier to process culminated in this powerful tool.</p>
+<p>The Soil Water Processes Lab at Kansas State University is a leading research group focused on understanding and modeling soil water processes. The lab combines a range of experimental and computational approaches to tackle some of the most pressing issues in soil and water research. The development of the CRNPy library is a testament to the lab's commitment to pushing the boundaries of soil science through the innovative use of technology. The authors would like to acknowledge the contributions of the wider scientific community in testing and providing feedback on the library, which has been instrumental in its ongoing development.</p>
 
 
 
