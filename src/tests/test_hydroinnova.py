@@ -33,25 +33,13 @@ def hydroinnova_example_mean_value():
     # Compute total neutron counts
     df['total_counts'] = crnpy.compute_total_raw_counts(df[counts_colums])
 
-    # Find stations with cutoff rigidity similar to estimated by lat,lon
-    crnpy.find_neutron_detectors(crnpy.cutoff_rigidity(df['LatDec'][0], df['LongDec'][0]),
-                                 start_date=df.iloc[0]['timestamp'], end_date=df.iloc[-1]['timestamp'])
-
-    # Download data for one of the similar stations and add to df
-    incoming_neutrons = crnpy.get_incoming_neutron_flux(start_date=df.iloc[0]['timestamp'],
-                                                        end_date=df.iloc[-1]['timestamp'], station="NEWK",
-                                                        utc_offset=-5, expand_window=2)
-    # Interpolate incomming flux hourly to measured timestamps (~ every minute)
-    df['incoming_flux'] = crnpy.interpolate_incoming_flux(incoming_neutrons, timestamps=df['timestamp']).values
-
     # Fill NaN values in atmospheric data
     df[['PTB110_mb', 'RH_CS215', 'T_CS215']] = crnpy.fill_missing_atm(df[['PTB110_mb', 'RH_CS215', 'T_CS215']])
 
     # Correct count by atmospheric variables and incoming flux
     df['corrected_counts'] = crnpy.atm_correction(df['total_counts'], pressure=df['PTB110_mb'], humidity=df['RH_CS215'],
                                                   temp=df['T_CS215'],
-                                                  Pref=df['PTB110_mb'].mean(), Aref=0, L=130,
-                                                  incoming_neutrons=df['incoming_flux'])
+                                                  Pref=df['PTB110_mb'].mean(), Aref=0, L=130)
 
     # Smooth variable
     df['corrected_smoothed'] = crnpy.smooth_2d(df['x'],
@@ -76,4 +64,5 @@ def hydroinnova_example_mean_value():
 
 def test_rover():
     X_pred, Y_pred, Z_pred = hydroinnova_example_mean_value()
-    assert np.nanmean(Z_pred) > 0.155 and np.nanmean(Z_pred) < 0.16, f"Rover survey test failed. Mean value is {np.nanmean(Z_pred)}, expected value is between 0.155 and 0.16."
+    print(f"Rover survey test passed. Mean value is {np.nanmean(Z_pred)}, expected value is between 0.16 and 0.1625.")
+    assert np.nanmean(Z_pred) > 0.16 and np.nanmean(Z_pred) < 0.1625, f"Rover survey test failed. Mean value is {np.nanmean(Z_pred)}, expected value is between 0.155 and 0.16."

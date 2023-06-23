@@ -74,40 +74,53 @@ def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', r
     df.set_index(col, inplace=True)
     return df
 
-def count_time(df):
+def count_time(counts=None, timestamp_col=None):
     """Approximate counting time.
 
     Args:
-        df (pandas.DataFrame): Dataframe containing only the columns with neutron counts and timestamp in the index.
+        counts (pandas.DataFrame): DataFrame with neutron counts, might have DateTimeIndex.
+        timestamp_col (pandas.Series): Series with timestamps. If counts has a DateTimeIndex, timestamp_col is not needed.
 
     Returns:
-        (pandas.DataFrame): Dataframe with the approximate counting time for each observation.
+        (pandas.Series): Series with the approximate counting time for each observation.
 
     Examples:
         Using `count_time` in a console environment:
 
         >>> df = pd.DataFrame(...)
-        >>> count_time(df)
+        >>> count_time(timestamp_col=df['timestamp'])
         0   3600.0
         1   3600.0
         2   3600.0
     """
+    if timestamp_col is not None:
+        if not isinstance(timestamp_col, pd.Series):
+            raise TypeError('timestamp_col must be a pandas Series.')
+        if timestamp_col.dtype != 'datetime64[ns]':
+            raise TypeError('timestamp_col must be a pandas Series with datetime64[ns] dtype.')
 
-    # Check that index is a timestamp
-    if type(df.index) != pd.core.indexes.datetimes.DatetimeIndex:
-        raise ValueError('Index must be a timestamp.')
+        count_time = timestamp_col.diff().dt.total_seconds()
+        return count_time
 
-    # Calculate time difference between rows
-    count_time = df.index.to_series().diff().dt.total_seconds()
+    if counts is not None:
+        if not isinstance(counts, pd.DataFrame):
+            raise TypeError('counts must be a pandas DataFrame.')
 
-    return count_time
+        if not counts.index.dtype == 'datetime64[ns]':
+            raise TypeError('counts must have a DateTimeIndex.')
 
-def fill_counts(counts, count_times=None, expected_time=False, threshold=0.25, limit=3):
+        count_time = counts.index.to_series().diff().dt.total_seconds()
+        return count_time
+
+    raise TypeError('Either counts or timestamp_col must be provided.')
+
+def fill_counts(counts, count_times=None, timestamp_col=None, expected_time=False, threshold=0.25, limit=3):
     """Fill missing neutron counts. Observation periods shorter than threshold are discarded (replaced with NaN).
     
     Args:
-        counts (pandas.DataFrame): DataFrame with neutron counts, might have count_time column(s).
-        count_time (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
+        counts (pandas.DataFrame): DataFrame with neutron counts, might have DateTimeIndex.
+        count_time (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as `counts`.
+        timestamp_col (pandas.Series): Series with timestamps. If counts has a DateTimeIndex, timestamp_col is not needed.
         expected_time (int): Expected counting time in seconds. If not provided, it is calculated as the median of the counting times.
         threshold (float): Minimum fraction of the neutron integration time. Default is 0.25.
 
@@ -129,10 +142,19 @@ def fill_counts(counts, count_times=None, expected_time=False, threshold=0.25, l
 
     if type(counts.index) == pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
         print("No count time columns provided. Using timestamp index to compute count time.")
-        count_times = counts.index.to_series().diff().dt.total_seconds()
+        count_times = count_time(timestamp_col=counts.index.to_series())
 
-    if type(counts.index) != pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
-        raise ValueError('Index must be a timestamp or count times must be provided.')
+    elif not isinstance(timestamp_col, type(None)) and isinstance(count_times, type(None)):
+        if timestamp_col.dtype != 'datetime64[ns]':
+            if len(timestamp_col) != len(counts):
+                raise ValueError('Timestamp column length does not match number of readings.')
+            print("No count time columns provided. Using timestamp column to compute count time.")
+            count_times = count_time(timestamp_col=timestamp_col)
+        else:
+            raise TypeError('Timestamp column must be a pandas Series with datetime64[ns] dtype.')
+
+    if type(counts.index) != pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)) and isinstance(timestamp_col, type(None)):
+        raise ValueError('Count_times must be provided, or timestamp_col must be provided, or counts must have a DatetimeIndex.')
 
     if len(counts) != len(count_times):
         raise ValueError('Count times length does not match number of readings.')
@@ -163,13 +185,14 @@ def fill_counts(counts, count_times=None, expected_time=False, threshold=0.25, l
     counts = counts.interpolate(method='linear', limit=limit, limit_direction='both').round()
     return counts
 
-def normalize_counts(counts, count_time=3600, count_times=None):
+def normalize_counts(counts, count_time=3600, count_times=None, timestamp_col=None):
     """Normalize neutron counts to the desired counting time.
     
     Args:
         counts (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
         count_time (int): Count time in seconds for normalization. Default is 3600 seconds.
-        count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as df.
+        count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as counts.
+        timestamp_col (pandas.Series): Timestamp column, used to calculate count time if count_times is not provided, it must have the same number of rows as counts.
         
     Returns:
         (pandas.DataFrame): Normalized neutron counts.
@@ -180,12 +203,20 @@ def normalize_counts(counts, count_time=3600, count_times=None):
         print("No count_times columns provided. Using timestamp index to compute count time.")
         count_times = counts.index.to_series().diff().dt.total_seconds()
 
+    elif count_times is None and not isinstance(timestamp_col, type(None)):
+        if len(timestamp_col) != len(counts):
+            raise ValueError('Timestamp column length does not match number of readings.')
+        print("No count_times columns provided. Using timestamp column to compute count time.")
+        if timestamp_col.dtype != 'datetime64[ns]':
+            raise TypeError('Timestamp column must be a pandas Series with datetime64[ns] dtype.')
+        count_times = count_time(timestamp_col=timestamp_col)
+
+
     if isinstance(count_times, type(None)):
-        raise ValueError('Count time must be provided or index must be a timestamp.')
+        raise ValueError('Count time must be provided, or `timestamp_col` must be provided, or counts must have a DatetimeIndex.')
 
     if len(counts) != len(count_times):
         raise ValueError('Count times length does not match number of readings.')
-
 
     #Normalize counts rounded to integer
     if type(count_times) == pd.core.series.Series or len(count_times.columns) == 1:
@@ -199,8 +230,7 @@ def normalize_counts(counts, count_time=3600, count_times=None):
         return normalized_counts
 
 
-
-def compute_total_raw_counts(counts, nan_strategy=None):
+def compute_total_raw_counts(counts, nan_strategy=None, timestamp_col=None):
     """Compute the sum of uncorrected neutron counts for all detectors.
 
     Args:
@@ -210,6 +240,7 @@ def compute_total_raw_counts(counts, nan_strategy=None):
     Returns:
         (pandas.DataFrame): Dataframe with the sum of uncorrected neutron counts for all detectors.
     """
+
     counts=counts.copy()
 
     if counts.isnull().values.any():
@@ -217,8 +248,13 @@ def compute_total_raw_counts(counts, nan_strategy=None):
             raise ValueError('NaN values found. Please fill missing values or provide a strategy. See documentation for more information.')
         elif nan_strategy == 'interpolate':
             print('NaN values found. Interpolating missing values using fill_counts().')
-            if type(counts.index) != pd.core.indexes.datetimes.DatetimeIndex:
-                raise ValueError('Index must be a timestamp to use interpolation strategy.')
+            if not isinstance(timestamp_col, type(None)):
+                if type(timestamp_col) != pd.core.series.Series:
+                    if timestamp_col.dtype != 'datetime64[ns]':
+                        raise TypeError('Timestamp column must be a pandas Series with datetime64[ns] dtype.')
+                counts = fill_counts(counts, timestamp_col)
+            elif type(counts.index) != pd.core.indexes.datetimes.DatetimeIndex:
+                raise ValueError('`timestamp_col` must be provided if `counts` does not have a DatetimeIndex.')
             counts = fill_counts(counts)
         elif nan_strategy == 'average':
             if len(counts.columns) == 1:
@@ -253,7 +289,6 @@ def drop_outliers(raw_counts, window=5, store_outliers=False, min_counts=None, m
     References:
         Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
     """
-
 
     if min_counts is not None:
         lower_count = np.sum(raw_counts < min_counts)
@@ -489,7 +524,7 @@ def interpolate_incoming_flux(df_flux, timestamps):
     return df_flux.loc[timestamps]
 
 
-def smooth_1D(corrected_counts,window=5,order=3, method='moving_median'):
+def smooth_1d(corrected_counts, window=5, order=3, method='moving_median'):
     """Use a Savitzky-Golay filter to smooth the signal of corrected neutron counts or another one-dimensional array (e.g. computed volumetric water content).
 
     Args:
@@ -953,7 +988,7 @@ def estimate_lattice_water(clay_content, total_carbon=None):
 
     ![img1](img/lattice_water_simple.png) | ![img2](img/lattice_water_multiple.png)
     :-------------------------:|:-------------------------:
-    $\omega_{lat} = 1.241 + 0.069 * clay(\%)$ | $\omega_{lat} = -0.028 + 0.077 * clay(\%) + 0.459 * carbon(\%)$
+    $\omega_{lat} = 0.097 * clay(\%)$ | $\omega_{lat} = -0.028 + 0.077 * clay(\%) + 0.459 * carbon(\%)$
     Linear regression [lattice water (%) as a function of clay (%)] done with data from Soil Water Processes Lab and Dong and Ochsner (2018) |  Multiple linear regression [lattice water (%) as a function of clay (%) and soil carbon (%)] done with data from Soil Water Processes Lab.
 
     Args:
@@ -971,7 +1006,7 @@ def estimate_lattice_water(clay_content, total_carbon=None):
 
     """
     if total_carbon is None:
-        lattice_water = 1.241 + 0.069 * clay_content
+        lattice_water = 0.097 * clay_content
     else:
         lattice_water = -0.028 + 0.077 * clay_content + 0.459 * total_carbon
     return lattice_water
@@ -1081,7 +1116,7 @@ def euclidean_distance(px, py, x, y):
     return d
 
 
-def smooth_2D(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=False):
+def smooth_2d(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=False):
     """Moving buffer filter to smooth georeferenced two-dimensional data.
 
     Args:
@@ -1156,7 +1191,7 @@ def idw(x, y, z, X_pred, Y_pred, neighborhood=1000, p=1):
         (array): Interpolated values.
 
     References:
-        [https://soilwater.github.io/pynotes-agriscience/notebooks/inverse_distance_weighting.html](https://soilwater.github.io/pynotes-agriscience/notebooks/inverse_distance_weighting.html)
+        [https://en.wikipedia.org/wiki/Inverse_distance_weighting](https://en.wikipedia.org/wiki/Inverse_distance_weighting)
 
 
     """
@@ -1173,7 +1208,7 @@ def idw(x, y, z, X_pred, Y_pred, neighborhood=1000, p=1):
         # Distance between current and observed points
         d = euclidean_distance(X_pred[n], Y_pred[n], x, y)
 
-        # Select points within neighborhood only for interpolateion
+        # Select points within neighborhood only for interpolation
         idx_neighbors = d < neighborhood
 
         # Compute interpolated value at point of interest
@@ -1182,7 +1217,7 @@ def idw(x, y, z, X_pred, Y_pred, neighborhood=1000, p=1):
     return np.reshape(Z_pred, s)
 
 
-def interpolate_2D(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
+def interpolate_2d(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
     """Function for interpolating irregular spatial data into a regular grid.
 
     Args:
