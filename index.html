@@ -14,7 +14,7 @@
       
       
       
-        <link rel="next" href="correction_routines/">
+        <link rel="next" href="sensor_description/">
       
       <link rel="icon" href="img/logo/favicon.png">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
@@ -78,7 +78,18 @@
       
     
     
-  </head>
+   <link href="assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+        html.glightbox-open { overflow: initial; height: 100%; }
+        .gslide-title { margin-top: 0px; user-select: text; }
+        .gslide-desc { color: #666; user-select: text; }
+        .gslide-image img { background: white; }
+        
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}
+            </style> <script src="assets/javascripts/glightbox.min.js"></script></head>
   
   
     <body dir="ltr">
@@ -306,6 +317,21 @@
   
   
     <li class="md-nav__item">
+      <a href="sensor_description/" class="md-nav__link">
+        Sensor description
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="correction_routines/" class="md-nav__link">
         Correction routines
       </a>
@@ -326,17 +352,17 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
       
       
       
-        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
           Examples
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_3">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Examples
         </label>
@@ -349,7 +375,7 @@
   
     <li class="md-nav__item">
       <a href="examples/stationary/example_RDT_station/" class="md-nav__link">
-        Processing and Analyzing RDT stationary detector observations with CRNPy
+        Processing and analyzing data from a stationary detector
       </a>
     </li>
   
@@ -363,7 +389,7 @@
   
     <li class="md-nav__item">
       <a href="examples/rover/Hydroinnova_rover_example/" class="md-nav__link">
-        Processing and Analyzing Hydroinnova Rover Data with CRNPy
+        Processing and analyzing data from a roving detector
       </a>
     </li>
   
@@ -377,7 +403,7 @@
   
     <li class="md-nav__item">
       <a href="examples/calibration/calibration/" class="md-nav__link">
-        CRNP field calibration of N0 device-specific parameter.
+        Device-specific field calibration
       </a>
     </li>
   
@@ -471,10 +497,11 @@
 
 
 <h1 id="cosmic-ray-neutron-python-crnpy-library">Cosmic-Ray Neutron Python (CRNPy) Library</h1>
-<p><img alt="GitHub Workflow Status (building)" src="https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-package.yml" />
-<img alt="GitHub Workflow Status (publish)" src="https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-publish.yml?label=publish" />
+<p><a class="glightbox" href="img/logo/crnpy-logo.png" data-type="image" data-width="100%" data-height="auto" data-desc-position="bottom"><img alt="CRNPy logo" src="img/logo/crnpy-logo.png" /></a></p>
+<p><a class="glightbox" href="https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-package.yml" data-type="image" data-width="100%" data-height="auto" data-desc-position="bottom"><img alt="GitHub Workflow Status (building)" src="https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-package.yml" /></a>
+<a class="glightbox" href="https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-publish.yml?label=publish" data-type="image" data-width="100%" data-height="auto" data-desc-position="bottom"><img alt="GitHub Workflow Status (publish)" src="https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-publish.yml?label=publish" /></a>
 <a href="https://pypi.org/project/crnpy/"><img alt="PyPI - Status" src="https://img.shields.io/pypi/v/crnpy" /></a>
-<img alt="GitHub commits since latest release (by SemVer including pre-releases)" src="https://img.shields.io/github/commits-since/soilwater/crnpy/latest/main" /></p>
+<a class="glightbox" href="https://img.shields.io/github/commits-since/soilwater/crnpy/latest/main" data-type="image" data-width="100%" data-height="auto" data-desc-position="bottom"><img alt="GitHub commits since latest release (by SemVer including pre-releases)" src="https://img.shields.io/github/commits-since/soilwater/crnpy/latest/main" /></a></p>
 <p>Welcome to the homepage of the CRNPy (Cosmic-Ray Neutron Python) library, an open-source Python library designed for the processing and conversion of raw neutron counts from Cosmic-Ray Neutron Probes (CRNP) into accurate field-level soil moisture data.</p>
 <p>This library has been developed with the intent of providing a comprehensive yet easy-to-use workflow for processing raw data from a variety of CRNP, encompassing multiple manufacturers and models.</p>
 <h2 id="key-features">Key Features</h2>
@@ -543,5 +570,5 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
       
     
-  </body>
+  <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
 </html>

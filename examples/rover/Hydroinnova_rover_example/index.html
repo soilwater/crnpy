@@ -23,7 +23,7 @@
     
     
       
-        <title>Processing and Analyzing Hydroinnova Rover Data with CRNPy - CRNPy Documentation</title>
+        <title>Processing and analyzing data from a roving detector - CRNPy Documentation</title>
       
     
     
@@ -80,7 +80,18 @@
       
     
     
-  </head>
+   <link href="../../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+        html.glightbox-open { overflow: initial; height: 100%; }
+        .gslide-title { margin-top: 0px; user-select: text; }
+        .gslide-desc { color: #666; user-select: text; }
+        .gslide-image img { background: white; }
+        
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}
+            </style> <script src="../../../assets/javascripts/glightbox.min.js"></script></head>
   
   
     <body dir="ltr">
@@ -95,7 +106,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#processing-and-analyzing-hydroinnova-rover-data-with-crnpy" class="md-skip">
+        <a href="#processing-and-analyzing-data-from-a-roving-detector" class="md-skip">
           Skip to content
         </a>
       
@@ -129,7 +140,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Processing and Analyzing Hydroinnova Rover Data with CRNPy
+              Processing and analyzing data from a roving detector
             
           </span>
         </div>
@@ -253,6 +264,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../sensor_description/" class="md-nav__link">
+        Sensor description
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../correction_routines/" class="md-nav__link">
         Correction routines
       </a>
@@ -275,17 +301,17 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
       
       
       
-        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+        <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
           Examples
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_3">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Examples
         </label>
@@ -298,7 +324,7 @@
   
     <li class="md-nav__item">
       <a href="../../stationary/example_RDT_station/" class="md-nav__link">
-        Processing and Analyzing RDT stationary detector observations with CRNPy
+        Processing and analyzing data from a stationary detector
       </a>
     </li>
   
@@ -321,7 +347,7 @@
       
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Processing and Analyzing Hydroinnova Rover Data with CRNPy
+        Processing and analyzing data from a roving detector
       </a>
       
     </li>
@@ -336,7 +362,7 @@
   
     <li class="md-nav__item">
       <a href="../../calibration/calibration/" class="md-nav__link">
-        CRNP field calibration of N0 device-specific parameter.
+        Device-specific field calibration
       </a>
     </li>
   
@@ -1437,7 +1463,7 @@ Licensed under the Apache License, Version 2.0.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="processing-and-analyzing-hydroinnova-rover-data-with-crnpy">Processing and Analyzing Hydroinnova Rover Data with CRNPy<a class="anchor-link" href="#processing-and-analyzing-hydroinnova-rover-data-with-crnpy">&#182;</a></h1><p>This tutorial demonstrates how to process and analyze data from a rover using the Cosmic Ray Neutron Python (CRNPy) library. The steps include loading the data, converting geographical coordinates to Cartesian coordinates, normalizing neutron counts, correcting for atmospheric effects, and visualizing the results.</p>
+<h1 id="processing-and-analyzing-data-from-a-roving-detector">Processing and analyzing data from a roving detector<a class="anchor-link" href="#processing-and-analyzing-data-from-a-roving-detector">&#182;</a></h1><p>This tutorial demonstrates how to process and analyze data from a rover using the Cosmic Ray Neutron Python (CRNPy) library. The steps include loading the data, converting geographical coordinates to Cartesian coordinates, normalizing neutron counts, correcting for atmospheric effects, and visualizing the results.</p>
 <p>First import the required packages.</p>
 
 </div>
@@ -1475,7 +1501,6 @@ import numpy as np
 import pandas as pd
 from crnpy import crnpy
 import matplotlib.pyplot as plt
-
 </div>
         
         </div>
@@ -1519,13 +1544,14 @@ import matplotlib.pyplot as plt
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Sample dataset</span>
+<span class="n">filepath</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/rover/gypsum_transect_01_may_2018.KSU&quot;</span>
 <span class="n">col_names</span> <span class="o">=</span> <span class="s1">&#39;RecordNum,Date Time(UTC),PTB110_mb,P4_mb,P1_mb,T1_C,RH1,T_CS215,RH_CS215,Vbat,N1Cts,N2Cts,N3Cts,N4Cts,N5Cts,N6Cts,N7Cts,N8Cts,N1ETsec,N3ETsec,N5ETsec,N7ETsec,N1T(C),N1RH,N5T(C),N5RH,GpsUTC,LatDec,LongDec,Alt,Qual,NumSats,HDOP,Speed_kmh,COG,SpeedQuality,strDate&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/rover/gypsum_transect_01_may_2018.KSU&#39;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LongDec&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LongDec&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># Raw data is in absolute values</span>
 
 <span class="c1"># Parse timestamps and set as index</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Date Time(UTC)&#39;</span><span class="p">])</span>
-<span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Remove rows with missing coordinates</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LatDec&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1537,13 +1563,14 @@ import matplotlib.pyplot as plt
 <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 <div id="cell-2" class="clipboard-copy-txt"># Sample dataset
+filepath = "https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/rover/gypsum_transect_01_may_2018.KSU"
 col_names = 'RecordNum,Date Time(UTC),PTB110_mb,P4_mb,P1_mb,T1_C,RH1,T_CS215,RH_CS215,Vbat,N1Cts,N2Cts,N3Cts,N4Cts,N5Cts,N6Cts,N7Cts,N8Cts,N1ETsec,N3ETsec,N5ETsec,N7ETsec,N1T(C),N1RH,N5T(C),N5RH,GpsUTC,LatDec,LongDec,Alt,Qual,NumSats,HDOP,Speed_kmh,COG,SpeedQuality,strDate'.split(',')
-df = pd.read_csv('https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/rover/gypsum_transect_01_may_2018.KSU', skiprows=20, names=col_names)
+
+df = pd.read_csv(filepath, skiprows=20, names=col_names)
 df['LongDec'] = df['LongDec'] * -1 # Raw data is in absolute values
 
 # Parse timestamps and set as index
 df['timestamp'] = pd.to_datetime(df['Date Time(UTC)'])
-df.set_index(df['timestamp'], inplace=True)
 
 # Remove rows with missing coordinates
 df['LatDec'].replace(0.0, np.nan, inplace=True)
@@ -1738,9 +1765,9 @@ df.head(3)
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">latlon_to_utm</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;LatDec&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LongDec&#39;</span><span class="p">],</span> <span class="mi">14</span><span class="p">,</span> <span class="n">missing_values</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
 
 <span class="c1"># Create figure of survey points</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">scilimits</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">scilimits</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Easting&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Northing&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -1749,9 +1776,9 @@ df.head(3)
 df['x'],df['y'] = crnpy.latlon_to_utm(df['LatDec'], df['LongDec'], 14, missing_values=0.0)
 
 # Create figure of survey points
-plt.figure(figsize=(5,5))
+plt.figure(figsize = (5,5))
 plt.scatter(df['x'], df['y'], marker='o', edgecolor='k', facecolor='w')
-plt.ticklabel_format(scilimits=(-5,5))
+plt.ticklabel_format(scilimits = (-5,5))
 plt.xlabel('Easting')
 plt.ylabel('Northing')
 plt.show()
@@ -1845,7 +1872,8 @@ df[counts_colums] = \
                            count_time=60, count_times=df[cont_times_col])
 
 # Compute total neutron counts
-df['total_counts'] = crnpy.compute_total_raw_counts(df[counts_colums])</div>
+df['total_counts'] = crnpy.compute_total_raw_counts(df[counts_colums])
+</div>
         
         </div>
     </div>
@@ -1887,17 +1915,27 @@ df['total_counts'] = crnpy.compute_total_raw_counts(df[counts_colums])</div>
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1">#Find stations with cutoff rigidity similar to estimated by lat,lon</span>
-<span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_detectors</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;LatDec&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LongDec&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="n">start_date</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="n">end_date</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">])</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="n">start_date</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span>
+<span class="n">end_date</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span>
 
-<span class="c1">#Download data for one of the similar stations and add to df</span>
-<span class="n">incoming_neutrons</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">get_incoming_neutron_flux</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="n">end_date</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;NEWK&quot;</span><span class="p">,</span> <span class="n">utc_offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">expand_window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1">#Find stations with cutoff rigidity similar to estimated by lat,lon</span>
+<span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_detectors</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;LatDec&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LongDec&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> 
+                             <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">)</span>
+
+<span class="c1">#Download data for one of the similar stations and add to df, with UTC offset for CST, and 2 extra hours in the dataset ends.</span>
+<span class="n">incoming_neutrons</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">get_incoming_neutron_flux</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;NEWK&quot;</span><span class="p">,</span>
+                                                    <span class="n">utc_offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">expand_window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
-<div id="cell-5" class="clipboard-copy-txt">#Find stations with cutoff rigidity similar to estimated by lat,lon
-crnpy.find_neutron_detectors(crnpy.cutoff_rigidity(df['LatDec'][0], df['LongDec'][0]), start_date=df.iloc[0]['timestamp'], end_date=df.iloc[-1]['timestamp'])
+<div id="cell-5" class="clipboard-copy-txt">start_date = df.iloc[0]['timestamp']
+end_date = df.iloc[-1]['timestamp']
 
-#Download data for one of the similar stations and add to df
-incoming_neutrons = crnpy.get_incoming_neutron_flux(start_date=df.iloc[0]['timestamp'], end_date=df.iloc[-1]['timestamp'], station="NEWK", utc_offset=-5, expand_window=2)</div>
+#Find stations with cutoff rigidity similar to estimated by lat,lon
+crnpy.find_neutron_detectors(crnpy.cutoff_rigidity(df['LatDec'][0], df['LongDec'][0]), 
+                             start_date=start_date, end_date=end_date)
+
+#Download data for one of the similar stations and add to df, with UTC offset for CST, and 2 extra hours in the dataset ends.
+incoming_neutrons = crnpy.get_incoming_neutron_flux(start_date=start_date, end_date=end_date, station="NEWK",
+                                                    utc_offset=-5, expand_window=2)</div>
         
         </div>
     </div>
@@ -1971,10 +2009,11 @@ Your cutoff rigidity is 2.99 GV
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Interpolate incomming flux hourly to measured timestamps (~ every minute)</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_incoming_flux</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">values</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_incoming_flux</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="p">,</span> <span class="n">timestamps</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">values</span>
 </pre></div>
 <div id="cell-6" class="clipboard-copy-txt"># Interpolate incomming flux hourly to measured timestamps (~ every minute)
-df['incoming_flux']=crnpy.interpolate_incoming_flux(incoming_neutrons, timestamps=df['timestamp']).values</div>
+df['incoming_flux'] = crnpy.interpolate_incoming_flux(incoming_neutrons, timestamps=df['timestamp']).values
+</div>
         
         </div>
     </div>
@@ -2020,15 +2059,18 @@ df['incoming_flux']=crnpy.interpolate_incoming_flux(incoming_neutrons, timestamp
 <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;PTB110_mb&#39;</span><span class="p">,</span> <span class="s1">&#39;RH_CS215&#39;</span><span class="p">,</span> <span class="s1">&#39;T_CS215&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">fill_missing_atm</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;PTB110_mb&#39;</span><span class="p">,</span> <span class="s1">&#39;RH_CS215&#39;</span><span class="p">,</span> <span class="s1">&#39;T_CS215&#39;</span><span class="p">]])</span>
 
 <span class="c1"># Correct count by atmospheric variables and incoming flux</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_counts&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">atm_correction</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PTB110_mb&#39;</span><span class="p">],</span> <span class="n">humidity</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;RH_CS215&#39;</span><span class="p">],</span> <span class="n">temp</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;T_CS215&#39;</span><span class="p">],</span>
-                                     <span class="n">Pref</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PTB110_mb&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span> <span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">atm_correction</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">],</span> <span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PTB110_mb&#39;</span><span class="p">],</span> <span class="n">humidity</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;RH_CS215&#39;</span><span class="p">],</span>
+                                              <span class="n">temp</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;T_CS215&#39;</span><span class="p">],</span><span class="n">Pref</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;PTB110_mb&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span>
+                                              <span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">])</span>
 </pre></div>
 <div id="cell-7" class="clipboard-copy-txt"># Fill NaN values in atmospheric data
 df[['PTB110_mb', 'RH_CS215', 'T_CS215']] = crnpy.fill_missing_atm(df[['PTB110_mb', 'RH_CS215', 'T_CS215']])
 
 # Correct count by atmospheric variables and incoming flux
-df['corrected_counts']=crnpy.atm_correction(df['total_counts'], pressure=df['PTB110_mb'], humidity=df['RH_CS215'], temp=df['T_CS215'],
-                                     Pref=df['PTB110_mb'].mean(), Aref=0, L=130, incoming_neutrons=df['incoming_flux'])</div>
+df['corrected_counts'] = crnpy.atm_correction(df['total_counts'], pressure=df['PTB110_mb'], humidity=df['RH_CS215'],
+                                              temp=df['T_CS215'],Pref=df['PTB110_mb'].mean(), Aref=0, L=130,
+                                              incoming_neutrons=df['incoming_flux'])
+</div>
         
         </div>
     </div>
@@ -2048,7 +2090,7 @@ df['corrected_counts']=crnpy.atm_correction(df['total_counts'], pressure=df['PTB
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>C:\Users\jperaza\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\crnpy\crnpy.py:366: UserWarning: Reference incoming neutron flux not provided. Using first value of incoming neutron flux.
+<pre>C:\Users\jperaza\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\crnpy\crnpy.py:400: UserWarning: Reference incoming neutron flux not provided. Using first value of incoming neutron flux.
   warnings.warn(&#39;Reference incoming neutron flux not provided. Using first value of incoming neutron flux.&#39;)
 </pre>
 </div>
@@ -2093,41 +2135,40 @@ df['corrected_counts']=crnpy.atm_correction(df['total_counts'], pressure=df['PTB
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Smooth variable</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_smoothed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">smooth_2D</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_smoothed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">smooth_2d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_counts&#39;</span><span class="p">],</span>
                                         <span class="n">buffer</span><span class="o">=</span> <span class="mi">800</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="n">rnd</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Estimate Soil Columetric Water Content</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;VWC&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">crnpy</span><span class="o">.</span><span class="n">counts_to_vwc</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_smoothed&#39;</span><span class="p">],</span> <span class="n">N0</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">bulk_density</span><span class="o">=</span><span class="mf">1.3</span><span class="p">,</span> <span class="n">Wlat</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">Wsoc</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;VWC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">counts_to_vwc</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_smoothed&#39;</span><span class="p">],</span> <span class="n">N0</span><span class="o">=</span><span class="mi">550</span><span class="p">,</span> <span class="n">bulk_density</span><span class="o">=</span><span class="mf">1.3</span><span class="p">,</span> <span class="n">Wlat</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">Wsoc</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 
 <span class="c1"># Drop VWC NaN values before interpolating values</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;VWC&#39;</span><span class="p">])</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;VWC&#39;</span><span class="p">])</span>
 
 <span class="c1"># Interpolate variable</span>
-<span class="n">X_pred</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">,</span> <span class="n">Z_pred</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_2D</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="n">X_pred</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">,</span> <span class="n">Z_pred</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_2d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;VWC&#39;</span><span class="p">],</span>
                                         <span class="n">dx</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
 </pre></div>
 <div id="cell-8" class="clipboard-copy-txt"># Smooth variable
-df['corrected_smoothed'] = crnpy.smooth_2D(df['x'],
+df['corrected_smoothed'] = crnpy.smooth_2d(df['x'],
                                         df['y'],
                                         df['corrected_counts'],
                                         buffer= 800, method='median', rnd=True)
 
 # Estimate Soil Columetric Water Content
-df['VWC']=crnpy.counts_to_vwc(df['corrected_smoothed'], N0=550, bulk_density=1.3, Wlat=0.03, Wsoc=0.01)
+df['VWC'] = crnpy.counts_to_vwc(df['corrected_smoothed'], N0=550, bulk_density=1.3, Wlat=0.03, Wsoc=0.01)
 
 # Drop VWC NaN values before interpolating values
-df = df.dropna(subset=['VWC'])
+df = df.dropna(subset = ['VWC'])
 
 # Interpolate variable
-X_pred, Y_pred, Z_pred = crnpy.interpolate_2D(df['x'],
+X_pred, Y_pred, Z_pred = crnpy.interpolate_2d(df['x'],
                                         df['y'],
                                         df['VWC'],
                                         dx=250, dy=250, method='cubic')
-
 </div>
         
         </div>
@@ -2370,5 +2411,5 @@ class="
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
       
     
-  </body>
+  <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
 </html>

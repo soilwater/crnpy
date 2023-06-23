@@ -10,18 +10,24 @@
       
       
       
+        <link rel="canonical" href="https://soilwater.github.io/crnpy/sensor_description/">
       
       
-      <link rel="icon" href="/crnpy/img/logo/favicon.png">
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../correction_routines/">
+      
+      <link rel="icon" href="../img/logo/favicon.png">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
     
     
       
-        <title>CRNPy Documentation</title>
+        <title>Sensor description - CRNPy Documentation</title>
       
     
     
-      <link rel="stylesheet" href="/crnpy/assets/stylesheets/main.85bb2934.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.85bb2934.min.css">
       
       
 
@@ -37,18 +43,55 @@
       
     
     
-      <link rel="stylesheet" href="/crnpy/assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
     
-    <script>__md_scope=new URL("/crnpy/",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
     
     
+      
+        <meta  property="og:type"  content="website" >
+      
+        <meta  property="og:title"  content="Sensor description - CRNPy Documentation" >
+      
+        <meta  property="og:description"  content="CRNPy is a Python package for the estimation and processing of soil moisture data from cosmic-ray neutron counts." >
+      
+        <meta  property="og:image"  content="https://soilwater.github.io/crnpy/assets/images/social/sensor_description.png" >
+      
+        <meta  property="og:image:type"  content="image/png" >
+      
+        <meta  property="og:image:width"  content="1200" >
+      
+        <meta  property="og:image:height"  content="630" >
+      
+        <meta  property="og:url"  content="https://soilwater.github.io/crnpy/sensor_description/" >
+      
+        <meta  name="twitter:card"  content="summary_large_image" >
+      
+        <meta  name="twitter:title"  content="Sensor description - CRNPy Documentation" >
+      
+        <meta  name="twitter:description"  content="CRNPy is a Python package for the estimation and processing of soil moisture data from cosmic-ray neutron counts." >
+      
+        <meta  name="twitter:image"  content="https://soilwater.github.io/crnpy/assets/images/social/sensor_description.png" >
+      
     
-  </head>
+    
+   <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+        html.glightbox-open { overflow: initial; height: 100%; }
+        .gslide-title { margin-top: 0px; user-select: text; }
+        .gslide-desc { color: #666; user-select: text; }
+        .gslide-image img { background: white; }
+        
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}
+            </style> <script src="../assets/javascripts/glightbox.min.js"></script></head>
   
   
     <body dir="ltr">
@@ -74,9 +117,9 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/crnpy/." title="CRNPy Documentation" class="md-header__button md-logo" aria-label="CRNPy Documentation" data-md-component="logo">
+    <a href=".." title="CRNPy Documentation" class="md-header__button md-logo" aria-label="CRNPy Documentation" data-md-component="logo">
       
-  <img src="/crnpy/img/logo/crnpy-logo.svg" alt="logo">
+  <img src="../img/logo/crnpy-logo.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -92,7 +135,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Sensor description
             
           </span>
         </div>
@@ -171,9 +214,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/crnpy/." title="CRNPy Documentation" class="md-nav__button md-logo" aria-label="CRNPy Documentation" data-md-component="logo">
+    <a href=".." title="CRNPy Documentation" class="md-nav__button md-logo" aria-label="CRNPy Documentation" data-md-component="logo">
       
-  <img src="/crnpy/img/logo/crnpy-logo.svg" alt="logo">
+  <img src="../img/logo/crnpy-logo.svg" alt="logo">
 
     </a>
     CRNPy Documentation
@@ -201,7 +244,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/crnpy/." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         Home
       </a>
     </li>
@@ -214,11 +257,19 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="/crnpy/sensor_description/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Sensor description
       </a>
+      
     </li>
   
 
@@ -231,7 +282,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/crnpy/correction_routines/" class="md-nav__link">
+      <a href="../correction_routines/" class="md-nav__link">
         Correction routines
       </a>
     </li>
@@ -273,7 +324,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/crnpy/examples/stationary/example_RDT_station/" class="md-nav__link">
+      <a href="../examples/stationary/example_RDT_station/" class="md-nav__link">
         Processing and analyzing data from a stationary detector
       </a>
     </li>
@@ -287,7 +338,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/crnpy/examples/rover/Hydroinnova_rover_example/" class="md-nav__link">
+      <a href="../examples/rover/Hydroinnova_rover_example/" class="md-nav__link">
         Processing and analyzing data from a roving detector
       </a>
     </li>
@@ -301,7 +352,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/crnpy/examples/calibration/calibration/" class="md-nav__link">
+      <a href="../examples/calibration/calibration/" class="md-nav__link">
         Device-specific field calibration
       </a>
     </li>
@@ -323,7 +374,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/crnpy/reference/" class="md-nav__link">
+      <a href="../reference/" class="md-nav__link">
         Reference
       </a>
     </li>
@@ -358,8 +409,25 @@
             <div class="md-content" data-md-component="content">
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+  
+  
+
+
+  <h1>Sensor description</h1>
+
+<p>Cosmic-ray neutron technology is an innovative and non-invasive method for monitoring soil moisture. The sensing principle is based on the detection of neutrons that are generated when cosmic rays interact with atoms in the Earth's atmosphere. These neutrons, in turn, interact with hydrogen atoms in soil water, and the intensity of neutrons detected near the ground surface is inversely related to the soil moisture content. Typically, cosmic-ray neutron probes have a large sensing footprint, covering an area of approximately 12 hectares (about 30 acres) and can measure soil moisture up to a depth of 70 cm (about 28 inches), although typically most field applications span a depth between 5 and 40 cm. This makes the technology particularly useful for capturing spatially-averaged soil moisture over large areas, bridging the gap between point measurements and remote sensing. In hydrology, cosmic-ray neutron sensors are used for watershed studies, understanding water balance, and improving hydrological models. In agriculture, they are employed for irrigation management, crop yield prediction, and understanding the effects of soil moisture on plant growth. The technology's ability to provide continuous, real-time data without disturbing the soil makes it a valuable tool for both hydrological and agricultural research.</p>
+<p><a class="glightbox" href="../img/detectors.png" data-type="image" data-width="100%" data-height="auto" data-desc-position="bottom"><img alt="Detectors" src="../img/detectors.png" /></a>
+Figure 1. A) Stationary detector manufactured by Radiation Detection Technologies Inc. (Manhattan, KS). B) Stationary detector manufactured by Hydroinnova Inc. (Albuquerque, NM). C) Roving detector manufactured by Hydroinnova Inc. (Albuquerque, NM).</p>
+<p><a class="glightbox" href="../img/CRNP_footprint.png" data-type="image" data-width="100%" data-height="auto" data-desc-position="bottom"><img alt="CRNP Footprint" src="../img/CRNP_footprint.png" /></a>
+Figure 2. Illustration showing the approximate sensing footprint of stationary detectors.</p>
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -391,17 +459,17 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "/crnpy/", "features": [], "search": "/crnpy/assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="/crnpy/assets/javascripts/bundle.fac441b0.min.js"></script>
+      <script src="../assets/javascripts/bundle.fac441b0.min.js"></script>
       
-        <script src="/crnpy/javascripts/katex.js"></script>
+        <script src="../javascripts/katex.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
       
     
-  </body>
+  <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
 </html>
