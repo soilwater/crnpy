@@ -6,7 +6,7 @@ This module contains data for the crnpy package.
 
 Attributes:
     cutoff_rigidity (list): Cutoff rigidity values for the whole world. See [crnpy.crnpy.cutoff_rigidity][]
-    neutron_detectors (list): Neutron detector locations. See [crnpy.crnpy.find_neutron_detectors][]
+    neutron_detectors (list): Neutron detector locations. See [crnpy.crnpy.find_neutron_monitor][]
 
 """
 

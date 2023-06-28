@@ -502,7 +502,7 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.find_neutron_detectors" class="md-nav__link">
-    find_neutron_detectors()
+    find_neutron_monitor()
   </a>
   
 </li>
@@ -551,7 +551,7 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.normalize_counts" class="md-nav__link">
-    normalize_counts()
+    adjust_temporal_counts()
   </a>
   
 </li>
@@ -586,7 +586,7 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.smooth_2d" class="md-nav__link">
-    smooth_2d()
+    spatial_average()
   </a>
   
 </li>
@@ -752,7 +752,7 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.find_neutron_detectors" class="md-nav__link">
-    find_neutron_detectors()
+    find_neutron_monitor()
   </a>
   
 </li>
@@ -801,7 +801,7 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.normalize_counts" class="md-nav__link">
-    normalize_counts()
+    adjust_temporal_counts()
   </a>
   
 </li>
@@ -836,7 +836,7 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.smooth_2d" class="md-nav__link">
-    smooth_2d()
+    spatial_average()
   </a>
   
 </li>
@@ -3121,7 +3121,7 @@ There is no interpolation at the end of the time series.</p>
 
 
 <h2 id="crnpy.crnpy.find_neutron_detectors" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">find_neutron_detectors</span><span class="p">(</span><span class="n">Rc</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">find_neutron_monitor</span><span class="p">(</span><span class="n">Rc</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -3196,7 +3196,7 @@ User needs to select station according to site altitude.</p></td>
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">crnpy</span> <span class="kn">import</span> <span class="n">crnpy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Rc</span> <span class="o">=</span> <span class="mf">2.40</span> <span class="c1"># 2.40 Newark, NJ, US</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_detectors</span><span class="p">(</span><span class="n">Rc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_monitor</span><span class="p">(</span><span class="n">Rc</span><span class="p">)</span>
 <span class="go">Select a station with an altitude similar to that of your location. For more information go to: &#39;https://www.nmdb.eu/nest/help.php#helpstations</span>
 </code></pre></div>
     <p>Your cutoff rigidity is 2.4 GV
@@ -3283,7 +3283,7 @@ User needs to select station according to site altitude.</p></td>
 <span class="normal">980</span>
 <span class="normal">981</span>
 <span class="normal">982</span>
-<span class="normal">983</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">find_neutron_detectors</span><span class="p">(</span><span class="n">Rc</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">983</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">find_neutron_monitor</span><span class="p">(</span><span class="n">Rc</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Search for potential reference neutron monitoring stations based on cutoff rigidity.</span>
 
 <span class="sd">    Args:</span>
@@ -3298,7 +3298,7 @@ User needs to select station according to site altitude.</p></td>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from crnpy import crnpy</span>
 <span class="sd">        &gt;&gt;&gt; Rc = 2.40 # 2.40 Newark, NJ, US</span>
-<span class="sd">        &gt;&gt;&gt; crnpy.find_neutron_detectors(Rc)</span>
+<span class="sd">        &gt;&gt;&gt; crnpy.find_neutron_monitor(Rc)</span>
 <span class="sd">        Select a station with an altitude similar to that of your location. For more information go to: &#39;https://www.nmdb.eu/nest/help.php#helpstations</span>
 
 <span class="sd">        Your cutoff rigidity is 2.4 GV</span>
@@ -4692,7 +4692,7 @@ UTM zones on an equirectangular world map with irregular zones in red and New Yo
 
 
 <h2 id="crnpy.crnpy.normalize_counts" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">normalize_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">count_time</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">count_times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp_col</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">adjust_temporal_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">count_time</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">count_times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp_col</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -4817,7 +4817,7 @@ UTM zones on an equirectangular world map with irregular zones in red and New Yo
 <span class="normal">227</span>
 <span class="normal">228</span>
 <span class="normal">229</span>
-<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">normalize_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">count_time</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">count_times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp_col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">adjust_temporal_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">count_time</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">count_times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp_col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize neutron counts to the desired counting time.</span>
 
 <span class="sd">    Args:</span>
@@ -5704,7 +5704,7 @@ doi.org/10.3389/frwa.2020.00009</p>
 
 
 <h2 id="crnpy.crnpy.smooth_2d" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">smooth_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">min_neighbours</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">rnd</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">spatial_average</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">min_neighbours</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">rnd</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h2>
 
@@ -5873,7 +5873,7 @@ doi.org/10.3389/frwa.2020.00009</p>
 <span class="normal">1172</span>
 <span class="normal">1173</span>
 <span class="normal">1174</span>
-<span class="normal">1175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">smooth_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">min_neighbours</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">rnd</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="normal">1175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">spatial_average</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">min_neighbours</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">rnd</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Moving buffer filter to smooth georeferenced two-dimensional data.</span>
 
 <span class="sd">    Args:</span>
@@ -6194,7 +6194,7 @@ Soil Science Society of America Journal.</p>
           <td>
                 <code>list</code>
           </td>
-          <td><p>Neutron detector locations. See <a class="autorefs autorefs-internal" href="#crnpy.crnpy.find_neutron_detectors">crnpy.crnpy.find_neutron_detectors</a></p></td>
+          <td><p>Neutron detector locations. See <a class="autorefs autorefs-internal" href="#crnpy.crnpy.find_neutron_detectors">crnpy.crnpy.find_neutron_monitor</a></p></td>
         </tr>
     </tbody>
   </table>

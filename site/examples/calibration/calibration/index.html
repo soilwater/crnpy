@@ -2258,7 +2258,7 @@ df.head()</div>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Find stations with cutoff rigidity similar to estimated by lat,lon, </span>
 <span class="c1"># filtering the time window from experiment setup to the end of the calibration</span>
-<span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_detectors</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="mf">39.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">96.6</span><span class="p">),</span> <span class="n">start_date</span> <span class="o">=</span> <span class="n">deployment_date</span><span class="p">,</span> <span class="n">end_date</span> <span class="o">=</span> <span class="n">calibration_end</span><span class="p">)</span>
+<span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_monitor</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="mf">39.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">96.6</span><span class="p">),</span> <span class="n">start_date</span> <span class="o">=</span> <span class="n">deployment_date</span><span class="p">,</span> <span class="n">end_date</span> <span class="o">=</span> <span class="n">calibration_end</span><span class="p">)</span>
 
 <span class="c1">#Download data for one of the similar stations and add to df</span>
 <span class="n">incoming_neutrons</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">get_incoming_neutron_flux</span><span class="p">(</span><span class="n">deployment_date</span><span class="p">,</span> <span class="n">calibration_end</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;DRBS&quot;</span><span class="p">,</span> <span class="n">utc_offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">)</span>
@@ -2267,7 +2267,7 @@ df.head()</div>
 </pre></div>
 <div id="cell-6" class="clipboard-copy-txt"># Find stations with cutoff rigidity similar to estimated by lat,lon, 
 # filtering the time window from experiment setup to the end of the calibration
-crnpy.find_neutron_detectors(crnpy.cutoff_rigidity(39.1, -96.6), start_date = deployment_date, end_date = calibration_end)
+crnpy.find_neutron_monitor(crnpy.cutoff_rigidity(39.1, -96.6), start_date = deployment_date, end_date = calibration_end)
 
 #Download data for one of the similar stations and add to df
 incoming_neutrons = crnpy.get_incoming_neutron_flux(deployment_date, calibration_end, station="DRBS", utc_offset=-5)

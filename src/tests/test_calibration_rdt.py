@@ -39,8 +39,8 @@ def calibration_example():
         df[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']])
     # Correct count by atmospheric variables and incoming flux
     df['total_counts'] = crnpy.fill_counts(df['total_counts'])
-    df['corrected'] = crnpy.atm_correction(df['total_counts'], pressure=df['pressure'], humidity=df['RH'], temp=df['T'],
-                                           Pref=976, Aref=0, L=130).dropna()
+    df['corrected'] = crnpy.humidity_correction(df['total_counts'], humidity=df['RH'], temp=df['T'], Aref=0)
+    df['corrected'] = crnpy.pressure_correction(df['corrected'], pressure=df['pressure'], Pref=976, L=130)
     print(f"Mean corrected neutron count during sampling: {df['corrected'].mean().round()}")
 
     # Define the function for which we want to find the roots

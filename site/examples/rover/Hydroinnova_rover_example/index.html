@@ -1856,7 +1856,7 @@ class="
 
 <span class="c1"># Normalize counts to counts/min</span>
 <span class="n">df</span><span class="p">[</span><span class="n">counts_colums</span><span class="p">]</span> <span class="o">=</span> \
-    <span class="n">crnpy</span><span class="o">.</span><span class="n">normalize_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">counts_colums</span><span class="p">],</span> \
+    <span class="n">crnpy</span><span class="o">.</span><span class="n">adjust_temporal_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">counts_colums</span><span class="p">],</span> \
                            <span class="n">count_time</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">count_times</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">cont_times_col</span><span class="p">])</span>
 
 <span class="c1"># Compute total neutron counts</span>
@@ -1868,7 +1868,7 @@ cont_times_col = ['N1ETsec', 'N1ETsec', 'N3ETsec','N3ETsec', 'N5ETsec', 'N5ETsec
 
 # Normalize counts to counts/min
 df[counts_colums] = \
-    crnpy.normalize_counts(df[counts_colums], \
+    crnpy.adjust_temporal_counts(df[counts_colums], \
                            count_time=60, count_times=df[cont_times_col])
 
 # Compute total neutron counts
@@ -1919,7 +1919,7 @@ df['total_counts'] = crnpy.compute_total_raw_counts(df[counts_colums])
 <span class="n">end_date</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span>
 
 <span class="c1">#Find stations with cutoff rigidity similar to estimated by lat,lon</span>
-<span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_detectors</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;LatDec&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LongDec&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> 
+<span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_monitor</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;LatDec&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;LongDec&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
                              <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">)</span>
 
 <span class="c1">#Download data for one of the similar stations and add to df, with UTC offset for CST, and 2 extra hours in the dataset ends.</span>
@@ -1930,7 +1930,7 @@ df['total_counts'] = crnpy.compute_total_raw_counts(df[counts_colums])
 end_date = df.iloc[-1]['timestamp']
 
 #Find stations with cutoff rigidity similar to estimated by lat,lon
-crnpy.find_neutron_detectors(crnpy.cutoff_rigidity(df['LatDec'][0], df['LongDec'][0]), 
+crnpy.find_neutron_monitor(crnpy.cutoff_rigidity(df['LatDec'][0], df['LongDec'][0]),
                              start_date=start_date, end_date=end_date)
 
 #Download data for one of the similar stations and add to df, with UTC offset for CST, and 2 extra hours in the dataset ends.
@@ -2135,7 +2135,7 @@ df['corrected_counts'] = crnpy.atm_correction(df['total_counts'], pressure=df['P
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Smooth variable</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_smoothed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">smooth_2d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_smoothed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">spatial_average</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
                                         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected_counts&#39;</span><span class="p">],</span>
                                         <span class="n">buffer</span><span class="o">=</span> <span class="mi">800</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="n">rnd</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2153,7 +2153,7 @@ df['corrected_counts'] = crnpy.atm_correction(df['total_counts'], pressure=df['P
                                         <span class="n">dx</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
 </pre></div>
 <div id="cell-8" class="clipboard-copy-txt"># Smooth variable
-df['corrected_smoothed'] = crnpy.smooth_2d(df['x'],
+df['corrected_smoothed'] = crnpy.spatial_average(df['x'],
                                         df['y'],
                                         df['corrected_counts'],
                                         buffer= 800, method='median', rnd=True)

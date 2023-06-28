@@ -26,7 +26,7 @@ if sys.version_info < python_version:
     raise Exception(msg)
 
 
-def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True):
+def fill_missing_timestamps(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True):
     """Helper function to change the format and round timestamps.
 
      Args:
@@ -185,7 +185,7 @@ def fill_counts(counts, count_times=None, timestamp_col=None, expected_time=Fals
     counts = counts.interpolate(method='linear', limit=limit, limit_direction='both').round()
     return counts
 
-def normalize_counts(counts, count_time=3600, count_times=None, timestamp_col=None):
+def adjust_temporal_counts(counts, count_time=3600, count_times=None, timestamp_col=None):
     """Normalize neutron counts to the desired counting time.
     
     Args:
@@ -339,73 +339,141 @@ def fill_missing_atm(cols_atm, limit=24):
     # Fill missing values in atmospheric variables
     return cols_atm.interpolate(method='pchip', limit=limit, limit_direction='both')
 
-def atm_correction(raw_counts, pressure, humidity, temp, Pref, Aref, L, incoming_neutrons=None, incoming_Ref=None):
-    r"""Correct neutron counts for atmospheric factors and incoming neutron flux.
 
-    This function corrects neutron counts for atmospheric pressure, and absolute humidity using the method described in Zreda et al. (2012) and Anderson et al. (2017). The correction is performed using the following equation:
+def pressure_correction(raw_counts, pressure, Pref, L):
+    r"""Correct neutron counts for atmospheric pressure.
+
+    This function corrects neutron counts for atmospheric pressure using the method described in Andreasen et al. (2017).
+    The correction is performed using the following equation:
 
     $$
-    C_{corrected} = \frac{C_{raw} \cdot f_w}{f_p \cdot f_i}
+    C_{corrected} = \frac{C_{raw}}{fp}
     $$
 
+    where:
+
+    - Ccorrected: corrected neutron counts
+    - Craw: raw neutron counts
     - fp: pressure correction factor
-    - fw: abosolute humidity correction factor
-    - fi: incoming neutron flux correction factor
-    
+
+    $$
+    fp = e^{\frac{P_{ref} - P}{L}}
+    $$
+
+    where:
+
+    - P: atmospheric pressure
+    - Pref: reference atmospheric pressure
+    - L: Atmospheric attenuation coefficient.
+
+
     Args:
         raw_counts (list or array): Neutron counts to correct.
-        pressure (list or array): Atmospheric pressure readings.
-        humidity (list or array): Atmospheric humidity readings in %.
-        temp (list or array): Atmospheric temperature readings in Celsius.
-        Pref (float): Reference atmospheric pressure in millibars (mbar).
-        Aref (float): Reference absolute humidity.
+        pressure (list or array): Atmospheric pressure readings. Long-term average pressure is recommended.
+        Pref (float): Reference atmospheric pressure.
         L (float): Atmospheric attenuation coefficient.
-        incoming_neutrons (list or array): Incoming neutron flux. Default is None.
-        incoming_Ref (float): Reference incoming neutron flux. Default is None.
-        
-    Returns:
-        (numpy.array): Total neutron counts corrected by atmospheric conditions.
-        
-    References:
-        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., et al. (2012).
-        COSMOS: the cosmic-ray soil moisture observing system. Hydrol. Earth Syst. Sci. 16, 4079–4099.
-        doi: 10.5194/hess-16-4079-2012
 
-        Andreasen, M., Jensen, K.H., Desilets, D., Franz, T.E., Zreda, M., Bogena, H.R. and Looms, M.C., 2017.
-        Status and perspectives on the cosmic‐ray neutron method for soil moisture estimation and other
-        environmental science applications. Vadose zone journal, 16(8), pp.1-11. doi.org/10.2136/vzj2017.04.0086
+    Returns:
+        (list): Corrected neutron counts.
+
+    References:
+        M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
     """
 
-    ### Barometric pressure factor
+    # Compute pressure correction factor
     fp = np.exp((Pref - pressure) / L) # Zreda et al. 2017 Eq 5.
+    # Compute corrected neutron counts
+    corrected_counts = raw_counts / fp
+    return np.round(corrected_counts)
 
-    ### Atmospheric water vapor factor
-    # Saturation vapor pressure
-    e_sat = 0.611 * np.exp(17.502 * temp / (temp + 240.97)) * 1000 # in Pascals Eq. 3.8 p.41 Environmental Biophysics (Campbell and Norman)
 
-    # Vapor pressure Pascals
-    Pw = e_sat * humidity/100
+def humidity_correction(raw_counts, humidity, temp, Aref):
+    r"""Correct neutron counts for absolute humidity.
 
-    # Absolute humidity (g/m^3)
-    C = 2.16679 # g K/J;
-    A = C * Pw / (temp + 273.15)
+    This function corrects neutron counts for absolute humidity using the method described in Rosolem et al. (2013) and Anderson et al. (2017). The correction is performed using the following equation:
+
+    $$
+    C_{corrected} = C_{raw} \cdot f_w
+    $$
+
+    where:
+
+    - Ccorrected: corrected neutron counts
+    - Craw: raw neutron counts
+    - fw: absolute humidity correction factor
+
+    $$
+    f_w = 1 + 0.0054(A - A_{ref})
+    $$
+
+    where:
+
+    - A: absolute humidity
+    - Aref: reference absolute humidity
+
+    Args:
+        raw_counts (list or array): Neutron counts to correct.
+        humidity (list or array): Relative humidity readings.
+        temp (list or array): Temperature readings (Celsius).
+        Aref (float): Reference absolute humidity (g/m^3). The day of the instrument calibration is recommended.
+
+    Returns:
+        (list): Corrected neutron counts.
+
+    References:
+        M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
+    """
+
+    A = estimate_abs_humidity(humidity, temp)
     fw = 1 + 0.0054*(A - Aref) # Zreda et al. 2017 Eq 6.
+    corrected_counts = raw_counts * fw
+    return np.round(corrected_counts)
 
-    ### Incoming neutron flux factor
-    if incoming_neutrons is None:
-        fi = 1
-        warnings.warn("Ignoring incoming neutron flux correction factor (using value fi=1)")
-    else:
-        if incoming_Ref is None and not isinstance(incoming_neutrons, type(None)):
-            incoming_Ref = incoming_neutrons[0]
-            warnings.warn('Reference incoming neutron flux not provided. Using first value of incoming neutron flux.')
+def incoming_flux_correction(raw_counts, incoming_neutrons, incoming_Ref=None):
+    r"""Correct neutron counts for incoming neutron flux.
 
-        fi = incoming_neutrons/incoming_Ref
-        fi.fillna(1.0, inplace=True) # Use a value of 1 for days without data
+    This function corrects neutron counts for incoming neutron flux using the method described in Anderson et al. (2017). The correction is performed using the following equation:
+
+    $$
+    C_{corrected} = \frac{C_{raw}}{f_i}
+    $$
+
+    where:
+
+    - Ccorrected: corrected neutron counts
+    - Craw: raw neutron counts
+    - fi: incoming neutron flux correction factor
+
+    $$
+    f_i = \frac{I_{ref}}{I}
+    $$
+
+    where:
+
+    - I: incoming neutron flux
+    - Iref: reference incoming neutron flux
+
+    Args:
+        raw_counts (list or array): Neutron counts to correct.
+        incoming_neutrons (list or array): Incoming neutron flux readings.
+        incoming_Ref (float): Reference incoming neutron flux. Baseline incoming neutron flux.
+
+    Returns:
+        (list): Corrected neutron counts.
+
+    References:
+        M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
+
+
+    """
+    if incoming_Ref is None and not isinstance(incoming_neutrons, type(None)):
+        incoming_Ref = incoming_neutrons[0]
+        warnings.warn('Reference incoming neutron flux not provided. Using first value of incoming neutron flux.')
+    fi = incoming_neutrons / incoming_Ref
+    fi.fillna(1.0, inplace=True)  # Use a value of 1 for days without data
 
     # Apply correction factors
-    return np.round((raw_counts*fw)/(fp*fi))
-
+    return np.round(raw_counts / fi)
 
 
 def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expand_window = 0,  verbose=False):
@@ -524,18 +592,18 @@ def interpolate_incoming_flux(df_flux, timestamps):
     return df_flux.loc[timestamps]
 
 
-def smooth_1d(corrected_counts, window=5, order=3, method='moving_median'):
+def smooth_1d(values, window=5, order=3, method='moving_median'):
     """Use a Savitzky-Golay filter to smooth the signal of corrected neutron counts or another one-dimensional array (e.g. computed volumetric water content).
 
     Args:
-        corrected_counts (pd.DataFrame): Dataframe containing the corrected neutron counts.
+        values (pd.DataFrame or pd.Serie): Dataframe containing the values to smooth.
         window (int): Window size for the Savitzky-Golay filter. Default is 5.
         method (str): Method to use for smoothing the data. Default is 'moving_median'.
             Options are 'moving_average', 'moving_median' and 'savitzky_golay'.
         order (int): Order of the Savitzky-Golay filter. Default is 3.
 
     Returns:
-        (pd.DataFrame): DataFrame with smoothed neutron counts.
+        (pd.DataFrame): DataFrame with smoothed values.
 
     References:
         Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020.
@@ -544,20 +612,20 @@ def smooth_1d(corrected_counts, window=5, order=3, method='moving_median'):
     """
 
     if method == 'moving_average':
-        corrected_counts = corrected_counts.rolling(window=window, center=True, min_periods=1).mean()
+        corrected_counts = values.rolling(window=window, center=True, min_periods=1).mean()
     elif method == 'moving_median':
-        corrected_counts = corrected_counts.rolling(window=window, center=True, min_periods=1).median()
+        corrected_counts = values.rolling(window=window, center=True, min_periods=1).median()
 
     elif method == 'savitzky_golay':
-        if corrected_counts.isna().any():
+        if values.isna().any():
             print('Dataframe contains NaN values. Please remove NaN values before smoothing the data.')
 
-        if type(corrected_counts) == pd.core.series.Series:
-            filtered = np.round(savgol_filter(corrected_counts,window,order))
-            corrected_counts = pd.DataFrame(filtered,columns=['counts'], index=corrected_counts.index)
-        elif type(corrected_counts) == pd.core.frame.DataFrame:
-            for col in corrected_counts.columns:
-                corrected_counts[col] = np.round(savgol_filter(corrected_counts[col],window,order))
+        if type(values) == pd.core.series.Series:
+            filtered = savgol_filter(values,window,order)
+            corrected_counts = pd.DataFrame(filtered,columns=['smoothed'], index=values.index)
+        elif type(values) == pd.core.frame.DataFrame:
+            for col in values.columns:
+                values[col] = savgol_filter(values[col],window,order)
     else:
         raise ValueError('Invalid method. Please select a valid filtering method., options are: moving_average, moving_median, savitzky_golay')
     corrected_counts = corrected_counts.ffill(limit=window).bfill(limit=window).copy()
@@ -670,7 +738,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist, method='Schron
     # Convert docstring to google format
     """Function that computes the estimated sensing depth of the cosmic-ray neutron probe.
     The function offers several methods to compute the depth at which 86 % of the neutrons
-    probes the soil profile.
+    probe the soil profile.
 
     Args:
         vwc (array or pd.Series or pd.DataFrame): Estimated volumetric water content for each timestamp.
@@ -710,7 +778,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist, method='Schron
             results.append(D86)
 
     elif method == 'Franz_2012':
-        results = [5.8/(bulk_density*Wlat+vwc+0.0829)]
+        results = 5.8/(bulk_density*Wlat+vwc+0.0829)
 
     return results
 
@@ -841,6 +909,7 @@ def storage(sm,T=1,Z_surface=150,Z_subsurface=1000):
         Soil Science Society of America Journal.
     """
 
+
     # Parameters
     t_delta = 1
     sm_min = np.min(sm)
@@ -915,7 +984,7 @@ def cutoff_rigidity(lat,lon):
     return np.round(zq,2)
 
 
-def find_neutron_detectors(Rc, start_date=None, end_date=None):
+def find_neutron_monitor(Rc, start_date=None, end_date=None):
     """Search for potential reference neutron monitoring stations based on cutoff rigidity.
     
     Args:
@@ -930,7 +999,7 @@ def find_neutron_detectors(Rc, start_date=None, end_date=None):
     Examples:
         >>> from crnpy import crnpy
         >>> Rc = 2.40 # 2.40 Newark, NJ, US
-        >>> crnpy.find_neutron_detectors(Rc)
+        >>> crnpy.find_neutron_monitor(Rc)
         Select a station with an altitude similar to that of your location. For more information go to: 'https://www.nmdb.eu/nest/help.php#helpstations
 
         Your cutoff rigidity is 2.4 GV
@@ -1116,7 +1185,7 @@ def euclidean_distance(px, py, x, y):
     return d
 
 
-def smooth_2d(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=False):
+def spatial_average(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=False):
     """Moving buffer filter to smooth georeferenced two-dimensional data.
 
     Args:
@@ -1265,6 +1334,37 @@ def interpolate_2d(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
         raise f"Method {method} does not exist. Provide either 'cubic', 'linear', 'nearest', or 'idw'."
 
     return X_pred, Y_pred, Z_pred
+
+
+def estimate_locations(x, y):
+    """Function to estimate the intermediate locations between two points, assuming the measurements were taken at a constant speed.
+
+    Args:
+        x (array): x coordinates.
+        y (array): y coordinates.
+
+    Returns:
+        x_est (array): Estimated x coordinates.
+        y_est (array): Estimated y coordinates.
+    """
+
+    # Make it datatype agnostic
+    if(isinstance(x, pd.Series)):
+        x = x.values
+    if(isinstance(y, pd.Series)):
+        y = y.values
+
+    # Do the average of the two points
+    x_est = (x[1:] + x[:-1]) / 2
+    y_est = (y[1:] + y[:-1]) / 2
+
+    # Add the first point to match the length of the original array
+    x_est = np.insert(x_est, 0, x[0])
+    y_est = np.insert(y_est, 0, y[0])
+
+
+    return x_est, y_est
+
 
 
 

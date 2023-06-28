@@ -1716,7 +1716,7 @@ dectors with nan: [False, False, False]
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Normalize the counts to counts per hour using the <a href="../../../reference/#crnpy.crnpy.normalize_counts"><code>normalize_counts()</code></a> function from the crnpy library.</p>
+<p>Normalize the counts to counts per hour using the <a href="../../../reference/#crnpy.crnpy.normalize_counts"><code>adjust_temporal_counts()</code></a> function from the crnpy library.</p>
 
 </div>
 </div>
@@ -1743,12 +1743,12 @@ dectors with nan: [False, False, False]
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Normalize counts to counts/h</span>
-<span class="n">df</span><span class="p">[[</span><span class="s1">&#39;counts_1&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2&#39;</span><span class="p">,</span><span class="s1">&#39;counts_3&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">normalize_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;counts_1&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2&#39;</span><span class="p">,</span><span class="s1">&#39;counts_3&#39;</span><span class="p">]],</span> <span class="n">count_time</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">count_times</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;count_time&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[[</span><span class="s1">&#39;counts_1&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2&#39;</span><span class="p">,</span><span class="s1">&#39;counts_3&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">adjust_temporal_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;counts_1&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2&#39;</span><span class="p">,</span><span class="s1">&#39;counts_3&#39;</span><span class="p">]],</span> <span class="n">count_time</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">count_times</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;count_time&#39;</span><span class="p">])</span>
 
 <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;counts_1&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2&#39;</span><span class="p">,</span><span class="s1">&#39;counts_3&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 <div id="cell-4" class="clipboard-copy-txt"># Normalize counts to counts/h
-df[['counts_1','counts_2','counts_3']] = crnpy.normalize_counts(df[['counts_1','counts_2','counts_3']], count_time=3600, count_times=df['count_time'])
+df[['counts_1','counts_2','counts_3']] = crnpy.adjust_temporal_counts(df[['counts_1','counts_2','counts_3']], count_time=3600, count_times=df['count_time'])
 
 df[['counts_1','counts_2','counts_3']].head()
 </div>
@@ -1945,7 +1945,7 @@ class="
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Find similar stations based on cutoff rigidity, which is estimated using latitude and longitude values. See <a href="../../../reference/#crnpy.crnpy.get_incoming_neutron_flux"><code>get_incoming_neutron_flux()</code></a> and <a href="../../../reference/#crnpy.crnpy.find_neutron_detectors"><code>find_neutron_detectors()</code></a>. Note that the station is hardcoded in the second line as <code>station=&quot;IRKT&quot;</code>. The user is required to manually define this after considering the potential options suggested.</p>
+<p>Find similar stations based on cutoff rigidity, which is estimated using latitude and longitude values. See <a href="../../../reference/#crnpy.crnpy.get_incoming_neutron_flux"><code>get_incoming_neutron_flux()</code></a> and <a href="../../../reference/#crnpy.crnpy.find_neutron_detectors"><code>find_neutron_monitor()</code></a>. Note that the station is hardcoded in the second line as <code>station=&quot;IRKT&quot;</code>. The user is required to manually define this after considering the potential options suggested.</p>
 
 </div>
 </div>
@@ -1975,7 +1975,7 @@ class="
 <span class="n">end_date</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span>
 
 <span class="c1">#Find stations with cutoff rigidity similar to estimated by lat,lon</span>
-<span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_detectors</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="mf">39.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">96.6</span><span class="p">),</span> <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">)</span>
+<span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_monitor</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="mf">39.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">96.6</span><span class="p">),</span> <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">)</span>
 
 <span class="c1">#Download data for one of the similar stations and add to df. Using CST utc offset.</span>
 <span class="n">incoming_neutrons</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">get_incoming_neutron_flux</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">,</span> <span class="n">station</span><span class="o">=</span><span class="s2">&quot;IRKT&quot;</span><span class="p">,</span> <span class="n">utc_offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">)</span>
@@ -1985,7 +1985,7 @@ class="
 end_date = df.iloc[-1]['timestamp']
 
 #Find stations with cutoff rigidity similar to estimated by lat,lon
-crnpy.find_neutron_detectors(crnpy.cutoff_rigidity(39.1, -96.6), start_date=start_date, end_date=end_date)
+crnpy.find_neutron_monitor(crnpy.cutoff_rigidity(39.1, -96.6), start_date=start_date, end_date=end_date)
 
 #Download data for one of the similar stations and add to df. Using CST utc offset.
 incoming_neutrons = crnpy.get_incoming_neutron_flux(start_date, end_date, station="IRKT", utc_offset=-5)
