@@ -1736,9 +1736,9 @@ Licensed under the Apache License, Version 2.0.
 
 <span class="c1"># Load the soil samples data and the CRNP dataset using pandas</span>
 <span class="n">df_soil</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/soil_data.csv&quot;</span><span class="p">)</span>
-<span class="n">df_station</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv&quot;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
 
 <span class="c1"># Load the station data</span>
+<span class="n">df_station</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv&quot;</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
 </pre></div>
 <div id="cell-1" class="clipboard-copy-txt"># Importing required libraries
 from scipy.optimize import root
@@ -1750,9 +1750,10 @@ from crnpy import crnpy
 
 # Load the soil samples data and the CRNP dataset using pandas
 df_soil = pd.read_csv("https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/soil_data.csv")
-df_station = pd.read_csv("https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv", skiprows=[0,2,3])
 
-# Load the station data</div>
+# Load the station data
+df_station = pd.read_csv("https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/station_data.csv", skiprows=[0,2,3])
+</div>
         
         </div>
     </div>
@@ -1877,8 +1878,7 @@ print(f"Field Volumetric Water content: {round(field_theta_v,3)}")</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="neutron-count-processing">Neutron count processing<a class="anchor-link" href="#neutron-count-processing">&#182;</a></h2><p>Following the example for processing CRNP data from <a href="../../stationary/example_RDT_station/">RDT detectors</a> neutron counts recorded while the field sampling was done need to be corrected.</p>
-<p><a href="https://github.com/soilwater/crnpy/blob/main/docs/examples/calibration/soil_data.xlsx">This dataset</a> contains the raw counts and atmospheric data recorded by the CRNP while the field sampling was done.</p>
+<h2 id="neutron-count-processing">Neutron count processing<a class="anchor-link" href="#neutron-count-processing">&#182;</a></h2><p>Following a similar approach as the example for <a href="../../stationary/example_RDT_station/">Stationary CRNP</a> neutron counts recorded while the field sampling was done will be corrected.</p>
 
 </div>
 </div>
@@ -2266,7 +2266,7 @@ Your cutoff rigidity is 2.87 GV
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>C:\Users\jperaza\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\crnpy\crnpy.py:471: UserWarning: Reference incoming neutron flux not provided. Using first value of incoming neutron flux.
+<pre>C:\Users\jperaza\AppData\Local\anaconda3\envs\crnpy\lib\site-packages\crnpy\crnpy.py:473: UserWarning: Reference incoming neutron flux not provided. Using first value of incoming neutron flux.
   warnings.warn(&#39;Reference incoming neutron flux not provided. Using first value of incoming neutron flux.&#39;)
 </pre>
 </div>
@@ -2353,9 +2353,9 @@ df['corrected'] = crnpy.pressure_correction(df['corrected'], pressure=df['pressu
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean corrected neutron count during sampling: </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean corrected neutron count during sampling: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
-<div id="cell-7" class="clipboard-copy-txt">print(f"Mean corrected neutron count during sampling: {df['corrected'].mean().round()}")
+<div id="cell-7" class="clipboard-copy-txt">print(f"Mean corrected neutron count during sampling: {int(df['corrected'].mean())}")
 </div>
         
         </div>
@@ -2376,7 +2376,7 @@ df['corrected'] = crnpy.pressure_correction(df['corrected'], pressure=df['pressu
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Mean corrected neutron count during sampling: 1538.0
+<pre>Mean corrected neutron count during sampling: 1537
 </pre>
 </div>
 </div>
