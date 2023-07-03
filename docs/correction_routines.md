@@ -14,7 +14,7 @@ Suggested steps for processing raw neutron counts from a roving CRNP. Dashed lin
 Suggested steps for processing raw neutron counts from a stationary CRNP. Dashed lines indicate optional steps. See the complete [example notebook](../examples/rover/Hydroinnova_rover_example/).
 
 ### Incoming neutron flux
-The CRNPy package includes a complete set of methods for correcting the raw observed neutron counts for natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea & Smart, 2019; Smart & Shea, 2001).
+The CRNPy package includes a complete set of methods for correcting the raw observed neutron counts for natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea & Smart., 2019).
 
 | Incoming neutron flux correction factor|
 |---------------------------------|
@@ -25,10 +25,10 @@ The CRNPy package includes a complete set of methods for correcting the raw obse
 
 !!! info "Implementation"
 
-    See  [crnpy.crnpy.cutoff_rigidity][], [crnpy.crnpy.find_neutron_detectors][], [crnpy.crnpy.get_incoming_neutron_flux][], [crnpy.crnpy.interpolate_incoming_flux][] and [crnpy.crnpy.atm_correction][] documentation for the implementation details.
+    See  [crnpy.crnpy.cutoff_rigidity][], [crnpy.crnpy.find_neutron_monitor][], [crnpy.crnpy.get_incoming_neutron_flux][], [crnpy.crnpy.interpolate_incoming_flux][] and [crnpy.crnpy.incoming_flux_correction][] documentation for the implementation details.
 
 ### Atmospheric corrections
-The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013; Zreda et al., 2012).
+The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013).
 
 | Pressure correction | Atmospheric water correction |
 |---------------------|------------------------------|
@@ -40,10 +40,10 @@ The package also provides functions for correcting raw neutron counts for atmosp
 
 !!! info "Implementation"
 
-    See [crnpy.crnpy.atm_correction][] documentation for the implementation details.
+    See [crnpy.crnpy.humidity_correction][] and [crnpy.crnpy.pressure_correction][] documentation for the implementation details.
 
 ### Biomass correction
-The library provides a function for correcting neutron counts for the effects of above-ground biomass by combining an approach for estimating biomass water equivalent (BWE) from in-situ biomass samples (Wahbi et al., 2018) and the BWE correction factor (Baatz et al., 2015).
+The library provides a function for correcting neutron counts for the effects of above-ground biomass by combining an approach for estimating biomass water equivalent (BWE) from in-situ biomass samples and the BWE correction factor (Baatz et al., 2015).
 
 | Biomass correction |
 |--------------------|
@@ -57,7 +57,7 @@ The library provides a function for correcting neutron counts for the effects of
     See [crnpy.crnpy.bwe_correction][] and [crnpy.crnpy.biomass_to_bwe][] documentation for the implementation details.
 
 ### Road correction
-Due to the known high sensitivity closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content, CRNPy implements the methodology proposed by Schrön et al. (2018).
+Due to the known high sensitivity closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content (Schrön et al., (2018)).
 
 | Road correction |
 |-----------------|

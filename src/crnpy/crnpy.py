@@ -76,6 +76,8 @@ def fill_missing_timestamps(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', fre
 
 def count_time(counts=None, timestamp_col=None):
     """Approximate counting time.
+    The function will calculate the approximate counting time for each observation by taking the difference between
+    consecutive timestamps. If counts has a DateTimeIndex, timestamp_col is not needed.
 
     Args:
         counts (pandas.DataFrame): DataFrame with neutron counts, might have DateTimeIndex.
@@ -119,7 +121,7 @@ def fill_counts(counts, count_times=None, timestamp_col=None, expected_time=Fals
     
     Args:
         counts (pandas.DataFrame): DataFrame with neutron counts, might have DateTimeIndex.
-        count_time (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as `counts`.
+        count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as `counts`.
         timestamp_col (pandas.Series): Series with timestamps. If counts has a DateTimeIndex, timestamp_col is not needed.
         expected_time (int): Expected counting time in seconds. If not provided, it is calculated as the median of the counting times.
         threshold (float): Minimum fraction of the neutron integration time. Default is 0.25.
@@ -185,7 +187,7 @@ def fill_counts(counts, count_times=None, timestamp_col=None, expected_time=Fals
     counts = counts.interpolate(method='linear', limit=limit, limit_direction='both').round()
     return counts
 
-def adjust_temporal_counts(counts, count_time=3600, count_times=None, timestamp_col=None):
+def adjust_temporal_counts(counts, count_time=None, count_times=None, timestamp_col=None):
     """Normalize neutron counts to the desired counting time.
     
     Args:
@@ -734,7 +736,7 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.
 
 
 
-def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist, method='Schron_2017'):
+def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='Schron_2017'):
     # Convert docstring to google format
     """Function that computes the estimated sensing depth of the cosmic-ray neutron probe.
     The function offers several methods to compute the depth at which 86 % of the neutrons
@@ -764,7 +766,6 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist, method='Schron
 
     # Determine sensing depth (D86)
     if method == 'Schron_2017':
-
         # See Appendix A of Schrön et al. (2017)
         Fp = 0.4922 / (0.86 - np.exp(-1 * pressure / p_ref));
         Fveg = 0
@@ -779,6 +780,8 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist, method='Schron
 
     elif method == 'Franz_2012':
         results = 5.8/(bulk_density*Wlat+vwc+0.0829)
+    else:
+        raise ValueError('Method not recognized. Please select either "Schron_2017" or "Franz_2012".')
 
     return results
 
@@ -943,8 +946,8 @@ def storage(sm,T=1,Z_surface=150,Z_subsurface=1000):
 
 def cutoff_rigidity(lat,lon):
     """Function to estimate the approximate cutoff rigidity for any point on Earth according to the
-    tabulated data of Smart and Shea, 2019. Values are approximations so that users have an idea of
-    what neutron detectors from the Neutron Monitor Database (NMD).
+    tabulated data of Smart and Shea, 2019. The returned value can be used to select the appropriate
+    neutron monitor station to estimate the cosmic-ray neutron intensity at the location of interest.
 
     Args:
         lat (float): Geographic latitude in decimal degrees. Value in range -90 to 90
@@ -1058,7 +1061,7 @@ def estimate_lattice_water(clay_content, total_carbon=None):
     ![img1](img/lattice_water_simple.png) | ![img2](img/lattice_water_multiple.png)
     :-------------------------:|:-------------------------:
     $\omega_{lat} = 0.097 * clay(\%)$ | $\omega_{lat} = -0.028 + 0.077 * clay(\%) + 0.459 * carbon(\%)$
-    Linear regression [lattice water (%) as a function of clay (%)] done with data from Soil Water Processes Lab and Dong and Ochsner (2018) |  Multiple linear regression [lattice water (%) as a function of clay (%) and soil carbon (%)] done with data from Soil Water Processes Lab.
+    Linear regression [lattice water (%) as a function of clay (%)] done with data from Kansas Sate University - Soil Water Processes Lab. |  Multiple linear regression [lattice water (%) as a function of clay (%) and soil carbon (%)] done with data from Soil Water Processes Lab.
 
     Args:
         clay_content (float): Clay content in the soil in percent.
@@ -1067,12 +1070,6 @@ def estimate_lattice_water(clay_content, total_carbon=None):
 
     Returns:
         (float): Amount of water in the lattice of clay minerals in percent
-
-    References:
-        Dong, J., & Ochsner, T. E. (2018). Soil texture often exerts a stronger influence than precipitation
-         on mesoscale soil moisture patterns. Water Resources Research, 54, 2199– 2211.
-         https://doi.org/10.1002/2017WR021692
-
     """
     if total_carbon is None:
         lattice_water = 0.097 * clay_content

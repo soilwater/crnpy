@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: crnpy
-Version: 0.4.0
+Version: 0.4.1
 Summary: A Python package for the estimation and processing of soil moisture data from cosmic-ray neutron counts.
 Home-page: https://github.com/soilwater/crnpy
 Author: Joaquin Peraza, Andres Patrignani
@@ -9,10 +9,10 @@ License: MIT
 Description-Content-Type: text/markdown
 License-File: LICENSE
 
-![GitHub Workflow Status (building)](https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-package.yml)
-![GitHub Workflow Status (publish)](https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-publish.yml?label=publish)
+[![GitHub Workflow Status (building)](https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-package.yml)](https://github.com/soilwater/crnpy/actions/workflows/python-package.yml)
+[![GitHub Workflow Status (publish)](https://img.shields.io/github/actions/workflow/status/soilwater/crnpy/python-publish.yml?label=publish)](https://github.com/soilwater/crnpy/actions/workflows/python-publish.yml)
 [![PyPI - Status](https://img.shields.io/pypi/v/crnpy)](https://pypi.org/project/crnpy/)
-![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/soilwater/crnpy/latest/main)
+[![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/soilwater/crnpy/latest/main)](https://github.com/soilwater/crnpy)
 
 # Cosmic-Ray Neutron Python (CRNPy) Library
 

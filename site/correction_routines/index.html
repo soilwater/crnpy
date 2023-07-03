@@ -588,7 +588,7 @@ Suggested steps for processing raw neutron counts from a roving CRNP. Dashed lin
 <p><a class="glightbox" href="../img/workflow_hydroinnova.png" data-type="image" data-width="100%" data-height="auto" data-desc-position="bottom"><img alt="CRNPy Processing Workflow" src="../img/workflow_hydroinnova.png" /></a>
 Suggested steps for processing raw neutron counts from a stationary CRNP. Dashed lines indicate optional steps. See the complete <a href="../examples/rover/Hydroinnova_rover_example/">example notebook</a>.</p>
 <h3 id="incoming-neutron-flux">Incoming neutron flux</h3>
-<p>The CRNPy package includes a complete set of methods for correcting the raw observed neutron counts for natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea &amp; Smart, 2019; Smart &amp; Shea, 2001).</p>
+<p>The CRNPy package includes a complete set of methods for correcting the raw observed neutron counts for natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea &amp; Smart., 2019).</p>
 <table>
 <thead>
 <tr>
@@ -612,10 +612,10 @@ Suggested steps for processing raw neutron counts from a stationary CRNP. Dashed
 </table>
 <div class="admonition info">
 <p class="admonition-title">Implementation</p>
-<p>See  <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.cutoff_rigidity">crnpy.crnpy.cutoff_rigidity</a>, [crnpy.crnpy.find_neutron_detectors][], <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.get_incoming_neutron_flux">crnpy.crnpy.get_incoming_neutron_flux</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.interpolate_incoming_flux">crnpy.crnpy.interpolate_incoming_flux</a> and [crnpy.crnpy.atm_correction][] documentation for the implementation details.</p>
+<p>See  <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.cutoff_rigidity">crnpy.crnpy.cutoff_rigidity</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.find_neutron_monitor">crnpy.crnpy.find_neutron_monitor</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.get_incoming_neutron_flux">crnpy.crnpy.get_incoming_neutron_flux</a>, <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.interpolate_incoming_flux">crnpy.crnpy.interpolate_incoming_flux</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.incoming_flux_correction">crnpy.crnpy.incoming_flux_correction</a> documentation for the implementation details.</p>
 </div>
 <h3 id="atmospheric-corrections">Atmospheric corrections</h3>
-<p>The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013; Zreda et al., 2012).</p>
+<p>The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013).</p>
 <table>
 <thead>
 <tr>
@@ -648,10 +648,10 @@ Suggested steps for processing raw neutron counts from a stationary CRNP. Dashed
 </table>
 <div class="admonition info">
 <p class="admonition-title">Implementation</p>
-<p>See [crnpy.crnpy.atm_correction][] documentation for the implementation details.</p>
+<p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.humidity_correction">crnpy.crnpy.humidity_correction</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.pressure_correction">crnpy.crnpy.pressure_correction</a> documentation for the implementation details.</p>
 </div>
 <h3 id="biomass-correction">Biomass correction</h3>
-<p>The library provides a function for correcting neutron counts for the effects of above-ground biomass by combining an approach for estimating biomass water equivalent (BWE) from in-situ biomass samples (Wahbi et al., 2018) and the BWE correction factor (Baatz et al., 2015).</p>
+<p>The library provides a function for correcting neutron counts for the effects of above-ground biomass by combining an approach for estimating biomass water equivalent (BWE) from in-situ biomass samples and the BWE correction factor (Baatz et al., 2015).</p>
 <table>
 <thead>
 <tr>
@@ -678,7 +678,7 @@ Suggested steps for processing raw neutron counts from a stationary CRNP. Dashed
 <p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.bwe_correction">crnpy.crnpy.bwe_correction</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.biomass_to_bwe">crnpy.crnpy.biomass_to_bwe</a> documentation for the implementation details.</p>
 </div>
 <h3 id="road-correction">Road correction</h3>
-<p>Due to the known high sensitivity closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content, CRNPy implements the methodology proposed by Schrön et al. (2018).</p>
+<p>Due to the known high sensitivity closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content (Schrön et al., (2018)).</p>
 <table>
 <thead>
 <tr>
