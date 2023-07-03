@@ -2210,8 +2210,8 @@ df.head()
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Find stations with cutoff rigidity similar to estimated by lat,lon, </span>
-<span class="c1"># filtering the time window from experiment setup to the end of the calibration</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Find stations with cutoff rigidity similar to the one estimated by lat,lon, </span>
+<span class="c1"># Filtering the time window from experiment setup to the end of the calibration</span>
 <span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_monitor</span><span class="p">(</span><span class="n">crnpy</span><span class="o">.</span><span class="n">cutoff_rigidity</span><span class="p">(</span><span class="mf">39.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">96.6</span><span class="p">),</span> <span class="n">start_date</span> <span class="o">=</span> <span class="n">deployment_date</span><span class="p">,</span> <span class="n">end_date</span> <span class="o">=</span> <span class="n">calibration_end</span><span class="p">)</span>
 
 <span class="c1">#Download data for one of the similar stations and add to df</span>
@@ -2220,8 +2220,8 @@ df.head()
 <span class="n">ref_incoming_flux</span> <span class="o">=</span> <span class="n">incoming_neutrons</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;corrected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">incoming_flux_correction</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_counts&#39;</span><span class="p">],</span> <span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">])</span>
 </pre></div>
-<div id="cell-5" class="clipboard-copy-txt"># Find stations with cutoff rigidity similar to estimated by lat,lon, 
-# filtering the time window from experiment setup to the end of the calibration
+<div id="cell-5" class="clipboard-copy-txt"># Find stations with cutoff rigidity similar to the one estimated by lat,lon, 
+# Filtering the time window from experiment setup to the end of the calibration
 crnpy.find_neutron_monitor(crnpy.cutoff_rigidity(39.1, -96.6), start_date = deployment_date, end_date = calibration_end)
 
 #Download data for one of the similar stations and add to df
@@ -2393,7 +2393,7 @@ df['corrected'] = crnpy.pressure_correction(df['corrected'], pressure=df['pressu
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="solving-the-equation-for-n_0">Solving the equation for $N_0$<a class="anchor-link" href="#solving-the-equation-for-n_0">&#182;</a></h2><p>Previous steps estimated the a field volumetric water content of <code>0.256</code> and an average neutron count of <code>1538</code>. Using <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html">scipy.optimize.root()</a> $N_0$ is estimated given the observed value of $\theta_v$ and neutron counts.</p>
+<h2 id="solving-the-equation-for-n_0">Solving the equation for $N_0$<a class="anchor-link" href="#solving-the-equation-for-n_0">&#182;</a></h2><p>Previous steps estimated the a field volumetric water content of <code>0.256</code> and an average neutron count of <code>1538</code>. Using <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html"><code>scipy.optimize.root()</code></a> $N_0$ is estimated given the observed value of $\theta_v$ and neutron counts.</p>
 
 </div>
 </div>

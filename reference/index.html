@@ -1917,8 +1917,8 @@ doi.org/10.1029/2009WR008726</p>
   <div class="doc doc-contents ">
   
       <p>Function to estimate the approximate cutoff rigidity for any point on Earth according to the
-tabulated data of Smart and Shea, 2019. Values are approximations so that users have an idea of
-what neutron detectors from the Neutron Monitor Database (NMD).</p>
+tabulated data of Smart and Shea, 2019. The returned value can be used to select the appropriate
+neutron monitor station to estimate the cosmic-ray neutron intensity at the location of interest.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -2031,8 +2031,8 @@ In International Cosmic Ray Conference (ICRC2019) (Vol. 36, p. 1149).</p>
 <span class="normal">986</span>
 <span class="normal">987</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cutoff_rigidity</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span><span class="n">lon</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to estimate the approximate cutoff rigidity for any point on Earth according to the</span>
-<span class="sd">    tabulated data of Smart and Shea, 2019. Values are approximations so that users have an idea of</span>
-<span class="sd">    what neutron detectors from the Neutron Monitor Database (NMD).</span>
+<span class="sd">    tabulated data of Smart and Shea, 2019. The returned value can be used to select the appropriate</span>
+<span class="sd">    neutron monitor station to estimate the cosmic-ray neutron intensity at the location of interest.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        lat (float): Geographic latitude in decimal degrees. Value in range -90 to 90</span>
@@ -2835,13 +2835,13 @@ in space and one or more points.</p>
           </td>
         </tr>
         <tr>
-          <td><code>count_time</code></td>
+          <td><code>count_times</code></td>
           <td>
                 <code>pandas.Series or pandas.DataFrame</code>
           </td>
           <td><p>Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as <code>counts</code>.</p></td>
           <td>
-              <em>required</em>
+                <code>None</code>
           </td>
         </tr>
         <tr>
@@ -2981,7 +2981,7 @@ in space and one or more points.</p>
 
 <span class="sd">    Args:</span>
 <span class="sd">        counts (pandas.DataFrame): DataFrame with neutron counts, might have DateTimeIndex.</span>
-<span class="sd">        count_time (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as `counts`.</span>
+<span class="sd">        count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as `counts`.</span>
 <span class="sd">        timestamp_col (pandas.Series): Series with timestamps. If counts has a DateTimeIndex, timestamp_col is not needed.</span>
 <span class="sd">        expected_time (int): Expected counting time in seconds. If not provided, it is calculated as the median of the counting times.</span>
 <span class="sd">        threshold (float): Minimum fraction of the neutron integration time. Default is 0.25.</span>
