@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: crnpy
-Version: 0.3.3
+Version: 0.4.0
 Summary: A Python package for the estimation and processing of soil moisture data from cosmic-ray neutron counts.
 Home-page: https://github.com/soilwater/crnpy
 Author: Joaquin Peraza, Andres Patrignani

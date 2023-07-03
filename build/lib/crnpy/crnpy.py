@@ -26,7 +26,7 @@ if sys.version_info < python_version:
     raise Exception(msg)
 
 
-def format_dates_df(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True):
+def fill_missing_timestamps(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', freq='H', round_time=True):
     """Helper function to change the format and round timestamps.
 
      Args:
@@ -429,7 +429,7 @@ def humidity_correction(raw_counts, humidity, temp, Aref):
     corrected_counts = raw_counts * fw
     return np.round(corrected_counts)
 
-def incoming_correction(raw_counts, incoming_neutrons, incoming_Ref=None):
+def incoming_flux_correction(raw_counts, incoming_neutrons, incoming_Ref=None):
     r"""Correct neutron counts for incoming neutron flux.
 
     This function corrects neutron counts for incoming neutron flux using the method described in Anderson et al. (2017). The correction is performed using the following equation:
@@ -639,7 +639,7 @@ def bwe_correction(counts, bwe, r2_N0=0.05):
     Args:
         counts (array or pd.Series or pd.DataFrame): Array of ephithermal neutron counts.
         bwe (float): Biomass water equivalent kg m-2.
-        r2_N0 (float): Ratio of the neutron counts reduction (counts kg-1) to the neutron calibration constant (N0). Default is 0.05 (Baatz et al., 2015).
+        r2_N0 (float): Ratio of neutron counts with biomass to neutron counts without biomass. Default is 0.05.
 
     Returns:
         (array or pd.Series or pd.DataFrame): Array of corrected neutron counts for biomass effects.
@@ -1358,7 +1358,7 @@ def estimate_locations(x, y):
     x_est = (x[1:] + x[:-1]) / 2
     y_est = (y[1:] + y[:-1]) / 2
 
-    # Add the first and last point
+    # Add the first point to match the length of the original array
     x_est = np.insert(x_est, 0, x[0])
     y_est = np.insert(y_est, 0, y[0])
 

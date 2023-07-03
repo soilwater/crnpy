@@ -639,7 +639,7 @@ def bwe_correction(counts, bwe, r2_N0=0.05):
     Args:
         counts (array or pd.Series or pd.DataFrame): Array of ephithermal neutron counts.
         bwe (float): Biomass water equivalent kg m-2.
-        r2_N0 (float): Ratio of the neutron counts reduction (counts kg-1) to the neutron calibration constant (N0). Default is 0.05 (Baatz et al., 2015).
+        r2_N0 (float): Ratio of neutron counts with biomass to neutron counts without biomass. Default is 0.05.
 
     Returns:
         (array or pd.Series or pd.DataFrame): Array of corrected neutron counts for biomass effects.

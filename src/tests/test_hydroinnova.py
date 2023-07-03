@@ -27,7 +27,7 @@ def hydroinnova_example_mean_value():
 
     # Normalize counts to counts/min
     df[counts_colums] = \
-        crnpy.normalize_counts(df[counts_colums], \
+        crnpy.adjust_temporal_counts(df[counts_colums], \
                                count_time=60, count_times=df[cont_times_col])
 
     # Compute total neutron counts
@@ -37,12 +37,13 @@ def hydroinnova_example_mean_value():
     df[['PTB110_mb', 'RH_CS215', 'T_CS215']] = crnpy.fill_missing_atm(df[['PTB110_mb', 'RH_CS215', 'T_CS215']])
 
     # Correct count by atmospheric variables and incoming flux
-    df['corrected_counts'] = crnpy.atm_correction(df['total_counts'], pressure=df['PTB110_mb'], humidity=df['RH_CS215'],
-                                                  temp=df['T_CS215'],
-                                                  Pref=df['PTB110_mb'].mean(), Aref=0, L=130)
+    df['corrected_counts'] = crnpy.humidity_correction(df['total_counts'], humidity=df['RH_CS215'], temp=df['T_CS215'],
+                                                       Aref=0)
+    df['corrected_counts'] = crnpy.pressure_correction(df['corrected_counts'], pressure=df['PTB110_mb'],
+                                                       Pref=df['PTB110_mb'].mean(), L=130)
 
     # Smooth variable
-    df['corrected_smoothed'] = crnpy.smooth_2d(df['x'],
+    df['corrected_smoothed'] = crnpy.spatial_average(df['x'],
                                                df['y'],
                                                df['corrected_counts'],
                                                buffer=800, method='median', rnd=True)
