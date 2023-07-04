@@ -1,20 +1,20 @@
 ### Overview
 
-The correction routines are slightly different depending on the detector type. The correction of the neutron counts from the stationary and roving detectors has some similarities and differences. This library provides the end user with the tools to correct neutron counts and process the data in both, the temporal and spatial domains. Below are two flowcharts describing the typical steps in the conversion of raw neutron counts to volumetric water content.
+The CRNPy library provides the tools to correct and process neutron counts recorded with both stationary and roving cosmic-ray neutron probes. Below are two flowcharts describing the typical steps from the correction of raw neutron counts to the conversion into volumetric soil water content.
 
 #### Stationary CRNP processing
 
 ![CRNPy Processing Workflow](img/workflow_rdt.png)
-Suggested steps for processing raw neutron counts from a roving CRNP. Dashed lines indicate optional steps. See the complete [example notebook](../examples/stationary/example_RDT_station/).
+Dashed lines indicate optional steps. See the complete [example notebook](../examples/stationary/example_RDT_station/).
 
 
 #### Roving CRNP processing
 
 ![CRNPy Processing Workflow](img/workflow_hydroinnova.png)
-Suggested steps for processing raw neutron counts from a stationary CRNP. Dashed lines indicate optional steps. See the complete [example notebook](../examples/rover/Hydroinnova_rover_example/).
+Dashed lines indicate optional steps. See the complete [example notebook](../examples/rover/Hydroinnova_rover_example/).
 
 ### Incoming neutron flux
-The CRNPy package includes a complete set of methods for correcting the raw observed neutron counts for natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from a reference neutron monitoring station from the NMDB database (www.nmdb.eu) by proposing the most similar stations after analyzing the cut-off rigidity of the reference station and the estimated cut-off rigidity value for the studied location as a form of finding stations under a similar earth electromagnetic field (Klein et al., 2009; Shea & Smart., 2019).
+The CRNPy library includes a complete set of methods for correcting the raw observed neutron counts for natural variation in the incoming neutron flux, including a set of tools for searching and downloading data from reference neutron monitors from the NMDB database (www.nmdb.eu) with similar the cut-off rigidity as the study location (Klein et al., 2009; Shea & Smart., 2019).
 
 | Incoming neutron flux correction factor|
 |---------------------------------|
@@ -28,7 +28,7 @@ The CRNPy package includes a complete set of methods for correcting the raw obse
     See  [crnpy.crnpy.cutoff_rigidity][], [crnpy.crnpy.find_neutron_monitor][], [crnpy.crnpy.get_incoming_neutron_flux][], [crnpy.crnpy.interpolate_incoming_flux][] and [crnpy.crnpy.incoming_flux_correction][] documentation for the implementation details.
 
 ### Atmospheric corrections
-The package also provides functions for correcting raw neutron counts for atmospheric pressure, humidity, and temperature variations, (Andreasen et al., 2017; Rosolem et al., 2013).
+The CRNPy library also provides functions for correcting raw neutron counts for atmospheric pressure, air humidity, and air temperature (Andreasen et al., 2017; Rosolem et al., 2013).
 
 | Pressure correction | Atmospheric water correction |
 |---------------------|------------------------------|
@@ -57,7 +57,7 @@ The library provides a function for correcting neutron counts for the effects of
     See [crnpy.crnpy.bwe_correction][] and [crnpy.crnpy.biomass_to_bwe][] documentation for the implementation details.
 
 ### Road correction
-Due to the known high sensitivity closer to the detector, use cases like rover surveys could require the use of a correction factor accounting for the differences between the field soil water content and the road water content (Schrön et al., (2018)).
+The lCRNPY library includes functions to correct for the effect of roads during rover surveys which account for the field soil water content and the road water content following the approach proposed by Schrön et al., (2018).
 
 | Road correction |
 |-----------------|
@@ -73,7 +73,7 @@ Due to the known high sensitivity closer to the detector, use cases like rover s
 
 ### Additional corrections
 
-Extra routines in this module account for other hydrogen environmental pools, lattice water, and total soil carbon that could affect cosmic-ray neutrons attenuation. A function to estimate the soil lattice water content based on texture and soil carbon was developed by analyzing collected soil samples across the state of Kansas.
+Other correction routines includes corrections for soil lattice water and total soil carbon that are known to affect the attentuation of epithermal cosmic-ray neutrons. A function to estimate the soil lattice water content based on clay content and soil organic carbon content was developed using soil samples collected across the state of Kansas.
 
 
 !!! info "Implementation"

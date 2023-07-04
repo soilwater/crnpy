@@ -342,8 +342,8 @@ def fill_missing_atm(cols_atm, limit=24):
     return cols_atm.interpolate(method='pchip', limit=limit, limit_direction='both')
 
 
-def pressure_correction(raw_counts, pressure, Pref, L):
-    r"""Correct neutron counts for atmospheric pressure.
+def pressure_correction(pressure, Pref, L):
+    r"""Correction factor for atmospheric pressure.
 
     This function corrects neutron counts for atmospheric pressure using the method described in Andreasen et al. (2017).
     The correction is performed using the following equation:
@@ -370,8 +370,7 @@ def pressure_correction(raw_counts, pressure, Pref, L):
 
 
     Args:
-        raw_counts (list or array): Neutron counts to correct.
-        pressure (list or array): Atmospheric pressure readings. Long-term average pressure is recommended.
+        atm_pressure (list or array): Atmospheric pressure readings. Long-term average pressure is recommended.
         Pref (float): Reference atmospheric pressure.
         L (float): Atmospheric attenuation coefficient.
 
@@ -384,13 +383,12 @@ def pressure_correction(raw_counts, pressure, Pref, L):
 
     # Compute pressure correction factor
     fp = np.exp((Pref - pressure) / L) # Zreda et al. 2017 Eq 5.
-    # Compute corrected neutron counts
-    corrected_counts = raw_counts / fp
-    return np.round(corrected_counts)
+
+    return fp
 
 
-def humidity_correction(raw_counts, humidity, temp, Aref):
-    r"""Correct neutron counts for absolute humidity.
+def humidity_correction(abs_humidity, temp, Aref):
+    r"""Correction factor for absolute humidity.
 
     This function corrects neutron counts for absolute humidity using the method described in Rosolem et al. (2013) and Anderson et al. (2017). The correction is performed using the following equation:
 
@@ -414,8 +412,7 @@ def humidity_correction(raw_counts, humidity, temp, Aref):
     - Aref: reference absolute humidity
 
     Args:
-        raw_counts (list or array): Neutron counts to correct.
-        humidity (list or array): Relative humidity readings.
+        abs_humidity (list or array): Relative humidity readings.
         temp (list or array): Temperature readings (Celsius).
         Aref (float): Reference absolute humidity (g/m^3). The day of the instrument calibration is recommended.
 
@@ -425,14 +422,12 @@ def humidity_correction(raw_counts, humidity, temp, Aref):
     References:
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
     """
-
-    A = estimate_abs_humidity(humidity, temp)
+    A = abs_humidity
     fw = 1 + 0.0054*(A - Aref) # Zreda et al. 2017 Eq 6.
-    corrected_counts = raw_counts * fw
-    return np.round(corrected_counts)
+    return fw
 
-def incoming_flux_correction(raw_counts, incoming_neutrons, incoming_Ref=None):
-    r"""Correct neutron counts for incoming neutron flux.
+def incoming_flux_correction(incoming_neutrons, incoming_Ref=None):
+    r"""Correction factor for incoming neutron flux.
 
     This function corrects neutron counts for incoming neutron flux using the method described in Anderson et al. (2017). The correction is performed using the following equation:
 
@@ -456,7 +451,6 @@ def incoming_flux_correction(raw_counts, incoming_neutrons, incoming_Ref=None):
     - Iref: reference incoming neutron flux
 
     Args:
-        raw_counts (list or array): Neutron counts to correct.
         incoming_neutrons (list or array): Incoming neutron flux readings.
         incoming_Ref (float): Reference incoming neutron flux. Baseline incoming neutron flux.
 
@@ -474,8 +468,7 @@ def incoming_flux_correction(raw_counts, incoming_neutrons, incoming_Ref=None):
     fi = incoming_neutrons / incoming_Ref
     fi.fillna(1.0, inplace=True)  # Use a value of 1 for days without data
 
-    # Apply correction factors
-    return np.round(raw_counts / fi)
+    return fi
 
 
 def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expand_window = 0,  verbose=False):
