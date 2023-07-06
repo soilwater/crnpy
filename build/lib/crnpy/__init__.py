@@ -6,4 +6,16 @@ Modules exported by this package:
 - `crnpy`: Provide several functions to process observations from cosmic ray neutron detectors.
 """
 
-__version__ = '0.2-28'
+# GEt version from setup.py
+from pathlib import Path
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version(__name__)
+except PackageNotFoundError:
+    __version__ = "unknown"
+
+# Import all functions from crnpy
+
+from .crnpy import *
+

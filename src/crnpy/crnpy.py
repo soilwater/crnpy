@@ -118,7 +118,7 @@ def count_time(counts=None, timestamp_col=None):
 
 def fill_counts(counts, count_times=None, timestamp_col=None, expected_time=False, threshold=0.25, limit=3):
     """Fill missing neutron counts. Observation periods shorter than threshold are discarded (replaced with NaN).
-    
+
     Args:
         counts (pandas.DataFrame): DataFrame with neutron counts, might have DateTimeIndex.
         count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as `counts`.
@@ -187,49 +187,49 @@ def fill_counts(counts, count_times=None, timestamp_col=None, expected_time=Fals
     counts = counts.interpolate(method='linear', limit=limit, limit_direction='both').round()
     return counts
 
-def adjust_temporal_counts(counts, count_time=None, count_times=None, timestamp_col=None):
-    """Normalize neutron counts to the desired counting time.
-    
+def adjust_temporal_counts(counts, nominal_integration_time=None, actual_integration_time=None, timestamp_col=None):
+    """Adjust neutron counts for the desired integration time.
+
     Args:
         counts (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
-        count_time (int): Count time in seconds for normalization. Default is 3600 seconds.
-        count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as counts.
-        timestamp_col (pandas.Series): Timestamp column, used to calculate count time if count_times is not provided, it must have the same number of rows as counts.
-        
+        nominal_integration_time (int): Nominal intgration time in seconds.
+        actual_integration_time (pandas.Series or pandas.DataFrame): Actual integration time of each measurement in seconds. If a DataFrame is provided, it must have the same number of columns as counts.
+        timestamp_col (pandas.Series): Timestamp column, used to calculate integration time if actual_integration_time is not provided, it must have the same number of rows as counts.
+
     Returns:
         (pandas.DataFrame): Normalized neutron counts.
 
     """
 
-    if count_times is None and type(counts.index) == pd.core.indexes.datetimes.DatetimeIndex:
+    if actual_integration_time is None and type(counts.index) == pd.core.indexes.datetimes.DatetimeIndex:
         print("No count_times columns provided. Using timestamp index to compute count time.")
-        count_times = counts.index.to_series().diff().dt.total_seconds()
+        actual_integration_time = counts.index.to_series().diff().dt.total_seconds()
 
-    elif count_times is None and not isinstance(timestamp_col, type(None)):
+    elif actual_integration_time is None and not isinstance(timestamp_col, type(None)):
         if len(timestamp_col) != len(counts):
             raise ValueError('Timestamp column length does not match number of readings.')
         print("No count_times columns provided. Using timestamp column to compute count time.")
         if timestamp_col.dtype != 'datetime64[ns]':
             raise TypeError('Timestamp column must be a pandas Series with datetime64[ns] dtype.')
-        count_times = count_time(timestamp_col=timestamp_col)
+        actual_integration_time = count_time(timestamp_col=timestamp_col)
 
 
-    if isinstance(count_times, type(None)):
-        raise ValueError('Count time must be provided, or `timestamp_col` must be provided, or counts must have a DatetimeIndex.')
+    if isinstance(actual_integration_time, type(None)):
+        raise ValueError('Actual integration time must be provided, or `timestamp_col` must be provided, or counts must have a DatetimeIndex.')
 
-    if len(counts) != len(count_times):
+    if len(counts) != len(actual_integration_time):
         raise ValueError('Count times length does not match number of readings.')
 
     #Normalize counts rounded to integer
-    if type(count_times) == pd.core.series.Series or len(count_times.columns) == 1:
-        normalized_counts = counts.div(count_times, axis=0).mul(count_time).round()
-        return normalized_counts
+    if type(actual_integration_time) == pd.core.series.Series or len(actual_integration_time.columns) == 1:
+        adjusted_counts = counts.div(actual_integration_time, axis=0).mul(nominal_integration_time).round()
+        return adjusted_counts
     else:
-        normalized_counts = counts.copy()
-        count_times = count_times.copy()
+        adjusted_counts = counts.copy()
+        count_times = actual_integration_time.copy()
         for i in range(len(count_times.columns)):
-            normalized_counts[normalized_counts.columns[i]] = normalized_counts.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(count_time).round()
-        return normalized_counts
+            adjusted_counts[adjusted_counts.columns[i]] = adjusted_counts.iloc[:,i].div(count_times.iloc[:,i], axis=0).mul(nominal_integration_time).round()
+        return adjusted_counts
 
 
 def compute_total_raw_counts(counts, nan_strategy=None, timestamp_col=None):
@@ -275,7 +275,7 @@ def compute_total_raw_counts(counts, nan_strategy=None, timestamp_col=None):
 
 def drop_outliers(raw_counts, window=5, store_outliers=False, min_counts=None, max_counts=None):
     """Computation of a moving modified Z-score based on the median absolute difference.
-    
+
     Args:
         raw_counts (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
         window (int): Window size for the moving median. Default is 11.
@@ -713,10 +713,10 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.
         a0 (float): Parameter given in Zreda et al., 2012. Default is 0.0808.
         a1 (float): Parameter given in Zreda et al., 2012. Default is 0.372.
         a2 (float): Parameter given in Zreda et al., 2012. Default is 0.115.
-        
+
     Returns:
         (array or pd.Series or pd.DataFrame): Volumetric water content in m3 m-3.
-        
+
     References:
         Desilets, D., M. Zreda, and T.P.A. Ferré. 2010. Nature’s neutron probe:
         Land surface hydrology at an elusive scale with cosmic rays. Water Resour. Res. 46:W11505.
@@ -982,16 +982,16 @@ def cutoff_rigidity(lat,lon):
 
 def find_neutron_monitor(Rc, start_date=None, end_date=None):
     """Search for potential reference neutron monitoring stations based on cutoff rigidity.
-    
+
     Args:
         Rc (float): Cutoff rigidity in GV. Values in range 1.0 to 3.0 GV.
-        start_date (datetime): Start date for the period of interest.   
+        start_date (datetime): Start date for the period of interest.
         end_date (datetime): End date for the period of interest.
-        
+
     Returns:
         (list): List of top five stations with closes cutoff rigidity.
             User needs to select station according to site altitude.
-            
+
     Examples:
         >>> from crnpy import crnpy
         >>> Rc = 2.40 # 2.40 Newark, NJ, US
