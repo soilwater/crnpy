@@ -197,7 +197,7 @@ def adjust_temporal_counts(counts, nominal_integration_time=None, actual_integra
         timestamp_col (pandas.Series): Timestamp column, used to calculate integration time if actual_integration_time is not provided, it must have the same number of rows as counts.
 
     Returns:
-        (pandas.DataFrame): Normalized neutron counts.
+        (pandas.DataFrame): Neutron counts adjusted for the desired integration time.
 
     """
 
@@ -375,7 +375,7 @@ def pressure_correction(pressure, Pref, L):
         L (float): Atmospheric attenuation coefficient.
 
     Returns:
-        (list): Corrected neutron counts.
+        (list): fp pressure correction factor.
 
     References:
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
@@ -417,7 +417,7 @@ def humidity_correction(abs_humidity, temp, Aref):
         Aref (float): Reference absolute humidity (g/m^3). The day of the instrument calibration is recommended.
 
     Returns:
-        (list): Corrected neutron counts.
+        (list): fw correction factor.
 
     References:
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
@@ -455,7 +455,7 @@ def incoming_flux_correction(incoming_neutrons, incoming_Ref=None):
         incoming_Ref (float): Reference incoming neutron flux. Baseline incoming neutron flux.
 
     Returns:
-        (list): Corrected neutron counts.
+        (list): fi correction factor.
 
     References:
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
