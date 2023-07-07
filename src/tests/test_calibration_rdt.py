@@ -35,11 +35,11 @@ def calibration_example():
     df['total_counts'] = crnpy.compute_total_raw_counts(df[['counts_1_Tot', 'counts_2_Tot']], nan_strategy='average')
 
     # Fill NaN values in atmospheric data
-    df[['pressure', 'RH', 'T']] = crnpy.fill_missing_atm(
+    df[['pressure', 'relative_humidity', 'T']] = crnpy.fill_missing_atm(
         df[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']])
     # Correct count by atmospheric variables and incoming flux
     df['total_counts'] = crnpy.fill_counts(df['total_counts'])
-    df['corrected'] = crnpy.humidity_correction(df['total_counts'], humidity=df['RH'], temp=df['T'], Aref=0)
+    df['corrected'] = crnpy.humidity_correction(df['total_counts'], humidity=df['relative_humidity'], temp=df['T'], Aref=0)
     df['corrected'] = crnpy.pressure_correction(df['corrected'], pressure=df['pressure'], Pref=976, L=130)
     print(f"Mean corrected neutron count during sampling: {df['corrected'].mean().round()}")
 

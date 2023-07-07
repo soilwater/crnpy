@@ -74,7 +74,7 @@ def fill_missing_timestamps(df, col='timestamp', format='%Y-%m-%d %H:%M:%S', fre
     df.set_index(col, inplace=True)
     return df
 
-def count_time(counts=None, timestamp_col=None):
+def get_integration_time(counts=None, timestamp_col=None):
     """Approximate counting time.
     The function will calculate the approximate counting time for each observation by taking the difference between
     consecutive timestamps. If counts has a DateTimeIndex, timestamp_col is not needed.
@@ -116,14 +116,14 @@ def count_time(counts=None, timestamp_col=None):
 
     raise TypeError('Either counts or timestamp_col must be provided.')
 
-def fill_counts(counts, count_times=None, timestamp_col=None, expected_time=False, threshold=0.25, limit=3):
+def fill_counts(counts, actual_integration_time=None, timestamp_col=None, expected_time=False, threshold=0.25, limit=3):
     """Fill missing neutron counts. Observation periods shorter than threshold are discarded (replaced with NaN).
 
     Args:
         counts (pandas.DataFrame): DataFrame with neutron counts, might have DateTimeIndex.
-        count_times (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as `counts`.
+        actual_integration_time (pandas.Series or pandas.DataFrame): Counting time in seconds. If a DataFrame is provided, it must have the same number of columns as `counts`.
         timestamp_col (pandas.Series): Series with timestamps. If counts has a DateTimeIndex, timestamp_col is not needed.
-        expected_time (int): Expected counting time in seconds. If not provided, it is calculated as the median of the counting times.
+        expected_time (int): Expected integration time in seconds. If not provided, it is calculated as the median of the counting times.
         threshold (float): Minimum fraction of the neutron integration time. Default is 0.25.
 
     Returns:
@@ -133,7 +133,7 @@ def fill_counts(counts, count_times=None, timestamp_col=None, expected_time=Fals
         Using `fill_counts` in a console environment:
 
         >>> counts = pd.DataFrame({'counts':[100,105,98,102], count_time:[3600,200,3600,3600]})
-        >>> fill_counts(counts, count_time=count_time, expected_time=3600, threshold=0.25)
+        >>> fill_counts(counts, actual_integration_time=counts['actual_integration_time'], expected_time=3600, threshold=0.25)
         0   100.0
         1   NaN
         2   98.0
@@ -142,45 +142,45 @@ def fill_counts(counts, count_times=None, timestamp_col=None, expected_time=Fals
 
     counts=counts.copy()
 
-    if type(counts.index) == pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)):
+    if type(counts.index) == pd.core.indexes.datetimes.DatetimeIndex and isinstance(actual_integration_time, type(None)):
         print("No count time columns provided. Using timestamp index to compute count time.")
-        count_times = count_time(timestamp_col=counts.index.to_series())
+        actual_integration_time = get_integration_time(timestamp_col=counts.index.to_series())
 
-    elif not isinstance(timestamp_col, type(None)) and isinstance(count_times, type(None)):
+    elif not isinstance(timestamp_col, type(None)) and isinstance(actual_integration_time, type(None)):
         if timestamp_col.dtype != 'datetime64[ns]':
             if len(timestamp_col) != len(counts):
                 raise ValueError('Timestamp column length does not match number of readings.')
             print("No count time columns provided. Using timestamp column to compute count time.")
-            count_times = count_time(timestamp_col=timestamp_col)
+            actual_integration_time = get_integration_time(timestamp_col=timestamp_col)
         else:
             raise TypeError('Timestamp column must be a pandas Series with datetime64[ns] dtype.')
 
-    if type(counts.index) != pd.core.indexes.datetimes.DatetimeIndex and isinstance(count_times, type(None)) and isinstance(timestamp_col, type(None)):
+    if type(counts.index) != pd.core.indexes.datetimes.DatetimeIndex and isinstance(actual_integration_time, type(None)) and isinstance(timestamp_col, type(None)):
         raise ValueError('Count_times must be provided, or timestamp_col must be provided, or counts must have a DatetimeIndex.')
 
-    if len(counts) != len(count_times):
+    if len(counts) != len(actual_integration_time):
         raise ValueError('Count times length does not match number of readings.')
 
     if expected_time is False:
-        expected_time = count_times.median()
+        expected_time = actual_integration_time.median()
         print('Using median count time as expected count time:', expected_time)
 
     # Replace values below threshold with NaN
     time_threshold = round(expected_time * threshold)
 
-    if type(count_times) == pd.core.frame.DataFrame:
-        if len(count_times.columns) == 1:
-            idx_nan = count_times[count_times < time_threshold].index
+    if type(actual_integration_time) == pd.core.frame.DataFrame:
+        if len(actual_integration_time.columns) == 1:
+            idx_nan = actual_integration_time[actual_integration_time < time_threshold].index
             counts.loc[idx_nan] = np.nan
         else:
-            for i in range(len(count_times.columns)):
-                idx_nan = count_times[count_times.iloc[:,i] < time_threshold].index
+            for i in range(len(actual_integration_time.columns)):
+                idx_nan = actual_integration_time[actual_integration_time.iloc[:, i] < time_threshold].index
                 counts.iloc[:,i].loc[idx_nan] = np.nan
-    elif type(count_times) == pd.core.series.Series:
-        idx_nan = count_times[count_times < time_threshold].index
+    elif type(actual_integration_time) == pd.core.series.Series:
+        idx_nan = actual_integration_time[actual_integration_time < time_threshold].index
         counts.loc[idx_nan] = np.nan
-    elif type(count_times) == np.ndarray:
-        idx_nan = np.where(count_times < time_threshold)
+    elif type(actual_integration_time) == np.ndarray:
+        idx_nan = np.where(actual_integration_time < time_threshold)
         counts.loc[idx_nan] = np.nan
 
     # Fill missing values with linear interpolation and round to nearest integer
@@ -387,7 +387,7 @@ def pressure_correction(pressure, Pref, L):
     return fp
 
 
-def humidity_correction(abs_humidity, temp, Aref):
+def humidity_correction(abs_humidity, Aref):
     r"""Correction factor for absolute humidity.
 
     This function corrects neutron counts for absolute humidity using the method described in Rosolem et al. (2013) and Anderson et al. (2017). The correction is performed using the following equation:
@@ -778,12 +778,12 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
 
     return results
 
-def estimate_abs_humidity(RH, temp):
+def estimate_abs_humidity(relative_humidity, temp):
     """
     Compute the actual vapor pressure (e) in g m^-3 using RH (%) and current temperature (c) observations.
 
     Args:
-        RH (float): relative humidity (%)
+        relative_humidity (float): relative humidity (%)
         temp (float): temperature (Celsius)
 
     Returns:
@@ -796,7 +796,7 @@ def estimate_abs_humidity(RH, temp):
                 temp + 240.97)) * 1000  # in Pascals Eq. 3.8 p.41 Environmental Biophysics (Campbell and Norman)
 
     # Vapor pressure Pascals
-    Pw = e_sat * RH / 100
+    Pw = e_sat * relative_humidity / 100
 
     # Absolute humidity (g/m^3)
     C = 2.16679  # g K/J;

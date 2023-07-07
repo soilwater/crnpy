@@ -387,7 +387,7 @@ def pressure_correction(pressure, Pref, L):
     return fp
 
 
-def humidity_correction(abs_humidity, temp, Aref):
+def humidity_correction(abs_humidity, Aref):
     r"""Correction factor for absolute humidity.
 
     This function corrects neutron counts for absolute humidity using the method described in Rosolem et al. (2013) and Anderson et al. (2017). The correction is performed using the following equation:
@@ -778,12 +778,12 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
 
     return results
 
-def estimate_abs_humidity(RH, temp):
+def estimate_abs_humidity(relative_humidity, temp):
     """
     Compute the actual vapor pressure (e) in g m^-3 using RH (%) and current temperature (c) observations.
 
     Args:
-        RH (float): relative humidity (%)
+        relative_humidity (float): relative humidity (%)
         temp (float): temperature (Celsius)
 
     Returns:
@@ -796,7 +796,7 @@ def estimate_abs_humidity(RH, temp):
                 temp + 240.97)) * 1000  # in Pascals Eq. 3.8 p.41 Environmental Biophysics (Campbell and Norman)
 
     # Vapor pressure Pascals
-    Pw = e_sat * RH / 100
+    Pw = e_sat * relative_humidity / 100
 
     # Absolute humidity (g/m^3)
     C = 2.16679  # g K/J;
