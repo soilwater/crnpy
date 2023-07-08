@@ -87,7 +87,7 @@ def get_integration_time(counts=None, timestamp_col=None):
         (pandas.Series): Series with the approximate counting time for each observation.
 
     Examples:
-        Using `count_time` in a console environment:
+        Using `get_integration_time` in a console environment:
 
         >>> df = pd.DataFrame(...)
         >>> get_integration_time(timestamp_col=df['timestamp'])
@@ -101,8 +101,8 @@ def get_integration_time(counts=None, timestamp_col=None):
         if timestamp_col.dtype != 'datetime64[ns]':
             raise TypeError('timestamp_col must be a pandas Series with datetime64[ns] dtype.')
 
-        count_time = timestamp_col.diff().dt.total_seconds()
-        return count_time
+        integration_time = timestamp_col.diff().dt.total_seconds()
+        return integration_time
 
     if counts is not None:
         if not isinstance(counts, pd.DataFrame):
@@ -111,8 +111,8 @@ def get_integration_time(counts=None, timestamp_col=None):
         if not counts.index.dtype == 'datetime64[ns]':
             raise TypeError('counts must have a DateTimeIndex.')
 
-        count_time = counts.index.to_series().diff().dt.total_seconds()
-        return count_time
+        integration_time = counts.index.to_series().diff().dt.total_seconds()
+        return integration_time
 
     raise TypeError('Either counts or timestamp_col must be provided.')
 
