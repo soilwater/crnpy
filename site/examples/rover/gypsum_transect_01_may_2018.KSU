@@ -16,7 +16,7 @@
 //Recordperiod = 1 minutes.
 //DataSelect=r1p4p1t1h1t7h7bn1n2n3n4n5n6n7n8e1e3e5e7s1s5
 //--Data Column Info:
-//RecordNum,Date Time(UTC),PTB110_mb,P4_mb,P1_mb,T1_C,RH1,T_CS215,RH_CS215,Vbat,N1Cts,N2Cts,N3Cts,N4Cts,N5Cts,N6Cts,N7Cts,N8Cts, N1ETsec , N3ETsec , N5ETsec , N7ETsec , N1T(C),N1RH , N5T(C),N5RH ,
+//RecordNum,Date Time(UTC),barometric_pressure_Avg,P4_mb,P1_mb,T1_C,RH1,air_temperature_Avg,relative_humidity_Avg,Vbat,N1Cts,N2Cts,N3Cts,N4Cts,N5Cts,N6Cts,N7Cts,N8Cts, N1ETsec , N3ETsec , N5ETsec , N7ETsec , N1T(C),N1RH , N5T(C),N5RH ,
 //GpsUTC, LatDec, LongDec, Alt, Qual, NumSats, HDOP, Speed_kmh, COG, SpeedQuality, strDate
 1, 2018/05/01 14:14:08,  962.84,  962.9,  961.4,   23.0, 35.4,  20.8, 72.6, 13.735,       24,       25,       14,       22,       16,       17,       24,       17,      39,      39,      39,      39,  23.4, 23.4,  23.0, 16.0, 0141044,   0.00000,   0.00000,,,!w,,   0.00,,V,
 2, 2018/05/01 14:15:00,  962.95,  962.8,  961.4,   23.2, 35.4,  20.9, 72.7, 13.574,       32,       52,       30,       39,       42,       23,       37,       50,      52,      52,      52,      52,  23.9, 23.2,  23.4, 16.0, 0141136,  38.68368,  97.37195,393.2,2,10,0.8,   0.00,270.70,A,010518
