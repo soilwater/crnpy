@@ -90,7 +90,7 @@ def get_integration_time(counts=None, timestamp_col=None):
         Using `count_time` in a console environment:
 
         >>> df = pd.DataFrame(...)
-        >>> count_time(timestamp_col=df['timestamp'])
+        >>> get_integration_time(timestamp_col=df['timestamp'])
         0   3600.0
         1   3600.0
         2   3600.0
@@ -211,7 +211,7 @@ def adjust_temporal_counts(counts, nominal_integration_time=None, actual_integra
         print("No count_times columns provided. Using timestamp column to compute count time.")
         if timestamp_col.dtype != 'datetime64[ns]':
             raise TypeError('Timestamp column must be a pandas Series with datetime64[ns] dtype.')
-        actual_integration_time = count_time(timestamp_col=timestamp_col)
+        actual_integration_time = get_integration_time(timestamp_col=timestamp_col)
 
 
     if isinstance(actual_integration_time, type(None)):
