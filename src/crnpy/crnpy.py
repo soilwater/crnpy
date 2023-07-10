@@ -208,27 +208,6 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
     return idx_outliers | idx_range_outliers
 
 
-def fill_missing_atm(cols_atm, limit=24):
-    """Fill missing values in atmospheric variables. Gap filling is performed using a
-    piecewise cubic Hermite interpolating polynomial (pchip method) that is restricted to intervals
-    of missing data with a limited number of values and surrounded by valid observations.
-    There is no interpolation at the end of the time series.
-
-    Args:
-        col_atm (pandas.Series or pandas.DataFrame): Atmospheric variables to fill.
-        limit (int): Maximum number of consecutive missing values to interpolate. Default is 24.
-
-    Returns:
-        (pandas.DataFrame): Atmospheric variables with filled missing values using a piecewise cubic Hermite polynomial.
-
-    References:
-        https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.interpolate.html
-    """
-
-    # Fill missing values in atmospheric variables
-    return cols_atm.interpolate(method='pchip', limit=limit, limit_direction='both')
-
-
 def pressure_correction(pressure, Pref, L):
     r"""Correction factor for atmospheric pressure.
 
