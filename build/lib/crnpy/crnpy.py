@@ -7,14 +7,13 @@
 
 # Import modules
 import sys
-import os
 import warnings
 import numbers
 import numpy as np
 import pandas as pd
 import requests
 import io
-import datetime
+
 
 from scipy.signal import savgol_filter
 from scipy.interpolate import griddata
@@ -180,8 +179,8 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
         idx_outliers = (zscore < -3) | (zscore > 3)
 
     elif method == 'movzscore':
-        movmean = x.rolling(window=w, center=True).mean()
-        movstd = x.rolling(window=w, center=True).std()
+        movmean = x.rolling(window=window, center=True).mean()
+        movstd = x.rolling(window=window, center=True).std()
         movzscore = (x - movmean)/movstd
         idx_outliers = (movzscore < -3) | (movzscore > 3)
 
@@ -364,8 +363,8 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     end_date += pd.Timedelta(hours=expand_window)
 
     # Convert local time to UTC
-    start_date = start_date - datetime.timedelta(hours=utc_offset)
-    end_date = end_date - datetime.timedelta(hours=utc_offset)
+    start_date = start_date - pd.Timedelta(hours=utc_offset)
+    end_date = end_date - pd.Timedelta(hours=utc_offset)
     date_format = '%Y-%m-%d %H:%M:%S'
     root = 'http://www.nmdb.eu/nest/draw_graph.php?'
     url_par = [ 'formchk=1',
@@ -723,14 +722,9 @@ def exp_filter(sm,T=1):
     Args:
         sm (list or array): Soil moisture in mm of water for the top layer of the soil profile.
         T (float): Characteristic time length in the same units as the measurement interval.
-        Z_surface (float): Depth of surface layer in mm. This should be an intermediate value according to the
-            sensing depth computed using the D86 method.
-        Z_subsurface (float): Depth of subsurface layer in mm.
 
     Returns:
-        (tuple): tuple containing:
-            - **Surface soil water storage** (*array*): Surface soil water storage in mm of water.
-            - **Subsurface soil water storage** (*array*): Subsurface soil water storage in mm of water.
+        sm_subsurface (list or array): Subsurface soil moisture in the same units as the input.
 
     References:
         Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J.C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B. and Martin, E., 2008.
@@ -767,13 +761,10 @@ def exp_filter(sm,T=1):
         else:
             continue
 
-    # Surface storage
-    sm_surface = sm
-
     # Rootzone storage
     sm_subsurface = SWI * (sm_max - sm_min) + sm_min
 
-    return sm_surface, sm_subsurface
+    return sm_subsurface
 
 
 def cutoff_rigidity(lat,lon):
