@@ -2313,11 +2313,11 @@ df_station.head(3)
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Compute total neutron counts by adding the counts from both probe detectors</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;total_raw_counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">compute_total_raw_counts</span><span class="p">(</span><span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;counts_1_Tot&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2_Tot&#39;</span><span class="p">]],</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;total_raw_counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">total_raw_counts</span><span class="p">(</span><span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;counts_1_Tot&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2_Tot&#39;</span><span class="p">]],</span>
                                                     <span class="n">nan_strategy</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">)</span>
 </pre></div>
 <div id="cell-6" class="clipboard-copy-txt"># Compute total neutron counts by adding the counts from both probe detectors
-df_station['total_raw_counts'] = crnpy.compute_total_raw_counts(df_station[['counts_1_Tot','counts_2_Tot']],
+df_station['total_raw_counts'] = crnpy.total_raw_counts(df_station[['counts_1_Tot','counts_2_Tot']],
                                                     nan_strategy='average')
 </div>
         
@@ -2355,7 +2355,7 @@ df_station['total_raw_counts'] = crnpy.compute_total_raw_counts(df_station[['cou
 <span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;pchip&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">limit_direction</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
 
 <span class="c1"># Calculate absolute humidity</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">estimate_abs_humidity</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">abs_humidity</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
 
 <span class="c1"># Compute correction factor for atmospheric pressure</span>
 <span class="c1"># Reference atmospheric pressure for the location is 976 Pa</span>
@@ -2373,7 +2373,7 @@ df_station['total_raw_counts'] = crnpy.compute_total_raw_counts(df_station[['cou
 df_station[['barometric_pressure_Avg','relative_humidity_Avg', 'air_temperature_Avg']] = df_station[['barometric_pressure_Avg','relative_humidity_Avg', 'air_temperature_Avg']].interpolate(method='pchip', limit=24, limit_direction='both')
 
 # Calculate absolute humidity
-df_station['abs_humidity'] = crnpy.estimate_abs_humidity(df_station['relative_humidity_Avg'], df_station['air_temperature_Avg'])
+df_station['abs_humidity'] = crnpy.abs_humidity(df_station['relative_humidity_Avg'], df_station['air_temperature_Avg'])
 
 # Compute correction factor for atmospheric pressure
 # Reference atmospheric pressure for the location is 976 Pa

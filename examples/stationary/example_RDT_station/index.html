@@ -1834,7 +1834,7 @@ Added a total of 60 missing timestamps.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Utilize the <a href="../../../reference/#crnpy.crnpy.compute_total_raw_counts"><code>compute_total_raw_counts()</code></a> function to calculate the total counts across all detectors. After calculating the total counts, identify outliers using the <a href="../../../reference/#crnpy.crnpy.is_outlier"><code>is_outlier()</code></a> function.</p>
+<p>Utilize the <a href="../../../reference/#crnpy.crnpy.total_raw_counts"><code>total_raw_counts()</code></a> function to calculate the total counts across all detectors. After calculating the total counts, identify outliers using the <a href="../../../reference/#crnpy.crnpy.is_outlier"><code>is_outlier()</code></a> function.</p>
 
 </div>
 </div>
@@ -1912,10 +1912,10 @@ for col in cols_counts:
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Compute total cunts</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_raw_counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">compute_total_raw_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">cols_counts</span><span class="p">],</span> <span class="n">nan_strategy</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_raw_counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">total_raw_counts</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">cols_counts</span><span class="p">],</span> <span class="n">nan_strategy</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">)</span>
 </pre></div>
 <div id="cell-5" class="clipboard-copy-txt"># Compute total cunts
-df['total_raw_counts'] = crnpy.compute_total_raw_counts(df[cols_counts], nan_strategy='average')
+df['total_raw_counts'] = crnpy.total_raw_counts(df[cols_counts], nan_strategy='average')
 </div>
         
         </div>
@@ -2326,7 +2326,7 @@ df['fi'] = crnpy.incoming_flux_correction(incoming_neutrons=df['incoming_flux'],
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;fp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">pressure_correction</span><span class="p">(</span><span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">],</span> <span class="n">Pref</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">)</span>
 
 <span class="c1"># Calculate the absolute humidity (g cm^-3) and the vapor pressure correction factor</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">estimate_abs_humidity</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">abs_humidity</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;fw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">humidity_correction</span><span class="p">(</span><span class="n">abs_humidity</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">],</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 <div id="cell-11" class="clipboard-copy-txt"># Fill NaN values in atmospheric data and neutron counts
@@ -2336,7 +2336,7 @@ df[['barometric_pressure_Avg','relative_humidity_Avg', 'air_temperature_Avg']] =
 df['fp'] = crnpy.pressure_correction(pressure=df['barometric_pressure_Avg'], Pref=df['barometric_pressure_Avg'].mean(), L=130)
 
 # Calculate the absolute humidity (g cm^-3) and the vapor pressure correction factor
-df['abs_humidity'] = crnpy.estimate_abs_humidity(df['relative_humidity_Avg'], df['air_temperature_Avg'])
+df['abs_humidity'] = crnpy.abs_humidity(df['relative_humidity_Avg'], df['air_temperature_Avg'])
 df['fw'] = crnpy.humidity_correction(abs_humidity=df['abs_humidity'], Aref=0)
 </div>
         
@@ -2419,7 +2419,7 @@ df['total_corrected_neutrons'] = df['total_raw_counts'] * df['fw'] / (df['fp'] *
 <span class="n">N0_rdt</span> <span class="o">=</span> <span class="mi">3767</span> <span class="c1"># Patrignani, A., Ochsner, T. E., Montag, B., &amp; Bellinger, S. (2021). A novel lithium foil cosmic-ray neutron detector for measuring field-scale soil moisture. Frontiers in Water, 3, 673185.</span>
 
 <span class="c1"># Estimate lattice water (%) based on texture, and convert it to decimal.</span>
-<span class="n">lattice_water</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">estimate_lattice_water</span><span class="p">(</span><span class="n">clay_content</span><span class="o">=</span><span class="mf">0.35</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span>
+<span class="n">lattice_water</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">lattice_water</span><span class="p">(</span><span class="n">clay_content</span><span class="o">=</span><span class="mf">0.35</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span>
 
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;VWC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">counts_to_vwc</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;total_corrected_neutrons&#39;</span><span class="p">],</span> <span class="n">N0</span><span class="o">=</span><span class="n">N0_rdt</span><span class="p">,</span> <span class="n">bulk_density</span><span class="o">=</span><span class="mf">1.33</span><span class="p">,</span> <span class="n">Wlat</span><span class="o">=</span><span class="n">lattice_water</span><span class="p">,</span> <span class="n">Wsoc</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 
@@ -2433,7 +2433,7 @@ df['total_corrected_neutrons'] = df['total_raw_counts'] * df['fw'] / (df['fp'] *
 N0_rdt = 3767 # Patrignani, A., Ochsner, T. E., Montag, B., & Bellinger, S. (2021). A novel lithium foil cosmic-ray neutron detector for measuring field-scale soil moisture. Frontiers in Water, 3, 673185.
 
 # Estimate lattice water (%) based on texture, and convert it to decimal.
-lattice_water = crnpy.estimate_lattice_water(clay_content=0.35) / 100
+lattice_water = crnpy.lattice_water(clay_content=0.35) / 100
 
 df['VWC'] = crnpy.counts_to_vwc(df['total_corrected_neutrons'], N0=N0_rdt, bulk_density=1.33, Wlat=lattice_water, Wsoc=0.01)
 
