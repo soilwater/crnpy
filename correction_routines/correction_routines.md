@@ -34,8 +34,8 @@ The CRNPy library also provides functions for correcting raw neutron counts for 
 |---------------------|------------------------------|
 |$fp = exp(\frac{P_{0} - P}{L})$ | $fw = 1 + 0.0054*(A - Aref)$ |
 |$fp$: Atmospheric pressure correction factor | $fw$: Atmospheric water correction factor
-|$P_{0}$: Reference atmospheric pressure (for e.g. long-term average) | $A$: Atmospheric water content
-|$P$: Measured atmospheric pressure | $Aref$: Reference atmospheric water content
+|$P_{0}$: Reference atmospheric pressure (for e.g. long-term average) | $A$: Atmospheric absolute humidity (g/m3)
+|$P$: Measured atmospheric pressure | $Aref$: Reference atmospheric absolute humidity (g/m3)
 |$L$: Mass attenuation factor for high-energy neutrons in air | |
 
 !!! info "Implementation"
