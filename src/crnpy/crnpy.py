@@ -108,7 +108,7 @@ def fill_missing_timestamps(df, timestamp_col='timestamp', freq='H', round_times
     return df
 
 
-def compute_total_raw_counts(counts, nan_strategy=None, timestamp_col=None):
+def total_raw_counts(counts, nan_strategy=None, timestamp_col=None):
     """Compute the sum of uncorrected neutron counts for all detectors.
 
     Args:
@@ -616,7 +616,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
 
     return results
 
-def estimate_abs_humidity(relative_humidity, temp):
+def abs_humidity(relative_humidity, temp):
     """
     Compute the actual vapor pressure (e) in g m^-3 using RH (%) and current temperature (c) observations.
 
@@ -904,7 +904,7 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
     return incoming_flux
 
 
-def estimate_lattice_water(clay_content, total_carbon=None):
+def lattice_water(clay_content, total_carbon=None):
     r"""Estimate the amount of water in the lattice of clay minerals.
 
     ![img1](img/lattice_water_simple.png) | ![img2](img/lattice_water_multiple.png)
@@ -1182,7 +1182,7 @@ def interpolate_2d(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
     return X_pred, Y_pred, Z_pred
 
 
-def estimate_locations(x, y):
+def rover_centered_coordinates(x, y):
     """Function to estimate the intermediate locations between two points, assuming the measurements were taken at a constant speed.
 
     Args:

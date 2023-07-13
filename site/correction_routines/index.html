@@ -634,11 +634,11 @@ Dashed lines indicate optional steps. See the complete <a href="../examples/rove
 </tr>
 <tr>
 <td>$P_{0}$: Reference atmospheric pressure (for e.g. long-term average)</td>
-<td>$A$: Atmospheric water content</td>
+<td>$A$: Atmospheric absolute humidity (g/m3)</td>
 </tr>
 <tr>
 <td>$P$: Measured atmospheric pressure</td>
-<td>$Aref$: Reference atmospheric water content</td>
+<td>$Aref$: Reference atmospheric absolute humidity (g/m3)</td>
 </tr>
 <tr>
 <td>$L$: Mass attenuation factor for high-energy neutrons in air</td>
@@ -711,7 +711,7 @@ Dashed lines indicate optional steps. See the complete <a href="../examples/rove
 <p>Other correction routines includes corrections for soil lattice water and total soil carbon that are known to affect the attentuation of epithermal cosmic-ray neutrons. A function to estimate the soil lattice water content based on clay content and soil organic carbon content was developed using soil samples collected across the state of Kansas.</p>
 <div class="admonition info">
 <p class="admonition-title">Implementation</p>
-<p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.estimate_lattice_water">crnpy.crnpy.estimate_lattice_water</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.counts_to_vwc">crnpy.crnpy.counts_to_vwc</a> documentation for the implementation details.</p>
+<p>See <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.estimate_lattice_water">crnpy.crnpy.lattice_water</a> and <a class="autorefs autorefs-internal" href="../reference/#crnpy.crnpy.counts_to_vwc">crnpy.crnpy.counts_to_vwc</a> documentation for the implementation details.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">References</p>
