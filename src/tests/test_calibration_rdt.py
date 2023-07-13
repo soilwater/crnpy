@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np
-from crnpy import crnpy
+import crnpy
 from scipy.optimize import root
-
 
 
 # content of test_calibration_rdt.py
@@ -38,8 +37,10 @@ def calibration_example():
     # Atmospheric corrections
 
     # Fill NaN values in atmospheric data
-    df_station[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']] = crnpy.fill_missing_atm(
-        df_station[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']])
+    df_station[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']] = df_station[
+        ['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']].interpolate(method='pchip',
+                                                                                                 limit=24,
+                                                                                                 limit_direction='both')
 
     # Calculate absolute humidity
     df_station['abs_humidity'] = crnpy.estimate_abs_humidity(df_station['relative_humidity_Avg'],
