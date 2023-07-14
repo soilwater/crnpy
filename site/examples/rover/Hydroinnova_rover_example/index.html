@@ -19,7 +19,7 @@
         <link rel="next" href="../../calibration/calibration/">
       
       <link rel="icon" href="../../../img/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.85bb2934.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.26e3688c.min.css">
       
       
 
@@ -1864,7 +1864,7 @@ df.head(3)
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Observation end&quot;</span><span class="p">)</span>
 
 <span class="c1"># Estimate the center of the observation, assuming each timestamp is observation end time.</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">rover_centered_coordinates</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">rover_centered_coordinates</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">])</span> 
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Observation center&quot;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">scilimits</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
@@ -1881,7 +1881,7 @@ plt.figure(figsize = (5,5))
 plt.scatter(df['x'], df['y'], marker='o', edgecolor='k', facecolor='w', label = "Observation end")
 
 # Estimate the center of the observation, assuming each timestamp is observation end time.
-df['x'],df['y'] = crnpy.rover_centered_coordinates(df['x'], df['y'])
+df['x'],df['y'] = crnpy.rover_centered_coordinates(df['x'], df['y']) 
 plt.scatter(df['x'], df['y'], marker='+', label="Observation center")
 
 plt.ticklabel_format(scilimits = (-5,5))
@@ -1986,7 +1986,7 @@ df['total_raw_counts'] = crnpy.total_raw_counts(df[counts_colums])
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="neutron-count-correction">Neutron count correction<a class="anchor-link" href="#neutron-count-correction">&#182;</a></h3><h4 id="incommng-neutron-flux">Incommng neutron flux<a class="anchor-link" href="#incommng-neutron-flux">&#182;</a></h4><p>Find stations with a cutoff rigidity similar to the estimated value based on the latitude and longitude, ensuring that the reference station is under a similar earth electromagnetic field. Note that the station is hardcoded in the second line as <code>station=&quot;NEWK&quot;</code>. The user is required to manually define this after considering the potential options suggested. See <a href="../../../reference/#crnpy.crnpy.get_incoming_neutron_flux"><code>get_incoming_neutron_flux()</code></a>, <a href="../../../reference/#crnpy.crnpy.find_neutron_monitor"><code>find_neutron_monitor()</code></a> and <a href="../../../reference/#crnpy.crnpy.incoming_flux_correction"><code>incoming_flux_correction()</code></a>.</p>
+<h3 id="neutron-count-correction">Neutron count correction<a class="anchor-link" href="#neutron-count-correction">&#182;</a></h3><h4 id="incommng-neutron-flux">Incommng neutron flux<a class="anchor-link" href="#incommng-neutron-flux">&#182;</a></h4><p>Find stations with a cutoff rigidity similar to the estimated value based on the latitude and longitude, ensuring that the reference station is under a similar earth electromagnetic field. Note that the station is hardcoded in the second line as <code>station=&quot;NEWK&quot;</code>. The user is required to manually define this after considering the potential options suggested. See <a href="../../../reference/#crnpy.crnpy.get_incoming_neutron_flux"><code>get_incoming_neutron_flux()</code></a>, <a href="../../../reference/#crnpy.crnpy.find_neutron_monitor"><code>find_neutron_monitor()</code></a> and <a href="../../../reference/#crnpy.crnpy.correction_incoming_flux"><code>correction_incoming_flux()</code></a>.</p>
 
 </div>
 </div>
@@ -2248,11 +2248,11 @@ df['incoming_flux'] = crnpy.interpolate_incoming_flux(nmdb['timestamp'], nmdb['c
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Compute correction factor for incoming neutron flux</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;fi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">incoming_flux_correction</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">],</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;fi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">correction_incoming_flux</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">],</span>
                                           <span class="n">incoming_Ref</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 <div id="cell-8" class="clipboard-copy-txt"># Compute correction factor for incoming neutron flux
-df['fi'] = crnpy.incoming_flux_correction(incoming_neutrons=df['incoming_flux'],
+df['fi'] = crnpy.correction_incoming_flux(incoming_neutrons=df['incoming_flux'],
                                           incoming_Ref=df['incoming_flux'].iloc[0])
 </div>
         
@@ -2270,7 +2270,7 @@ df['fi'] = crnpy.incoming_flux_correction(incoming_neutrons=df['incoming_flux'],
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h4 id="atmospheric-correction">Atmospheric correction<a class="anchor-link" href="#atmospheric-correction">&#182;</a></h4><p>NaN values in the atmospheric data are filled. The neutron counts are then corrected for atmospheric variables. See <a href="../../../reference/#crnpy.crnpy.humidity_correction"><code>humidity_correction()</code></a> and <a href="../../../reference/#crnpy.crnpy.pressure_correction"><code>pressure_correction()</code></a></p>
+<h4 id="atmospheric-correction">Atmospheric correction<a class="anchor-link" href="#atmospheric-correction">&#182;</a></h4><p>NaN values in the atmospheric data are filled. The neutron counts are then corrected for atmospheric variables. See <a href="../../../reference/#crnpy.crnpy.correction_humidity"><code>correction_humidity()</code></a> and <a href="../../../reference/#crnpy.crnpy.correction_pressure"><code>correction_pressure()</code></a></p>
 
 </div>
 </div>
@@ -2300,21 +2300,21 @@ df['fi'] = crnpy.incoming_flux_correction(incoming_neutrons=df['incoming_flux'],
 <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;pchip&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">limit_direction</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
 
 <span class="c1"># Compute the pressure correction factor</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;fp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">pressure_correction</span><span class="p">(</span><span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">],</span> <span class="n">Pref</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;fp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">correction_pressure</span><span class="p">(</span><span class="n">pressure</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">],</span> <span class="n">Pref</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">)</span>
 
 <span class="c1"># Estimate the absolute humidity and compute the vapor pressure correction factor</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">abs_humidity</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
-<span class="n">df</span><span class="p">[</span><span class="s1">&#39;fw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">humidity_correction</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">],</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;fw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">correction_humidity</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">],</span> <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 <div id="cell-9" class="clipboard-copy-txt"># Fill NaN values in atmospheric data
 df[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']] = df[['barometric_pressure_Avg','relative_humidity_Avg', 'air_temperature_Avg']].interpolate(method='pchip', limit=24, limit_direction='both')
 
 # Compute the pressure correction factor
-df['fp'] = crnpy.pressure_correction(pressure=df['barometric_pressure_Avg'], Pref=df['barometric_pressure_Avg'].mean(), L=130)
+df['fp'] = crnpy.correction_pressure(pressure=df['barometric_pressure_Avg'], Pref=df['barometric_pressure_Avg'].mean(), L=130)
 
 # Estimate the absolute humidity and compute the vapor pressure correction factor
 df['abs_humidity'] = crnpy.abs_humidity(df['relative_humidity_Avg'], df['air_temperature_Avg'])
-df['fw'] = crnpy.humidity_correction(df['abs_humidity'], Aref=0)
+df['fw'] = crnpy.correction_humidity(df['abs_humidity'], Aref=0)
 </div>
         
         </div>
@@ -2660,16 +2660,22 @@ class="
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.fac441b0.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.220ee61c.min.js"></script>
       
-        <script src="../../../javascripts/katex.js"></script>
+        
+          <script src="../../../javascripts/katex.js"></script>
+        
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
       
     
   <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>

@@ -207,7 +207,7 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
     return idx_outliers | idx_range_outliers
 
 
-def pressure_correction(pressure, Pref, L):
+def correction_pressure(pressure, Pref, L):
     r"""Correction factor for atmospheric pressure.
 
     This function corrects neutron counts for atmospheric pressure using the method described in Andreasen et al. (2017).
@@ -252,7 +252,7 @@ def pressure_correction(pressure, Pref, L):
     return fp
 
 
-def humidity_correction(abs_humidity, Aref):
+def correction_humidity(abs_humidity, Aref):
     r"""Correction factor for absolute humidity.
 
     This function corrects neutron counts for absolute humidity using the method described in Rosolem et al. (2013) and Anderson et al. (2017). The correction is performed using the following equation:
@@ -291,7 +291,7 @@ def humidity_correction(abs_humidity, Aref):
     fw = 1 + 0.0054*(A - Aref) # Zreda et al. 2017 Eq 6.
     return fw
 
-def incoming_flux_correction(incoming_neutrons, incoming_Ref=None):
+def correction_incoming_flux(incoming_neutrons, incoming_Ref=None):
     r"""Correction factor for incoming neutron flux.
 
     This function corrects neutron counts for incoming neutron flux using the method described in Anderson et al. (2017). The correction is performed using the following equation:
@@ -465,7 +465,7 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
     return corrected_counts
 
 
-def bwe_correction(counts, bwe, r2_N0=0.05):
+def correction_bwe(counts, bwe, r2_N0=0.05):
     """Function to correct for biomass effects in neutron counts.
     following the approach described in Baatz et al., 2015.
 
@@ -505,7 +505,7 @@ def biomass_to_bwe(biomass_dry, biomass_fresh, fWE=0.494):
     return (biomass_fresh - biomass_dry) + fWE * biomass_dry
 
 
-def road_correction(counts, theta_N, road_width, road_distance=0.0, theta_road=0.12, p0=0.42, p1=0.5, p2=1.06, p3=4, p4=0.16, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
+def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0.12, p0=0.42, p1=0.5, p2=1.06, p3=4, p4=0.16, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
     """Function to correct for road effects in neutron counts.
     following the approach described in Schrön et al., 2018.
 

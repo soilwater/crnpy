@@ -17,7 +17,7 @@
       
       
       <link rel="icon" href="../img/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
     
     
       
@@ -25,7 +25,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.85bb2934.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
       
       
 
@@ -425,7 +425,7 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.compute_total_raw_counts" class="md-nav__link">
-    total_raw_counts()
+    compute_total_raw_counts()
   </a>
   
 </li>
@@ -446,21 +446,21 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.estimate_abs_humidity" class="md-nav__link">
-    abs_humidity()
+    estimate_abs_humidity()
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.estimate_lattice_water" class="md-nav__link">
-    lattice_water()
+    estimate_lattice_water()
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.estimate_locations" class="md-nav__link">
-    rover_centered_coordinates()
+    estimate_locations()
   </a>
   
 </li>
@@ -675,7 +675,7 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.compute_total_raw_counts" class="md-nav__link">
-    total_raw_counts()
+    compute_total_raw_counts()
   </a>
   
 </li>
@@ -696,21 +696,21 @@
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.estimate_abs_humidity" class="md-nav__link">
-    abs_humidity()
+    estimate_abs_humidity()
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.estimate_lattice_water" class="md-nav__link">
-    lattice_water()
+    estimate_lattice_water()
   </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#crnpy.crnpy.estimate_locations" class="md-nav__link">
-    rover_centered_coordinates()
+    estimate_locations()
   </a>
   
 </li>
@@ -1172,7 +1172,7 @@ Water Resour. Res., 51, 2030–2046, doi:10.1002/ 2014WR016443.</p>
 
 
 <h2 id="crnpy.crnpy.compute_total_raw_counts" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">total_raw_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">nan_strategy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp_col</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">compute_total_raw_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">nan_strategy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp_col</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1255,7 +1255,7 @@ Water Resour. Res., 51, 2030–2046, doi:10.1002/ 2014WR016443.</p>
 <span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
-<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">total_raw_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">nan_strategy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp_col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">compute_total_raw_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">nan_strategy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timestamp_col</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the sum of uncorrected neutron counts for all detectors.</span>
 
 <span class="sd">    Args:</span>
@@ -1658,7 +1658,7 @@ In International Cosmic Ray Conference (ICRC2019) (Vol. 36, p. 1149).</p>
 
 
 <h2 id="crnpy.crnpy.estimate_abs_humidity" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">abs_humidity</span><span class="p">(</span><span class="n">relative_humidity</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">estimate_abs_humidity</span><span class="p">(</span><span class="n">relative_humidity</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1743,7 +1743,7 @@ In International Cosmic Ray Conference (ICRC2019) (Vol. 36, p. 1149).</p>
 <span class="normal">639</span>
 <span class="normal">640</span>
 <span class="normal">641</span>
-<span class="normal">642</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">abs_humidity</span><span class="p">(</span><span class="n">relative_humidity</span><span class="p">,</span> <span class="n">temp</span><span class="p">):</span>
+<span class="normal">642</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">estimate_abs_humidity</span><span class="p">(</span><span class="n">relative_humidity</span><span class="p">,</span> <span class="n">temp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the actual vapor pressure (e) in g m^-3 using RH (%) and current temperature (c) observations.</span>
 
@@ -1778,7 +1778,7 @@ In International Cosmic Ray Conference (ICRC2019) (Vol. 36, p. 1149).</p>
 
 
 <h2 id="crnpy.crnpy.estimate_lattice_water" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">lattice_water</span><span class="p">(</span><span class="n">clay_content</span><span class="p">,</span> <span class="n">total_carbon</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">estimate_lattice_water</span><span class="p">(</span><span class="n">clay_content</span><span class="p">,</span> <span class="n">total_carbon</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1880,7 +1880,7 @@ If None, the amount of water is estimated based on clay content only.</p></td>
 <span class="normal">924</span>
 <span class="normal">925</span>
 <span class="normal">926</span>
-<span class="normal">927</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">lattice_water</span><span class="p">(</span><span class="n">clay_content</span><span class="p">,</span> <span class="n">total_carbon</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">927</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">estimate_lattice_water</span><span class="p">(</span><span class="n">clay_content</span><span class="p">,</span> <span class="n">total_carbon</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate the amount of water in the lattice of clay minerals.</span>
 
 <span class="sd">    ![img1](img/lattice_water_simple.png) | ![img2](img/lattice_water_multiple.png)</span>
@@ -1912,7 +1912,7 @@ If None, the amount of water is estimated based on clay content only.</p></td>
 
 
 <h2 id="crnpy.crnpy.estimate_locations" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">rover_centered_coordinates</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">estimate_locations</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></code>
 
 </h2>
 
@@ -2008,7 +2008,7 @@ If None, the amount of water is estimated based on clay content only.</p></td>
 <span class="normal">1209</span>
 <span class="normal">1210</span>
 <span class="normal">1211</span>
-<span class="normal">1212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">rover_centered_coordinates</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="normal">1212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">estimate_locations</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to estimate the intermediate locations between two points, assuming the measurements were taken at a constant speed.</span>
 
 <span class="sd">    Args:</span>
@@ -6041,16 +6041,22 @@ doi.org/10.3389/frwa.2020.00009</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.fac441b0.min.js"></script>
+      <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
       
-        <script src="../javascripts/katex.js"></script>
+        
+          <script src="../javascripts/katex.js"></script>
+        
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
       
     
   <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>

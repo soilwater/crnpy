@@ -19,7 +19,7 @@
         <link rel="next" href="../../../reference/">
       
       <link rel="icon" href="../../../img/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.85bb2934.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.26e3688c.min.css">
       
       
 
@@ -2360,11 +2360,11 @@ df_station['total_raw_counts'] = crnpy.total_raw_counts(df_station[['counts_1_To
 <span class="c1"># Compute correction factor for atmospheric pressure</span>
 <span class="c1"># Reference atmospheric pressure for the location is 976 Pa</span>
 <span class="c1"># Using an atmospheric attentuation coefficient of 130 g/cm2</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">pressure_correction</span><span class="p">(</span><span class="n">pressure</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">],</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">correction_pressure</span><span class="p">(</span><span class="n">pressure</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">],</span>
                                              <span class="n">Pref</span><span class="o">=</span><span class="mi">976</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">)</span>
 
 <span class="c1"># Compute correction factor for air humidity</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">humidity_correction</span><span class="p">(</span><span class="n">abs_humidity</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">],</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">correction_humidity</span><span class="p">(</span><span class="n">abs_humidity</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">],</span>
                                              <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 <div id="cell-7" class="clipboard-copy-txt"># Atmospheric corrections
@@ -2378,11 +2378,11 @@ df_station['abs_humidity'] = crnpy.abs_humidity(df_station['relative_humidity_Av
 # Compute correction factor for atmospheric pressure
 # Reference atmospheric pressure for the location is 976 Pa
 # Using an atmospheric attentuation coefficient of 130 g/cm2
-df_station['fp'] = crnpy.pressure_correction(pressure=df_station['barometric_pressure_Avg'],
+df_station['fp'] = crnpy.correction_pressure(pressure=df_station['barometric_pressure_Avg'],
                                              Pref=976, L=130)
 
 # Compute correction factor for air humidity
-df_station['fw'] = crnpy.humidity_correction(abs_humidity=df_station['abs_humidity'],
+df_station['fw'] = crnpy.correction_humidity(abs_humidity=df_station['abs_humidity'],
                                              Aref=0)
 </div>
         
@@ -2562,7 +2562,7 @@ Your cutoff rigidity is 2.87 GV
 <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_incoming_flux</span><span class="p">(</span><span class="n">nmdb</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="n">nmdb</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">],</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">])</span>
 
 <span class="c1"># Compute correction factor for incoming neutron flux</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">incoming_flux_correction</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">],</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">correction_incoming_flux</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">],</span>
                                                   <span class="n">incoming_Ref</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 <div id="cell-9" class="clipboard-copy-txt"># Incoming neutron flux correction
@@ -2577,7 +2577,7 @@ nmdb = crnpy.get_incoming_neutron_flux(deployment_date,
 df_station['incoming_flux'] = crnpy.interpolate_incoming_flux(nmdb['timestamp'], nmdb['counts'], df_station['timestamp'])
 
 # Compute correction factor for incoming neutron flux
-df_station['fi'] = crnpy.incoming_flux_correction(incoming_neutrons=df_station['incoming_flux'],
+df_station['fi'] = crnpy.correction_incoming_flux(incoming_neutrons=df_station['incoming_flux'],
                                                   incoming_Ref=df_station['incoming_flux'].iloc[0])
 
 </div>
@@ -2886,16 +2886,22 @@ print(f"The solved value for N0 is: {sol}")
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.fac441b0.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.220ee61c.min.js"></script>
       
-        <script src="../../../javascripts/katex.js"></script>
+        
+          <script src="../../../javascripts/katex.js"></script>
+        
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
       
     
   <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
