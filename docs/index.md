@@ -12,7 +12,6 @@ Welcome to the homepage of the CRNPy (Cosmic-Ray Neutron Python) library, an ope
 This library has been developed with the intent of providing a comprehensive yet easy-to-use workflow for processing raw data from a variety of CRNP, encompassing multiple manufacturers and models.
 
 ## Statement of Need
-
 CRNPs are a valuable tool for non-invasive soil moisture estimation at the hectometer scale (e.g., typical agricultural fields), filling the gap between point-level sensors and large-scale (i.e., several kilometers) remote sensors onboard orbiting satellites. However, cleaning, processing, and analyzing CRNP data involves multiple corrections and filtering steps spread across multiple peer-reviewed manuscripts. CRNPy simplifies these steps by providing a complete, user-friendly, and well-documented library with minimal dependencies that includes examples to convert raw CRNP data into soil moisture. The library is designed to be accessible to both researchers and instrument manufacturers. Unlike other similar libraries, CRNPy does not require any specific naming convention for the input data or large external data sources, or reanalysis data.
 
 ## Key Features
@@ -23,7 +22,6 @@ CRNPs are a valuable tool for non-invasive soil moisture estimation at the hecto
 
 
 ## Installation
-
 To install the CRNPy library, you can use Python's package manager. Open a terminal and type:
 
 ```pip install crnpy```
@@ -46,7 +44,6 @@ The CRNPy library was developed at the Kansas State University Soil Water Proces
 - Joaquin Peraza
 
 - Andres Patrignani
-
 
 The Soil Water Processes Lab at Kansas State University combines a range of experimental and computational approaches to tackle pressing issues in soil and water research. The development of the CRNPy library is a step forward to creating reproducible data processing workflows across the scientific community using cosmic-ray neutrons probes for soil moisture sensing. 
 

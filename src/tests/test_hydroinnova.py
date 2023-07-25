@@ -53,8 +53,11 @@ def hydroinnova_example_mean_value():
                                                               df['total_corrected_neutrons'],
                                                               buffer=800, method='median', rnd=True)
 
+    # Estimate lattice water (%) based on texture, and convert it to decimal.
+    lattice_water = crnpy.lattice_water(clay_content=0.35)
+
     # Estimate Soil Columetric Water Content
-    df['VWC'] = crnpy.counts_to_vwc(df['corrected_neutrons_smoothed'], N0=550, bulk_density=1.3, Wlat=0.03, Wsoc=0.01)
+    df['VWC'] = crnpy.counts_to_vwc(df['corrected_neutrons_smoothed'], N0=550, bulk_density=1.3, Wlat=lattice_water, Wsoc=0.01)
 
     # Drop VWC NaN values before interpolating values
     df = df.dropna(subset=['VWC'])
@@ -68,8 +71,9 @@ def hydroinnova_example_mean_value():
 
 
 def test_rover():
+    print("\nRunning Rover survey test...")
     X_pred, Y_pred, Z_pred = hydroinnova_example_mean_value()
-    expected_min = 0.165
+    expected_min = 0.16
     expected_max = 0.17
     print(f"Rover survey test passed. Mean value is {np.nanmean(Z_pred)}, expected value is between {expected_min} and {expected_max}")
     assert np.nanmean(Z_pred) > expected_min and np.nanmean(Z_pred) < expected_max, f"Rover survey test failed. Mean value is {np.nanmean(Z_pred)}, expected value is between {expected_min} and {expected_max}"

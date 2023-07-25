@@ -96,4 +96,5 @@ def calibration_example():
 
 def test_calibration():
     solved_N0 = calibration_example()
+    print("The expected value for N0 is between 2500 and 2800")
     assert solved_N0 > 2500 and solved_N0 < 2800, f"Calibration test failed. Solved N0: {solved_N0}, expected value between 2500 and 2800."
