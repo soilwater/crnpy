@@ -7,14 +7,13 @@
 
 # Import modules
 import sys
-import os
 import warnings
 import numbers
 import numpy as np
 import pandas as pd
 import requests
 import io
-import datetime
+
 
 from scipy.signal import savgol_filter
 from scipy.interpolate import griddata
@@ -109,7 +108,7 @@ def fill_missing_timestamps(df, timestamp_col='timestamp', freq='H', round_times
     return df
 
 
-def compute_total_raw_counts(counts, nan_strategy=None, timestamp_col=None):
+def total_raw_counts(counts, nan_strategy=None, timestamp_col=None):
     """Compute the sum of uncorrected neutron counts for all detectors.
 
     Args:
@@ -180,8 +179,8 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
         idx_outliers = (zscore < -3) | (zscore > 3)
 
     elif method == 'movzscore':
-        movmean = x.rolling(window=w, center=True).mean()
-        movstd = x.rolling(window=w, center=True).std()
+        movmean = x.rolling(window=window, center=True).mean()
+        movstd = x.rolling(window=window, center=True).std()
         movzscore = (x - movmean)/movstd
         idx_outliers = (movzscore < -3) | (movzscore > 3)
 
@@ -208,28 +207,7 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
     return idx_outliers | idx_range_outliers
 
 
-def fill_missing_atm(cols_atm, limit=24):
-    """Fill missing values in atmospheric variables. Gap filling is performed using a
-    piecewise cubic Hermite interpolating polynomial (pchip method) that is restricted to intervals
-    of missing data with a limited number of values and surrounded by valid observations.
-    There is no interpolation at the end of the time series.
-
-    Args:
-        col_atm (pandas.Series or pandas.DataFrame): Atmospheric variables to fill.
-        limit (int): Maximum number of consecutive missing values to interpolate. Default is 24.
-
-    Returns:
-        (pandas.DataFrame): Atmospheric variables with filled missing values using a piecewise cubic Hermite polynomial.
-
-    References:
-        https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.interpolate.html
-    """
-
-    # Fill missing values in atmospheric variables
-    return cols_atm.interpolate(method='pchip', limit=limit, limit_direction='both')
-
-
-def pressure_correction(pressure, Pref, L):
+def correction_pressure(pressure, Pref, L):
     r"""Correction factor for atmospheric pressure.
 
     This function corrects neutron counts for atmospheric pressure using the method described in Andreasen et al. (2017).
@@ -274,7 +252,7 @@ def pressure_correction(pressure, Pref, L):
     return fp
 
 
-def humidity_correction(abs_humidity, Aref):
+def correction_humidity(abs_humidity, Aref):
     r"""Correction factor for absolute humidity.
 
     This function corrects neutron counts for absolute humidity using the method described in Rosolem et al. (2013) and Anderson et al. (2017). The correction is performed using the following equation:
@@ -313,7 +291,7 @@ def humidity_correction(abs_humidity, Aref):
     fw = 1 + 0.0054*(A - Aref) # Zreda et al. 2017 Eq 6.
     return fw
 
-def incoming_flux_correction(incoming_neutrons, incoming_Ref=None):
+def correction_incoming_flux(incoming_neutrons, incoming_Ref=None):
     r"""Correction factor for incoming neutron flux.
 
     This function corrects neutron counts for incoming neutron flux using the method described in Anderson et al. (2017). The correction is performed using the following equation:
@@ -385,8 +363,8 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     end_date += pd.Timedelta(hours=expand_window)
 
     # Convert local time to UTC
-    start_date = start_date - datetime.timedelta(hours=utc_offset)
-    end_date = end_date - datetime.timedelta(hours=utc_offset)
+    start_date = start_date - pd.Timedelta(hours=utc_offset)
+    end_date = end_date - pd.Timedelta(hours=utc_offset)
     date_format = '%Y-%m-%d %H:%M:%S'
     root = 'http://www.nmdb.eu/nest/draw_graph.php?'
     url_par = [ 'formchk=1',
@@ -487,7 +465,7 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
     return corrected_counts
 
 
-def bwe_correction(counts, bwe, r2_N0=0.05):
+def correction_bwe(counts, bwe, r2_N0=0.05):
     """Function to correct for biomass effects in neutron counts.
     following the approach described in Baatz et al., 2015.
 
@@ -527,7 +505,7 @@ def biomass_to_bwe(biomass_dry, biomass_fresh, fWE=0.494):
     return (biomass_fresh - biomass_dry) + fWE * biomass_dry
 
 
-def road_correction(counts, theta_N, road_width, road_distance=0.0, theta_road=0.12, p0=0.42, p1=0.5, p2=1.06, p3=4, p4=0.16, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
+def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0.12, p0=0.42, p1=0.5, p2=1.06, p3=4, p4=0.16, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
     """Function to correct for road effects in neutron counts.
     following the approach described in Schrön et al., 2018.
 
@@ -638,7 +616,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
 
     return results
 
-def estimate_abs_humidity(relative_humidity, temp):
+def abs_humidity(relative_humidity, temp):
     """
     Compute the actual vapor pressure (e) in g m^-3 using RH (%) and current temperature (c) observations.
 
@@ -744,14 +722,9 @@ def exp_filter(sm,T=1):
     Args:
         sm (list or array): Soil moisture in mm of water for the top layer of the soil profile.
         T (float): Characteristic time length in the same units as the measurement interval.
-        Z_surface (float): Depth of surface layer in mm. This should be an intermediate value according to the
-            sensing depth computed using the D86 method.
-        Z_subsurface (float): Depth of subsurface layer in mm.
 
     Returns:
-        (tuple): tuple containing:
-            - **Surface soil water storage** (*array*): Surface soil water storage in mm of water.
-            - **Subsurface soil water storage** (*array*): Subsurface soil water storage in mm of water.
+        sm_subsurface (list or array): Subsurface soil moisture in the same units as the input.
 
     References:
         Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J.C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B. and Martin, E., 2008.
@@ -788,13 +761,10 @@ def exp_filter(sm,T=1):
         else:
             continue
 
-    # Surface storage
-    sm_surface = sm
-
     # Rootzone storage
     sm_subsurface = SWI * (sm_max - sm_min) + sm_min
 
-    return sm_surface, sm_subsurface
+    return sm_subsurface
 
 
 def cutoff_rigidity(lat,lon):
@@ -934,7 +904,7 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
     return incoming_flux
 
 
-def estimate_lattice_water(clay_content, total_carbon=None):
+def lattice_water(clay_content, total_carbon=None):
     r"""Estimate the amount of water in the lattice of clay minerals.
 
     ![img1](img/lattice_water_simple.png) | ![img2](img/lattice_water_multiple.png)
@@ -1212,7 +1182,7 @@ def interpolate_2d(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
     return X_pred, Y_pred, Z_pred
 
 
-def estimate_locations(x, y):
+def rover_centered_coordinates(x, y):
     """Function to estimate the intermediate locations between two points, assuming the measurements were taken at a constant speed.
 
     Args:
@@ -1240,6 +1210,77 @@ def estimate_locations(x, y):
 
 
     return x_est, y_est
+
+
+def uncertainty_counts(raw_counts, metric="std", fp=1, fw=1, fi=1):
+    """Function to estimate the uncertainty of raw counts.
+
+    Measurements of a proportional neutron detector system are governed by counting statistics that follow a Poissonian probability distribution (Zreda et al., 2012).
+    The expected uncertainty in the neutron count rate N is defined by the standard deviation $ \sqrt{N} $. (Jakobi et al., 2020)
+    It can be expressed as CV% as $ N^{-1/2} $
+
+    Args:
+        raw_counts (array): Raw neutron counts.
+
+    Returns:
+        uncertainty (float): Uncertainty of raw counts.
+
+    References:
+        Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With
+        Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010
+
+        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System,
+        Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.
+
+    """
+
+    s = fw / (fp * fi)
+    if metric == "std":
+        uncertainty = np.sqrt(raw_counts) * s
+    elif metric == "cv":
+        uncertainty = 1 /  np.sqrt(raw_counts) * s
+    else:
+        raise f"Metric {metric} does not exist. Provide either 'std' or 'cv' for standard deviation or coefficient of variation."
+    return uncertainty
+
+
+def uncertainty_vwc(raw_counts, N0, bulk_density, fp=1, fw=1, fi=1, a0=0.0808,a1=0.372,a2=0.115):
+    r"""Function to estimate the uncertainty propagated to volumetric water content.
+
+    The uncertainty of the volumetric water content is estimated by propagating the uncertainty of the raw counts.
+    Following Eq. 10 in Jakobi et al. (2020), the uncertainty of the volumetric water content is estimated as:
+    $$
+    \sigma_{\theta_g}(N) = \sigma_N \frac{a_0 N_0}{(N_{cor} - a_1 N_0)^4} \sqrt{(N_{cor} - a_1 N_0)^4 + 8 \sigma_N^2 (N_{cor} - a_1 N_0)^2 + 15 \sigma_N^4}
+    $$
+
+    Args:
+        raw_counts (array): Raw neutron counts.
+        N0 (float): Calibration parameter N0.
+        bulk_density (float): Bulk density in kg/m3.
+        fp (float): Calibration parameter fp.
+        fw (float): Calibration parameter fw.
+        fi (float): Calibration parameter fi.
+
+    Returns:
+        sigma_VWC (float): Uncertainty in terms of volumetric water content.
+
+    References:
+        Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With
+        Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010
+    """
+
+    Ncorr = raw_counts * fw / (fp * fi)
+    sigma_N = uncertainty_counts(raw_counts, metric="std", fp=fp, fw=fw, fi=fi)
+    sigma_GWC = sigma_N * ((a0*N0) / ((Ncorr - a1*N0)**4)) * np.sqrt((Ncorr - a1 * N0)**4 + 8 * sigma_N**2 * (Ncorr - a1 * N0)**2 + 15 * sigma_N**4)
+    sigma_VWC = sigma_GWC * bulk_density
+
+    return sigma_VWC
+
+
+
+
+
+
 
 
 

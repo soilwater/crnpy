@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name="crnpy",
-    version="0.5.0",
+    version="0.5.1",
     packages=['crnpy'],
     package_dir = {"": "src"},
     description="A Python package for the estimation and processing of soil moisture data from cosmic-ray neutron counts.",
@@ -13,5 +13,12 @@ setuptools.setup(
     url="https://github.com/soilwater/crnpy",
     author="Joaquin Peraza, Andres Patrignani",
     author_email="jperaza@ksu.edu, andrespatrignani@ksu.edu",
-    license="MIT"
+    license="MIT",
+    license_files=["LICENSE"],
+    install_requires=[
+        "numpy",
+        "pandas",
+        "scipy",
+        "requests"
+    ],
 )

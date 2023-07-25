@@ -19,7 +19,7 @@
         <link rel="next" href="../../../reference/">
       
       <link rel="icon" href="../../../img/logo/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.11">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
     
     
       
@@ -27,7 +27,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.85bb2934.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.26e3688c.min.css">
       
       
 
@@ -1916,7 +1916,7 @@ calibration_end = pd.to_datetime("2021-10-22 16:00")
 <span class="n">df_station</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url_station_data</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
 
 <span class="c1">#  Parse dates (you can also use the option `parse_dates=[&#39;TIMESTAMP]` in pd.read_csv()</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
 
 <span class="n">df_station</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
@@ -1925,7 +1925,7 @@ url_station_data = "https://raw.githubusercontent.com/soilwater/crnpy/main/docs/
 df_station = pd.read_csv(url_station_data, skiprows=[0,2,3])
 
 #  Parse dates (you can also use the option `parse_dates=['TIMESTAMP]` in pd.read_csv()
-df_station['TIMESTAMP'] = pd.to_datetime(df_station['TIMESTAMP'], format='%Y-%m-%d %H:%M:%S')
+df_station['timestamp'] = pd.to_datetime(df_station['TIMESTAMP'], format='%Y-%m-%d %H:%M:%S')
 
 df_station.head(3)
 </div>
@@ -1978,7 +1978,6 @@ df_station.head(3)
       <th>battery_voltage_Min</th>
       <th>PTemp_Avg</th>
       <th>...</th>
-      <th>wind_direction_Avg</th>
       <th>wind_speed_gust_Max</th>
       <th>air_temperature_Avg</th>
       <th>vapor_pressure_Avg</th>
@@ -1988,6 +1987,7 @@ df_station.head(3)
       <th>tilt_north_south_Avg</th>
       <th>tilt_west_east_Avg</th>
       <th>NDVI_Avg</th>
+      <th>timestamp</th>
     </tr>
   </thead>
   <tbody>
@@ -2004,7 +2004,6 @@ df_station.head(3)
       <td>13.52</td>
       <td>29.04</td>
       <td>...</td>
-      <td>352.3</td>
       <td>4.20</td>
       <td>22.30</td>
       <td>9.20</td>
@@ -2014,6 +2013,7 @@ df_station.head(3)
       <td>-1.000</td>
       <td>1.000</td>
       <td>0.311</td>
+      <td>2021-09-22 12:00:00</td>
     </tr>
     <tr>
       <th>1</th>
@@ -2028,7 +2028,6 @@ df_station.head(3)
       <td>13.53</td>
       <td>29.98</td>
       <td>...</td>
-      <td>291.6</td>
       <td>9.02</td>
       <td>22.90</td>
       <td>9.08</td>
@@ -2038,6 +2037,7 @@ df_station.head(3)
       <td>-0.975</td>
       <td>0.950</td>
       <td>0.308</td>
+      <td>2021-09-22 13:00:00</td>
     </tr>
     <tr>
       <th>2</th>
@@ -2052,7 +2052,6 @@ df_station.head(3)
       <td>13.53</td>
       <td>30.43</td>
       <td>...</td>
-      <td>292.8</td>
       <td>5.54</td>
       <td>23.38</td>
       <td>8.68</td>
@@ -2062,10 +2061,11 @@ df_station.head(3)
       <td>-0.775</td>
       <td>0.625</td>
       <td>0.31</td>
+      <td>2021-09-22 14:00:00</td>
     </tr>
   </tbody>
 </table>
-<p>3 rows × 27 columns</p>
+<p>3 rows × 28 columns</p>
 </div>
 </div>
 
@@ -2100,22 +2100,22 @@ df_station.head(3)
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Select station data only until the calibration date</span>
 
 <span class="c1"># Define date in which the probe was deployed in the field (i.e., first record)</span>
-<span class="n">deployment_date</span> <span class="o">=</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">deployment_date</span> <span class="o">=</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c1"># Filter station data from the first record to the end of the field survey calibration</span>
 <span class="c1"># This is important since we are considering the incoming flux on the first day as the reference value</span>
-<span class="n">idx_period</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">deployment_date</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">calibration_end</span><span class="p">)</span>
+<span class="n">idx_period</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">deployment_date</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">calibration_end</span><span class="p">)</span>
 <span class="n">df_station</span> <span class="o">=</span> <span class="n">df_station</span><span class="p">[</span><span class="n">idx_period</span><span class="p">]</span>
 <span class="n">df_station</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 <div id="cell-5" class="clipboard-copy-txt"># Select station data only until the calibration date
 
 # Define date in which the probe was deployed in the field (i.e., first record)
-deployment_date = df_station['TIMESTAMP'].iloc[0]
+deployment_date = df_station['timestamp'].iloc[0]
 
 # Filter station data from the first record to the end of the field survey calibration
 # This is important since we are considering the incoming flux on the first day as the reference value
-idx_period = (df_station['TIMESTAMP'] >= deployment_date) & (df_station['TIMESTAMP'] <= calibration_end)
+idx_period = (df_station['timestamp'] >= deployment_date) & (df_station['timestamp'] <= calibration_end)
 df_station = df_station[idx_period]
 df_station.head(3)
 </div>
@@ -2168,7 +2168,6 @@ df_station.head(3)
       <th>battery_voltage_Min</th>
       <th>PTemp_Avg</th>
       <th>...</th>
-      <th>wind_direction_Avg</th>
       <th>wind_speed_gust_Max</th>
       <th>air_temperature_Avg</th>
       <th>vapor_pressure_Avg</th>
@@ -2178,6 +2177,7 @@ df_station.head(3)
       <th>tilt_north_south_Avg</th>
       <th>tilt_west_east_Avg</th>
       <th>NDVI_Avg</th>
+      <th>timestamp</th>
     </tr>
   </thead>
   <tbody>
@@ -2194,7 +2194,6 @@ df_station.head(3)
       <td>13.52</td>
       <td>29.04</td>
       <td>...</td>
-      <td>352.3</td>
       <td>4.20</td>
       <td>22.30</td>
       <td>9.20</td>
@@ -2204,6 +2203,7 @@ df_station.head(3)
       <td>-1.000</td>
       <td>1.000</td>
       <td>0.311</td>
+      <td>2021-09-22 12:00:00</td>
     </tr>
     <tr>
       <th>1</th>
@@ -2218,7 +2218,6 @@ df_station.head(3)
       <td>13.53</td>
       <td>29.98</td>
       <td>...</td>
-      <td>291.6</td>
       <td>9.02</td>
       <td>22.90</td>
       <td>9.08</td>
@@ -2228,6 +2227,7 @@ df_station.head(3)
       <td>-0.975</td>
       <td>0.950</td>
       <td>0.308</td>
+      <td>2021-09-22 13:00:00</td>
     </tr>
     <tr>
       <th>2</th>
@@ -2242,7 +2242,6 @@ df_station.head(3)
       <td>13.53</td>
       <td>30.43</td>
       <td>...</td>
-      <td>292.8</td>
       <td>5.54</td>
       <td>23.38</td>
       <td>8.68</td>
@@ -2252,10 +2251,11 @@ df_station.head(3)
       <td>-0.775</td>
       <td>0.625</td>
       <td>0.31</td>
+      <td>2021-09-22 14:00:00</td>
     </tr>
   </tbody>
 </table>
-<p>3 rows × 27 columns</p>
+<p>3 rows × 28 columns</p>
 </div>
 </div>
 
@@ -2313,11 +2313,11 @@ df_station.head(3)
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Compute total neutron counts by adding the counts from both probe detectors</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;total_raw_counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">compute_total_raw_counts</span><span class="p">(</span><span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;counts_1_Tot&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2_Tot&#39;</span><span class="p">]],</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;total_raw_counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">total_raw_counts</span><span class="p">(</span><span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;counts_1_Tot&#39;</span><span class="p">,</span><span class="s1">&#39;counts_2_Tot&#39;</span><span class="p">]],</span>
                                                     <span class="n">nan_strategy</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">)</span>
 </pre></div>
 <div id="cell-6" class="clipboard-copy-txt"># Compute total neutron counts by adding the counts from both probe detectors
-df_station['total_raw_counts'] = crnpy.compute_total_raw_counts(df_station[['counts_1_Tot','counts_2_Tot']],
+df_station['total_raw_counts'] = crnpy.total_raw_counts(df_station[['counts_1_Tot','counts_2_Tot']],
                                                     nan_strategy='average')
 </div>
         
@@ -2352,37 +2352,37 @@ df_station['total_raw_counts'] = crnpy.compute_total_raw_counts(df_station[['cou
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Atmospheric corrections</span>
 
 <span class="c1"># Fill NaN values in atmospheric data</span>
-<span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">fill_missing_atm</span><span class="p">(</span><span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]])</span>
+<span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df_station</span><span class="p">[[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">,</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">,</span> <span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;pchip&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">limit_direction</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
 
 <span class="c1"># Calculate absolute humidity</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">estimate_abs_humidity</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">abs_humidity</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;relative_humidity_Avg&#39;</span><span class="p">],</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;air_temperature_Avg&#39;</span><span class="p">])</span>
 
 <span class="c1"># Compute correction factor for atmospheric pressure</span>
 <span class="c1"># Reference atmospheric pressure for the location is 976 Pa</span>
 <span class="c1"># Using an atmospheric attentuation coefficient of 130 g/cm2</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">pressure_correction</span><span class="p">(</span><span class="n">pressure</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">],</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">correction_pressure</span><span class="p">(</span><span class="n">pressure</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;barometric_pressure_Avg&#39;</span><span class="p">],</span>
                                              <span class="n">Pref</span><span class="o">=</span><span class="mi">976</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mi">130</span><span class="p">)</span>
 
 <span class="c1"># Compute correction factor for air humidity</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">humidity_correction</span><span class="p">(</span><span class="n">abs_humidity</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">],</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">correction_humidity</span><span class="p">(</span><span class="n">abs_humidity</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;abs_humidity&#39;</span><span class="p">],</span>
                                              <span class="n">Aref</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 <div id="cell-7" class="clipboard-copy-txt"># Atmospheric corrections
 
 # Fill NaN values in atmospheric data
-df_station[['barometric_pressure_Avg','relative_humidity_Avg', 'air_temperature_Avg']] = crnpy.fill_missing_atm(df_station[['barometric_pressure_Avg','relative_humidity_Avg', 'air_temperature_Avg']])
+df_station[['barometric_pressure_Avg','relative_humidity_Avg', 'air_temperature_Avg']] = df_station[['barometric_pressure_Avg','relative_humidity_Avg', 'air_temperature_Avg']].interpolate(method='pchip', limit=24, limit_direction='both')
 
 # Calculate absolute humidity
-df_station['abs_humidity'] = crnpy.estimate_abs_humidity(df_station['relative_humidity_Avg'], df_station['air_temperature_Avg'])
+df_station['abs_humidity'] = crnpy.abs_humidity(df_station['relative_humidity_Avg'], df_station['air_temperature_Avg'])
 
 # Compute correction factor for atmospheric pressure
 # Reference atmospheric pressure for the location is 976 Pa
 # Using an atmospheric attentuation coefficient of 130 g/cm2
-df_station['fp'] = crnpy.pressure_correction(pressure=df_station['barometric_pressure_Avg'],
+df_station['fp'] = crnpy.correction_pressure(pressure=df_station['barometric_pressure_Avg'],
                                              Pref=976, L=130)
 
 # Compute correction factor for air humidity
-df_station['fw'] = crnpy.humidity_correction(abs_humidity=df_station['abs_humidity'],
+df_station['fw'] = crnpy.correction_humidity(abs_humidity=df_station['abs_humidity'],
                                              Aref=0)
 </div>
         
@@ -2419,16 +2419,16 @@ df_station['fw'] = crnpy.humidity_correction(abs_humidity=df_station['abs_humidi
 
 <span class="c1"># Filtering the time window from experiment setup to the end of the calibration</span>
 <span class="n">crnpy</span><span class="o">.</span><span class="n">find_neutron_monitor</span><span class="p">(</span><span class="n">cutoff_rigidity</span><span class="p">,</span>
-                           <span class="n">start_date</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                           <span class="n">end_date</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                           <span class="n">start_date</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                           <span class="n">end_date</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 <div id="cell-8" class="clipboard-copy-txt"># Find the cutoff rigidity for the location
 cutoff_rigidity = crnpy.cutoff_rigidity(39.1, -96.6)
 
 # Filtering the time window from experiment setup to the end of the calibration
 crnpy.find_neutron_monitor(cutoff_rigidity,
-                           start_date=df_station['TIMESTAMP'].iloc[0],
-                           end_date=df_station['TIMESTAMP'].iloc[-1])
+                           start_date=df_station['timestamp'].iloc[0],
+                           end_date=df_station['timestamp'].iloc[-1])
 </div>
         
         </div>
@@ -2553,34 +2553,32 @@ Your cutoff rigidity is 2.87 GV
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Incoming neutron flux correction</span>
 
 <span class="c1"># Download data for the reference neutron monitor and add to the DataFrame</span>
-<span class="n">incoming_neutrons</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">get_incoming_neutron_flux</span><span class="p">(</span><span class="n">deployment_date</span><span class="p">,</span>
-                                                    <span class="n">calibration_end</span><span class="p">,</span>
-                                                    <span class="n">station</span><span class="o">=</span><span class="s2">&quot;DRBS&quot;</span><span class="p">,</span>
-                                                    <span class="n">utc_offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">nmdb</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">get_incoming_neutron_flux</span><span class="p">(</span><span class="n">deployment_date</span><span class="p">,</span>
+                                        <span class="n">calibration_end</span><span class="p">,</span>
+                                        <span class="n">station</span><span class="o">=</span><span class="s2">&quot;DRBS&quot;</span><span class="p">,</span>
+                                        <span class="n">utc_offset</span><span class="o">=-</span><span class="mi">6</span><span class="p">)</span>
 
 <span class="c1"># Interpolate incoming neutron flux to match the timestamps in our station data</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_incoming_flux</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="p">,</span>
-                                                              <span class="n">timestamps</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">])</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">interpolate_incoming_flux</span><span class="p">(</span><span class="n">nmdb</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">],</span> <span class="n">nmdb</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">],</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">])</span>
 
 <span class="c1"># Compute correction factor for incoming neutron flux</span>
-<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">incoming_flux_correction</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">],</span>
-                                                  <span class="n">incoming_Ref</span><span class="o">=</span><span class="n">incoming_neutrons</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;fi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">correction_incoming_flux</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">],</span>
+                                                  <span class="n">incoming_Ref</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;incoming_flux&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 <div id="cell-9" class="clipboard-copy-txt"># Incoming neutron flux correction
 
 # Download data for the reference neutron monitor and add to the DataFrame
-incoming_neutrons = crnpy.get_incoming_neutron_flux(deployment_date,
-                                                    calibration_end,
-                                                    station="DRBS",
-                                                    utc_offset=-5)
+nmdb = crnpy.get_incoming_neutron_flux(deployment_date,
+                                        calibration_end,
+                                        station="DRBS",
+                                        utc_offset=-6)
 
 # Interpolate incoming neutron flux to match the timestamps in our station data
-df_station['incoming_flux'] = crnpy.interpolate_incoming_flux(incoming_neutrons,
-                                                              timestamps=df_station['TIMESTAMP'])
+df_station['incoming_flux'] = crnpy.interpolate_incoming_flux(nmdb['timestamp'], nmdb['counts'], df_station['timestamp'])
 
 # Compute correction factor for incoming neutron flux
-df_station['fi'] = crnpy.incoming_flux_correction(incoming_neutrons=df_station['incoming_flux'],
-                                                  incoming_Ref=incoming_neutrons.iloc[0])
+df_station['fi'] = crnpy.correction_incoming_flux(incoming_neutrons=df_station['incoming_flux'],
+                                                  incoming_Ref=df_station['incoming_flux'].iloc[0])
 
 </div>
         
@@ -2703,14 +2701,14 @@ field_bulk_density = np.sum(df_soil['bulk_density']*nrad_weights)
                 </clipboard-copy>
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Determine the mean corrected counts during the calibration survey</span>
-<span class="n">idx_cal_period</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">calibration_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">calibration_end</span><span class="p">)</span>
+<span class="n">idx_cal_period</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">calibration_start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">calibration_end</span><span class="p">)</span>
 <span class="n">mean_cal_counts</span> <span class="o">=</span> <span class="n">df_station</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx_cal_period</span><span class="p">,</span> <span class="s1">&#39;total_corrected_neutrons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean volumetric Water content during calibration survey: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">field_theta_v</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean corrected counts during calibration: </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">mean_cal_counts</span><span class="p">)</span><span class="si">}</span><span class="s2"> counts&quot;</span><span class="p">)</span>
 </pre></div>
 <div id="cell-12" class="clipboard-copy-txt"># Determine the mean corrected counts during the calibration survey
-idx_cal_period = (df_station['TIMESTAMP'] >= calibration_start) & (df_station['TIMESTAMP'] <= calibration_end)
+idx_cal_period = (df_station['timestamp'] >= calibration_start) & (df_station['timestamp'] <= calibration_end)
 mean_cal_counts = df_station.loc[idx_cal_period, 'total_corrected_neutrons'].mean()
 
 print(f"Mean volumetric Water content during calibration survey: {round(field_theta_v,3)}")
@@ -2736,7 +2734,7 @@ print(f"Mean corrected counts during calibration: {round(mean_cal_counts)} count
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Mean volumetric Water content during calibration survey: 0.263
-Mean corrected counts during calibration: 1546 counts
+Mean corrected counts during calibration: 1542 counts
 </pre>
 </div>
 </div>
@@ -2753,7 +2751,7 @@ Mean corrected counts during calibration: 1546 counts
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="solving-for-n_0">Solving for $N_0$<a class="anchor-link" href="#solving-for-n_0">&#182;</a></h2><p>Previous steps estimated the a field volumetric water content of <code>0.263</code> and an average neutron count of <code>1546</code>. Using <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html"><code>scipy.optimize.root()</code></a> $N_0$ is estimated given the observed value of $\theta_v$ and neutron counts.</p>
+<h2 id="solving-for-n_0">Solving for $N_0$<a class="anchor-link" href="#solving-for-n_0">&#182;</a></h2><p>Previous steps estimated the a field volumetric water content of <code>0.263</code> and an average neutron count of <code>1542</code>. Using <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html"><code>scipy.optimize.root()</code></a> $N_0$ is estimated given the observed value of $\theta_v$ and neutron counts.</p>
 
 </div>
 </div>
@@ -2822,7 +2820,7 @@ print(f"The solved value for N0 is: {sol}")
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>The solved value for N0 is: 2650
+<pre>The solved value for N0 is: 2644
 </pre>
 </div>
 </div>
@@ -2888,16 +2886,22 @@ print(f"The solved value for N0 is: {sol}")
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.fac441b0.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.220ee61c.min.js"></script>
       
-        <script src="../../../javascripts/katex.js"></script>
+        
+          <script src="../../../javascripts/katex.js"></script>
+        
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
       
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
       
     
   <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>

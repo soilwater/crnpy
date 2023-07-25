@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np
-from crnpy import crnpy
+import crnpy
 from scipy.optimize import root
-
 
 
 # content of test_calibration_rdt.py
@@ -32,36 +31,33 @@ def calibration_example():
     df_station = df_station[idx_period]
 
     # Compute total neutron counts by adding the counts from both probe detectors
-    df_station['total_raw_counts'] = crnpy.compute_total_raw_counts(df_station[['counts_1_Tot', 'counts_2_Tot']],
+    df_station['total_raw_counts'] = crnpy.total_raw_counts(df_station[['counts_1_Tot', 'counts_2_Tot']],
                                                                     nan_strategy='average')
 
     # Atmospheric corrections
 
     # Fill NaN values in atmospheric data
-    df_station[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']] = crnpy.fill_missing_atm(
-        df_station[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']])
+    df_station[['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']] = df_station[
+        ['barometric_pressure_Avg', 'relative_humidity_Avg', 'air_temperature_Avg']].interpolate(method='pchip',
+                                                                                                 limit=24,
+                                                                                                 limit_direction='both')
 
     # Calculate absolute humidity
-    df_station['abs_humidity'] = crnpy.estimate_abs_humidity(df_station['relative_humidity_Avg'],
+    df_station['abs_humidity'] = crnpy.abs_humidity(df_station['relative_humidity_Avg'],
                                                              df_station['air_temperature_Avg'])
 
     # Compute correction factor for atmospheric pressure
     # Reference atmospheric pressure for the location is 976 Pa
     # Using an atmospheric attentuation coefficient of 130 g/cm2
-    df_station['fp'] = crnpy.pressure_correction(pressure=df_station['barometric_pressure_Avg'],
+    df_station['fp'] = crnpy.correction_pressure(pressure=df_station['barometric_pressure_Avg'],
                                                  Pref=976, L=130)
 
     # Compute correction factor for air humidity
-    df_station['fw'] = crnpy.humidity_correction(abs_humidity=df_station['abs_humidity'],
+    df_station['fw'] = crnpy.correction_humidity(abs_humidity=df_station['abs_humidity'],
                                                  Aref=0)
 
     # Incoming neutron flux correction
 
-    # Download data for the reference neutron monitor and add to the DataFrame
-    incoming_neutrons = crnpy.get_incoming_neutron_flux(deployment_date,
-                                                        calibration_end,
-                                                        station="DRBS",
-                                                        utc_offset=-5)
 
     df_station['total_corrected_neutrons'] = df_station['total_raw_counts'] * df_station['fw'] / (
                 df_station['fp'])
