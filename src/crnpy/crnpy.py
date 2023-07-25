@@ -1212,5 +1212,76 @@ def rover_centered_coordinates(x, y):
     return x_est, y_est
 
 
+def uncertainty_counts(raw_counts, metric="std", fp=1, fw=1, fi=1):
+    """Function to estimate the uncertainty of raw counts.
+
+    Measurements of a proportional neutron detector system are governed by counting statistics that follow a Poissonian probability distribution (Zreda et al., 2012).
+    The expected uncertainty in the neutron count rate N is defined by the standard deviation $ \sqrt{N} $. (Jakobi et al., 2020)
+    It can be expressed as CV% as $ N^{-1/2} $
+
+    Args:
+        raw_counts (array): Raw neutron counts.
+
+    Returns:
+        uncertainty (float): Uncertainty of raw counts.
+
+    References:
+        Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With
+        Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010
+
+        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System,
+        Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.
+
+    """
+
+    s = fw / (fp * fi)
+    if metric == "std":
+        uncertainty = np.sqrt(raw_counts) * s
+    elif metric == "cv":
+        uncertainty = 1 /  np.sqrt(raw_counts) * s
+    else:
+        raise f"Metric {metric} does not exist. Provide either 'std' or 'cv' for standard deviation or coefficient of variation."
+    return uncertainty
+
+
+def uncertainty_vwc(raw_counts, N0, bulk_density, fp=1, fw=1, fi=1, a0=0.0808,a1=0.372,a2=0.115):
+    r"""Function to estimate the uncertainty propagated to volumetric water content.
+
+    The uncertainty of the volumetric water content is estimated by propagating the uncertainty of the raw counts.
+    Following Eq. 10 in Jakobi et al. (2020), the uncertainty of the volumetric water content is estimated as:
+    $$
+    \sigma_{\theta_g}(N) = \sigma_N \frac{a_0 N_0}{(N_{cor} - a_1 N_0)^4} \sqrt{(N_{cor} - a_1 N_0)^4 + 8 \sigma_N^2 (N_{cor} - a_1 N_0)^2 + 15 \sigma_N^4}
+    $$
+
+    Args:
+        raw_counts (array): Raw neutron counts.
+        N0 (float): Calibration parameter N0.
+        bulk_density (float): Bulk density in kg/m3.
+        fp (float): Calibration parameter fp.
+        fw (float): Calibration parameter fw.
+        fi (float): Calibration parameter fi.
+
+    Returns:
+        sigma_VWC (float): Uncertainty in terms of volumetric water content.
+
+    References:
+        Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With
+        Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010
+    """
+
+    Ncorr = raw_counts * fw / (fp * fi)
+    sigma_N = uncertainty_counts(raw_counts, metric="std", fp=fp, fw=fw, fi=fi)
+    sigma_GWC = sigma_N * ((a0*N0) / ((Ncorr - a1*N0)**4)) * np.sqrt((Ncorr - a1 * N0)**4 + 8 * sigma_N**2 * (Ncorr - a1 * N0)**2 + 15 * sigma_N**4)
+    sigma_VWC = sigma_GWC * bulk_density
+
+    return sigma_VWC
+
+
+
+
+
+
+
+
 
 

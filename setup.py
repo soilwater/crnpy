@@ -13,5 +13,12 @@ setuptools.setup(
     url="https://github.com/soilwater/crnpy",
     author="Joaquin Peraza, Andres Patrignani",
     author_email="jperaza@ksu.edu, andrespatrignani@ksu.edu",
-    license="MIT"
+    license="MIT",
+    license_files=["LICENSE"],
+    install_requires=[
+        "numpy",
+        "pandas",
+        "scipy",
+        "requests"
+    ],
 )
