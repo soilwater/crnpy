@@ -5980,9 +5980,9 @@ doi.org/10.3389/frwa.2020.00009</p>
   <div class="doc doc-contents ">
   
       <p>Function to estimate the uncertainty of raw counts.</p>
-<p>Measurements of a proportional neutron detector system are governed by counting statistics that follow a Poissonian probability distribution (Zreda et al., 2012).
-The expected uncertainty in the neutron count rate N is defined by the standard deviation $ \sqrt{N} $. (Jakobi et al., 2020)
-It can be expressed as CV% as $ N^{-1/2} $</p>
+<p>Measurements of proportional neutron detector systems are governed by counting statistics that follow a Poissonian probability distribution (Zreda et al., 2012).
+The expected uncertainty in the neutron count rate $N$ is defined by the standard deviation $ \sqrt{N} $ (Jakobi et al., 2020).
+The CV% can be expressed as $ N^{-1/2} $</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -6067,9 +6067,9 @@ Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-
 <span class="normal">1244</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">uncertainty_counts</span><span class="p">(</span><span class="n">raw_counts</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fi</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to estimate the uncertainty of raw counts.</span>
 
-<span class="sd">    Measurements of a proportional neutron detector system are governed by counting statistics that follow a Poissonian probability distribution (Zreda et al., 2012).</span>
-<span class="sd">    The expected uncertainty in the neutron count rate N is defined by the standard deviation $ \sqrt{N} $. (Jakobi et al., 2020)</span>
-<span class="sd">    It can be expressed as CV% as $ N^{-1/2} $</span>
+<span class="sd">    Measurements of proportional neutron detector systems are governed by counting statistics that follow a Poissonian probability distribution (Zreda et al., 2012).</span>
+<span class="sd">    The expected uncertainty in the neutron count rate $N$ is defined by the standard deviation $ \sqrt{N} $ (Jakobi et al., 2020).</span>
+<span class="sd">    The CV% can be expressed as $ N^{-1/2} $</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        raw_counts (array): Raw neutron counts.</span>
@@ -6114,7 +6114,7 @@ Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-
   
       <p>Function to estimate the uncertainty propagated to volumetric water content.</p>
 <p>The uncertainty of the volumetric water content is estimated by propagating the uncertainty of the raw counts.
-Following Eq. 10 in Jakobi et al. (2020), the uncertainty of the volumetric water content is estimated as:
+Following Eq. 10 in Jakobi et al. (2020), the uncertainty of the volumetric water content can be expressed as:
 $$
 \sigma_{\theta_g}(N) = \sigma_N \frac{a_0 N_0}{(N_{cor} - a_1 N_0)^4} \sqrt{(N_{cor} - a_1 N_0)^4 + 8 \sigma_N^2 (N_{cor} - a_1 N_0)^2 + 15 \sigma_N^4}
 $$</p>
@@ -6252,7 +6252,7 @@ Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to estimate the uncertainty propagated to volumetric water content.</span>
 
 <span class="sd">    The uncertainty of the volumetric water content is estimated by propagating the uncertainty of the raw counts.</span>
-<span class="sd">    Following Eq. 10 in Jakobi et al. (2020), the uncertainty of the volumetric water content is estimated as:</span>
+<span class="sd">    Following Eq. 10 in Jakobi et al. (2020), the uncertainty of the volumetric water content can be expressed as:</span>
 <span class="sd">    $$</span>
 <span class="sd">    \sigma_{\theta_g}(N) = \sigma_N \frac{a_0 N_0}{(N_{cor} - a_1 N_0)^4} \sqrt{(N_{cor} - a_1 N_0)^4 + 8 \sigma_N^2 (N_{cor} - a_1 N_0)^2 + 15 \sigma_N^4}</span>
 <span class="sd">    $$</span>
