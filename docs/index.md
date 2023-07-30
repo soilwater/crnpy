@@ -51,7 +51,7 @@ The Soil Water Processes Lab at Kansas State University combines a range of expe
 ## Community Guidelines
 
 ### Contributing
-To contribute to the software, please first fork the repository and create your own branch from `master`. Ensure your code adheres to our established standards and includes appropriate test coverage. Then, submit a pull request with a clear and detailed description of your changes.
+To contribute to the software, please first fork the repository and create your own branch from `main`. Ensure your code adheres to our established code structure and includes appropriate test/examples coverage. CRNPy source code is located in the `/src/crnpy/` folder, and tests implemented using `pytest` are stored in the `/src/tests/` folder. Submit a pull request with a clear and detailed description of your changes to include them in the main repository.
 
 ### Reporting Issues
 If you encounter any issues or problems with the software, please report them on our [issues page](https://github.com/soilwater/crnpy/issues). Include a detailed description of the issue, steps to reproduce the problem, any error messages you received, and details about your operating system and software version.
