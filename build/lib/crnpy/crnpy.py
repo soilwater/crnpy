@@ -1215,12 +1215,16 @@ def rover_centered_coordinates(x, y):
 def uncertainty_counts(raw_counts, metric="std", fp=1, fw=1, fi=1):
     """Function to estimate the uncertainty of raw counts.
 
-    Measurements of a proportional neutron detector system are governed by counting statistics that follow a Poissonian probability distribution (Zreda et al., 2012).
-    The expected uncertainty in the neutron count rate N is defined by the standard deviation $ \sqrt{N} $. (Jakobi et al., 2020)
-    It can be expressed as CV% as $ N^{-1/2} $
+    Measurements of proportional neutron detector systems are governed by counting statistics that follow a Poissonian probability distribution (Zreda et al., 2012).
+    The expected uncertainty in the neutron count rate $N$ is defined by the standard deviation $ \sqrt{N} $ (Jakobi et al., 2020).
+    The CV% can be expressed as $ N^{-1/2} $
 
     Args:
         raw_counts (array): Raw neutron counts.
+        metric (str): Either 'std' or 'cv' for standard deviation or coefficient of variation.
+        fp (float): Pressure correction factor.
+        fw (float): Humidity correction factor.
+        fi (float): Incoming neutron flux correction factor.
 
     Returns:
         uncertainty (float): Uncertainty of raw counts.
@@ -1248,7 +1252,7 @@ def uncertainty_vwc(raw_counts, N0, bulk_density, fp=1, fw=1, fi=1, a0=0.0808,a1
     r"""Function to estimate the uncertainty propagated to volumetric water content.
 
     The uncertainty of the volumetric water content is estimated by propagating the uncertainty of the raw counts.
-    Following Eq. 10 in Jakobi et al. (2020), the uncertainty of the volumetric water content is estimated as:
+    Following Eq. 10 in Jakobi et al. (2020), the uncertainty of the volumetric water content can be expressed as:
     $$
     \sigma_{\theta_g}(N) = \sigma_N \frac{a_0 N_0}{(N_{cor} - a_1 N_0)^4} \sqrt{(N_{cor} - a_1 N_0)^4 + 8 \sigma_N^2 (N_{cor} - a_1 N_0)^2 + 15 \sigma_N^4}
     $$
@@ -1256,10 +1260,10 @@ def uncertainty_vwc(raw_counts, N0, bulk_density, fp=1, fw=1, fi=1, a0=0.0808,a1
     Args:
         raw_counts (array): Raw neutron counts.
         N0 (float): Calibration parameter N0.
-        bulk_density (float): Bulk density in kg/m3.
-        fp (float): Calibration parameter fp.
-        fw (float): Calibration parameter fw.
-        fi (float): Calibration parameter fi.
+        bulk_density (float): Bulk density in g cm-3.
+        fp (float): Pressure correction factor.
+        fw (float): Humidity correction factor.
+        fi (float): Incoming neutron flux correction factor.
 
     Returns:
         sigma_VWC (float): Uncertainty in terms of volumetric water content.

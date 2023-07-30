@@ -2097,9 +2097,7 @@ df_station.head(3)
                     </div>
                 </clipboard-copy>
             </div>
-            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Select station data only until the calibration date</span>
-
-<span class="c1"># Define date in which the probe was deployed in the field (i.e., first record)</span>
+            <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Define date in which the probe was deployed in the field (i.e., first record)</span>
 <span class="n">deployment_date</span> <span class="o">=</span> <span class="n">df_station</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c1"># Filter station data from the first record to the end of the field survey calibration</span>
@@ -2108,9 +2106,7 @@ df_station.head(3)
 <span class="n">df_station</span> <span class="o">=</span> <span class="n">df_station</span><span class="p">[</span><span class="n">idx_period</span><span class="p">]</span>
 <span class="n">df_station</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
-<div id="cell-5" class="clipboard-copy-txt"># Select station data only until the calibration date
-
-# Define date in which the probe was deployed in the field (i.e., first record)
+<div id="cell-5" class="clipboard-copy-txt"># Define date in which the probe was deployed in the field (i.e., first record)
 deployment_date = df_station['timestamp'].iloc[0]
 
 # Filter station data from the first record to the end of the field survey calibration
@@ -2552,7 +2548,7 @@ Your cutoff rigidity is 2.87 GV
             </div>
             <div class="highlight-ipynb hl-python "><pre><span></span><span class="c1"># Incoming neutron flux correction</span>
 
-<span class="c1"># Download data for the reference neutron monitor and add to the DataFrame</span>
+<span class="c1"># Download data for the reference neutron monitor and add it to the DataFrame</span>
 <span class="n">nmdb</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">get_incoming_neutron_flux</span><span class="p">(</span><span class="n">deployment_date</span><span class="p">,</span>
                                         <span class="n">calibration_end</span><span class="p">,</span>
                                         <span class="n">station</span><span class="o">=</span><span class="s2">&quot;DRBS&quot;</span><span class="p">,</span>
@@ -2567,7 +2563,7 @@ Your cutoff rigidity is 2.87 GV
 </pre></div>
 <div id="cell-9" class="clipboard-copy-txt"># Incoming neutron flux correction
 
-# Download data for the reference neutron monitor and add to the DataFrame
+# Download data for the reference neutron monitor and add it to the DataFrame
 nmdb = crnpy.get_incoming_neutron_flux(deployment_date,
                                         calibration_end,
                                         station="DRBS",
@@ -2631,7 +2627,7 @@ df_station['total_corrected_neutrons'] = df_station['total_raw_counts'] * df_sta
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="determine-field-average-soil-moisture-and-bulk-density">Determine field-average soil moisture and bulk density<a class="anchor-link" href="#determine-field-average-soil-moisture-and-bulk-density">&#182;</a></h3><p>Using the function <a href="../../../reference/#crnpy.crnpy.nrad_weight"><code>nrad_weight()</code></a> the weights corresponding to each soil sample will be computed considering air-humidity, sample depth, distance from station and bulk density.</p>
+<h3 id="determine-field-average-soil-moisture-and-bulk-density">Determine field-average soil moisture and bulk density<a class="anchor-link" href="#determine-field-average-soil-moisture-and-bulk-density">&#182;</a></h3><p>Using the function <a href="../../../reference/#crnpy.crnpy.nrad_weight"><code>nrad_weight()</code></a> the weights corresponding to each soil sample will be computed considering air-humidity, sample depth, and distance from station and bulk density.</p>
 
 </div>
 </div>
@@ -2751,7 +2747,7 @@ Mean corrected counts during calibration: 1542 counts
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="solving-for-n_0">Solving for $N_0$<a class="anchor-link" href="#solving-for-n_0">&#182;</a></h2><p>Previous steps estimated the a field volumetric water content of <code>0.263</code> and an average neutron count of <code>1542</code>. Using <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html"><code>scipy.optimize.root()</code></a> $N_0$ is estimated given the observed value of $\theta_v$ and neutron counts.</p>
+<h2 id="solving-for-n_0">Solving for $N_0$<a class="anchor-link" href="#solving-for-n_0">&#182;</a></h2><p>Previous steps estimated the field volumetric water content of <code>0.263</code> and an average neutron count of <code>1542</code>. Using <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html"><code>scipy.optimize.root()</code></a> $N_0$ is estimated given the observed value of $\theta_v$ and neutron counts.</p>
 
 </div>
 </div>
