@@ -1,0 +1,45 @@
+digraph G {
+    graph [rankdir=LR, overlap=false, repulsiveforce=1, dpi = 200, splines=true]
+    edge [color="grey25"]
+
+    // New node
+    "Counts" [pos="1,1.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+
+    // Define Nodes with Positions
+    "Outlier Removal and\n Data Interpolation" [pos="2,1.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "drop_outlier()\nfill_counts()\nfill_missing_atm()" [pos="2,1!", shape=box, color="lightblue", fontcolor="black", style=filled];
+    
+    "Incoming Neutron\nFlux Correction" [pos="3,1.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "cutoff_rigidity()\nfind_neutron_detectors()\nget_incoming_neutron_flux()" [pos="3,1!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Atmospheric\nCorrection" [pos="4,1.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "atm_correction()" [pos="4,1!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Biomass\nCorrection" [pos="1,.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "biomass_to_bwe()\nbwe_correction()" [pos="1,0!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Road\nCorrection" [pos="2,.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "road_correction()" [pos="2,0!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Soil Mositure\nEstimation" [pos="3,.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "counts_to_vwc()" [pos="3,0!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Soil VWC" [pos="4,.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    
+    // Define Edges
+    "Outlier Removal and\n Data Interpolation" -> "Incoming Neutron\nFlux Correction"
+    "Incoming Neutron\nFlux Correction" -> "cutoff_rigidity()\nfind_neutron_detectors()\nget_incoming_neutron_flux()"
+    "Atmospheric\nCorrection" -> "atm_correction()"
+    "Biomass\nCorrection" -> "biomass_to_bwe()\nbwe_correction()"
+    "Road\nCorrection" -> "road_correction()"
+    "Soil Mositure\nEstimation" -> "counts_to_vwc()"
+    "Soil Mositure\nEstimation" -> "Soil VWC"
+    
+    // Steps Arrows
+    "Counts" -> "Outlier Removal and\n Data Interpolation"
+    "Outlier Removal and\n Data Interpolation" -> "drop_outlier()\nfill_counts()\nfill_missing_atm()"
+    "Incoming Neutron\nFlux Correction" -> "Atmospheric\nCorrection"
+    "Atmospheric\nCorrection" -> "Biomass\nCorrection"
+    "Biomass\nCorrection" -> "Road\nCorrection" [style=dashed]
+    "Road\nCorrection" -> "Soil Mositure\nEstimation" [style=dashed]
+}

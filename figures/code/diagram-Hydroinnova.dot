@@ -1,0 +1,47 @@
+digraph G {
+    graph [rankdir=LR, overlap=false, repulsiveforce=1, dpi = 200, splines=true]
+    edge [color="grey25"]
+
+    // New node
+    "Counts" [pos="1,1.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+
+    // Define Nodes with Positions
+    "Data preprocessing and\nspatial projection" [pos="2,1.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "latlon_to_utm()\nrover_centered_coordinates()\ntotal_raw_counts()" [pos="2,1!", shape=box, color="lightblue", fontcolor="black", style=filled];
+    
+    "Incoming Neutron\nFlux Correction" [pos="3,1.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "cutoff_rigidity()\nfind_neutron_monitor()\nget_incoming_neutron_flux()\ninterpolate_incoming_flux()\ncorrection_incoming_flux()" [pos="3,1!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Atmospheric\nCorrection" [pos="4,1.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "correction_humidity()\ncorrection_pressure()" [pos="4,1!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Biomass\nCorrection" [pos="1,.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "biomass_to_bwe()\ncorrection_bwe()" [pos="1,0!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Road\nCorrection" [pos="2,.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "correction_road()" [pos="2,0!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Soil Mositure\nEstimation" [pos="3,.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    "spatial_average()\ninterpolate_2d()\nlattice_water()\ncounts_to_vwc()" [pos="3,0!", shape=box, color="lightblue", fontcolor="black", style=filled];
+
+    "Soil VWC" [pos="4,.5!", shape=box3d, color="midnightblue", fontcolor="white", style=filled, group=1];
+    
+    // Define Edges
+    "Data preprocessing and\nspatial projection" -> "latlon_to_utm()\nrover_centered_coordinates()\ntotal_raw_counts()"
+    "Incoming Neutron\nFlux Correction" -> "cutoff_rigidity()\nfind_neutron_monitor()\nget_incoming_neutron_flux()\ninterpolate_incoming_flux()\ncorrection_incoming_flux()"
+    "Atmospheric\nCorrection" -> "correction_humidity()\ncorrection_pressure()"
+    "Biomass\nCorrection" -> "biomass_to_bwe()\ncorrection_bwe()"
+    "Road\nCorrection" -> "correction_road()"
+    "Soil Mositure\nEstimation" -> "spatial_average()\ninterpolate_2d()\nlattice_water()\ncounts_to_vwc()"
+
+    
+    // Steps Arrows
+    "Counts" -> "Data preprocessing and\nspatial projection"
+    "Data preprocessing and\nspatial projection" -> "Incoming Neutron\nFlux Correction"
+    "Incoming Neutron\nFlux Correction" -> "Atmospheric\nCorrection"
+    "Atmospheric\nCorrection" -> "Biomass\nCorrection"
+    "Biomass\nCorrection" -> "Road\nCorrection" [style=dashed]
+    "Road\nCorrection" -> "Soil Mositure\nEstimation" [style=dashed]
+    "Soil Mositure\nEstimation" -> "Soil VWC"
+
+}
