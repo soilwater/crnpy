@@ -1280,6 +1280,61 @@ def uncertainty_vwc(raw_counts, N0, bulk_density, fp=1, fw=1, fi=1, a0=0.0808,a1
 
     return sigma_VWC
 
+def barometer_offset(pressure, temperature, delta_h, return_correction=False):
+    """Function to correct readings from a barometer at a different altitude.
+
+    The barometric formula describes the decrease of the atmospheric pressure with altitude.
+    The pressure at a certain altitude can be calculated as:
+    $$
+    P2 = P1 \cdot e^{\frac{g \cdot M \cdot \Delta h}{R \cdot T}}
+    $$
+
+    where $P_1$ is the pressure at a different altitude, $P_2$ is the pressure at the target altitude, $g$ is the gravitational acceleration, $M$ is the molar mass of air, $\Delta h$ is the difference in altitude, $R$ is the universal gas constant, and $T$ is the temperature in Kelvin.
+
+    Args:
+        pressure (float): Pressure reading at the reference altitude in hPa.
+        temperature (float): Temperature at the reference altitude in Celsius.
+        delta_h (float): Difference in altitude between the reference and target altitude in meters.
+
+    Returns:
+        pressure_corrected (float): Pressure reading at the target altitude in hPa.
+        correction (float): Correction factor applied to the pressure reading (optional).
+
+    References:
+        Bellamy, J. C. (1945). The use of pressure altitude and altimeter corrections in meteorology. Journal of the Atmospheric Sciences, 2(1), 1-79.
+
+    Examples:
+        >>> import numpy as np
+        >>> import pandas as pd
+        >>> import matplotlib.pyplot as plt
+        >>> from crnpy import barometer_offset
+        >>> mesonetGypsum = pd.read_csv("http://mesonet.k-state.edu/rest/stationdata?stn=Gypsum&int=day&t_start=20200101000000&t_end=20231230000000", na_values='M', parse_dates=['TIMESTAMP'])
+        >>> mesonetAshland = pd.read_csv("http://mesonet.k-state.edu/rest/stationdata?stn=Ashland%20Bottoms&int=day&t_start=20200101000000&t_end=20231230000000", na_values='M', parse_dates=['TIMESTAMP'])
+        >>> merged = pd.merge(mesonetGypsum,mesonetAshland, left_on='TIMESTAMP', right_on='TIMESTAMP', suffixes=['_g', '_a'])
+        >>> delta_h = -52
+        >>> merged['P_g_corrected'] = barometer_offset(merged['PRESSUREAVG_g'], merged['TEMP2MAVG_g'], delta_h)
+        >>> plt.scatter(merged['PRESSUREAVG_a'], merged['P_g_corrected'], label='Corrected', color='teal')
+        >>> plt.scatter(merged['PRESSUREAVG_a'], merged['PRESSUREAVG_g'], label='Raw', color='orange', alpha=0.5)
+        >>> plt.xlabel('Ashland Bottoms Pressure (hPa)')
+        >>> plt.ylabel('Gypsum Pressure (hPa)')
+        >>> plt.legend()
+        >>> plt.show()
+    """
+    # Define constants
+    G = -9.80665  # m/s^2
+    m = 0.0289644 # kg/mol
+    R = 8.31432
+    T= (temperature + 273.15)
+
+    if return_correction:
+        correction = np.exp((G * m * delta_h) / (R * T))
+        pressure_corrected = pressure * correction
+        return pressure_corrected, correction
+
+    pressure_corrected = pressure * np.exp((G * m * delta_h) / (R * T))
+    return pressure_corrected
+
+
 
 
 
