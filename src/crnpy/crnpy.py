@@ -291,7 +291,9 @@ def correction_humidity(abs_humidity, Aref):
     fw = 1 + 0.0054*(A - Aref) # Zreda et al. 2017 Eq 6.
     return fw
 
-def correction_incoming_flux(incoming_neutrons, incoming_Ref=None):
+
+
+def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None, Rc_method=None, Rc_site=None, site_atmdepth=None, Rc_ref=None, ref_atmdepth=None):
     r"""Correction factor for incoming neutron flux.
 
     This function corrects neutron counts for incoming neutron flux using the method described in Anderson et al. (2017). The correction is performed using the following equation:
@@ -331,7 +333,28 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None):
         incoming_Ref = incoming_neutrons[0]
         warnings.warn('Reference incoming neutron flux not provided. Using first value of incoming neutron flux.')
     fi = incoming_neutrons / incoming_Ref
-    fi.fillna(1.0, inplace=True)  # Use a value of 1 for days without data
+
+    if Rc_method is not None:
+        if Rc_ref is None:
+            raise ValueError('Reference cutoff rigidity not provided.')
+        if Rc_site is None:
+            raise ValueError('Site cutoff rigidity not provided.')
+
+        if Rc_method == 'McJannetandDesilets2023':
+            if latitude is None or elevation is None:
+                raise ValueError('Latitude and elevation are required inputs for McJannet and Desilets (2023) method.')
+            tau = location_factor(site_atmdepth, Rc_site, ref_atmdepth, Rc_ref)
+            fi = 1 / (tau * fi + 1 - tau)
+
+        elif Rc_method == 'Hawdonetal2014':
+            Rc_corr = -0.075 * (Rc_site - Rc_ref)+ 1.0
+            fi = (fi - 1.0) * Rc_corr + 1.0
+
+        else:
+            raise ValueError('Cutoff rigidity method not found. Valid options are: McJannetandDesilets2023, Hawdonetal2014.')
+
+    if fill_na is not None:
+        fi.fillna(fill_na, inplace=True)  # Use a value of 1 for days without data
 
     return fi
 
@@ -812,6 +835,10 @@ def cutoff_rigidity(lat,lon):
         2.52 GV (Value from NMD is 2.40 GV)
 
     References:
+        Hawdon, A., McJannet, D., & Wallace, J. (2014). Calibration and correction procedures
+        for cosmic‐ray neutron soil moisture probes located across Australia. Water Resources Research,
+        50(6), 5029-5043.
+
         Smart, D. & Shea, Matthew. (2001). Geomagnetic Cutoff Rigidity Computer Program:
         Theory, Software Description and Example. NASA STI/Recon Technical Report N.
 
@@ -833,6 +860,88 @@ def cutoff_rigidity(lat,lon):
 
     return np.round(zq,2)
 
+
+def atmospheric_depth(elevation, latitude):
+    """Function to estimate the atmospheric depth for any point on Earth according to McJannet and Desilets, 2023
+
+    This function is required in the calculation of the location-dependent reference correction proposed by McJannet and Desilets, 2023.
+
+    Args:
+        elevation (float): Elevation in meters above sea level.
+        latitude (float): Geographic latitude in decimal degrees. Value in range -90 to 90
+
+    Returns:
+        (float): Atmospheric depth in g/cm2
+
+    References:
+        Atmosphere, U. S. (1976). US standard atmosphere. National Oceanic and Atmospheric Administration.
+
+        McJannet, D. L., & Desilets, D. (2023). Incoming Neutron Flux Corrections for Cosmic‐Ray Soil and Snow Sensors Using the Global Neutron Monitor Network. Water Resources Research, 59(4), e2022WR033889.
+    """
+
+    density_of_rock = 2670  # Density of rock in kg/m3
+    air_pressure_sea_level = 1013.25  # Air pressure at sea level in hPa
+    air_molar_mass = 0.0289644  # Air molar mass in kg/mol
+    universal_gas_constant = 8.3144598  # Universal gas constant in J/(mol*K)
+    reference_temperature = 288.15  # Reference temperature Kelvin
+    temperature_lapse_rate = -0.0065  # Temperature lapse rate in K/m
+
+    # Gravity at sea-level calculation
+    gravity_sea_level = 9.780327 * (
+                1 + 0.0053024 * np.sin(np.radians(latitude)) ** 2 - 0.0000058 * np.sin(2 * np.radians(latitude)) ** 2)
+    # Free air correction
+    free_air = -3.086 * 10 ** -6 * elevation
+    # Bouguer correction
+    bouguer_corr = 4.194 * 10 ** -10 * density_of_rock * elevation
+    # Total gravity
+    gravity = gravity_sea_level + free_air + bouguer_corr
+
+    # Air pressure calculation
+    reference_air_pressure = air_pressure_sea_level * (1 + temperature_lapse_rate / reference_temperature * elevation) ** ((-gravity * air_molar_mass) / (universal_gas_constant * temperature_lapse_rate))
+
+    # Atmospheric depth calculation
+    atmospheric_depth = (10 * reference_air_pressure) / gravity
+    return atmospheric_depth
+
+
+
+def location_factor(site_atmospheric_depth, site_Rc, reference_atmospheric_depth, reference_Rc):
+    """
+    Function to estimate the location factor between two sites according to McJannet and Desilets, 2023.
+
+
+    Args:
+        site_atmospheric_depth (float): Atmospheric depth at the site in g/cm2. Can be estimated using the function `atmospheric_depth()`
+        site_Rc (float): Cutoff rigidity at the site in GV. Can be estimated using the function `cutoff_rigidity()`
+        reference_atmospheric_depth (float): Atmospheric depth at the reference location in g/cm2.
+        reference_Rc (float): Cutoff rigidity at the reference location in GV.
+
+    Returns:
+        (float): Location-dependent correction factor.
+
+    References:
+        McJannet, D. L., & Desilets, D. (2023). Incoming Neutron Flux Corrections for Cosmic‐Ray Soil and Snow Sensors Using the Global Neutron Monitor Network. Water Resources Research, 59(4), e2022WR033889.
+
+    """
+
+    # Renamed variables based on the provided table
+    c0 = -0.0009  # from C39
+    c1 = 1.7699  # from C40
+    c2 = 0.0064  # from C41
+    c3 = 1.8855  # from C42
+    c4 = 0.000013  # from C43
+    c5 = -1.2237  # from C44
+    epsilon = 1  # from C45
+
+    # Translated formula with renamed variables from McJannet and Desilets, 2023
+    tau_new = epsilon * (c0 * reference_atmospheric_depth + c1) * (
+                1 - np.exp(-(c2 * reference_atmospheric_depth + c3) * reference_Rc ** (c4 * reference_atmospheric_depth + c5)))
+
+    norm_factor = 1/tau_new
+
+    # Calculate the result using the provided parameters
+    tau = epsilon * norm_factor * (c0 * site_atmospheric_depth + c1) * (1 - np.exp(-(c2 * site_atmospheric_depth + c3) * site_Rc**(c4 * site_atmospheric_depth + c5)))
+    return tau
 
 def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
     """Search for potential reference neutron monitoring stations based on cutoff rigidity.
