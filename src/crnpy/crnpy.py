@@ -423,7 +423,31 @@ the origin by a sentence like 'We acknowledge the NMDB database (www.nmdb.eu) fo
 
     return df_flux
 
+def get_reference_neutron_flux(station, date = pd.to_datetime("2011-05-01")):
+    """Function to retrieve reference neutron flux from the Neutron Monitor Database. Default date is 2011-05-01, following previous studies (Zreda et a., 2012, Hawdon et al., 2014, Bogena et al., 2022).
 
+    Args:
+        station (str): Neutron Monitor station to retrieve data from.
+        date (datetime): Date of the reference neutron flux. Default is 2011-05-01.
+
+    Returns:
+        (float): Reference neutron flux in counts per hour.
+
+    References:
+        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., & Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079-4099.
+
+        Hawdon, A., McJannet, D., & Wallace, J. (2014). Calibration and correction procedures for cosmic‐ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029-5043.
+
+        Bogena, H. R., Schrön, M., Jakobi, J., Ney, P., Zacharias, S., Andreasen, M., ... & Vereecken, H. (2022). COSMOS-Europe: a European network of cosmic-ray neutron soil moisture sensors. Earth System Science Data, 14(3), 1125-1151.
+
+"""
+
+    # Get flux for 2011-05-01
+    df_flux = get_incoming_flux(station, date, date + pd.Timedelta(hours=24))
+    if df_flux is None:
+        warnings.warn(f"Reference neutron flux for {station} not available. Returning NaN.")
+    else:
+        return df_flux['counts'].median()
 
 def smooth_1d(values, window=5, order=3, method='moving_median'):
     """Use a Savitzky-Golay filter to smooth the signal of corrected neutron counts or another one-dimensional array (e.g. computed volumetric water content).
