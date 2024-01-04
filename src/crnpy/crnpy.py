@@ -689,15 +689,18 @@ def abs_humidity(relative_humidity, temp):
     return abs_h
 
 
-def nrad_weight(h,theta,distances,depth,rhob=1.4):
+def nrad_weight(h,theta,distances,depth,rhob=1.4, method=None, p=None, Hveg=None)
     """Function to compute distance weights corresponding to each soil sample.
 
     Args:
-        h (float): Air Humidity  from 0.1  to 50 in g/m^3. When h=0, the function will skip the distance weighting.
-        theta (array or pd.Series or pd.DataFrame): Soil Moisture for each sample (0.02 - 0.50 m^3/m^3)
-        distances (array or pd.Series or pd.DataFrame): Distances from the location of each sample to the origin (0.5 - 600 m)
-        depth (array or pd.Series or pd.DataFrame): Depths for each sample (m)
-        rhob (float): Bulk density in g/cm^3
+        h (np.array or pd.Series): Air Humidity  from 0.1  to 50 in g/m^3. When h=0, the function will skip the distance weighting.
+        theta (np.array or pd.Series): Soil Moisture for each sample (0.02 - 0.50 m^3/m^3)
+        distances (np.array or pd.Series): Distances from the location of each sample to the origin (0.5 - 600 m)
+        depth (np.array or pd.Series): Depths for each sample (m)
+        rhob (np.array or pd.Series): Bulk density in g/cm^3
+        p (np.array or pd.Series): Atmospheric pressure in hPa. Required for the 'Schron_2017' method.
+        Hveg (np.array or pd.Series): Vegetation height in m. Required for the 'Schron_2017' method.
+        method (str): Method to compute the distance weights. Options are 'Kohli_2015' or 'Schron_2017'.
 
     Returns:
         (array or pd.Series or pd.DataFrame): Distance weights for each sample.
@@ -706,61 +709,152 @@ def nrad_weight(h,theta,distances,depth,rhob=1.4):
         Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., and Zacharias, S. (2015).
         Footprint characteristics revised for field-scale soil moisture monitoring with cosmic-ray
         neutrons. Water Resour. Res. 51, 5772–5790. doi:10.1002/2015WR017169
+
+        Schrön, M., Köhli, M., Scheiffele, L., Iwema, J., Bogena, H. R., Lv, L.,
+        Martini, E., Baroni, G., Rosolem, R., Weimar, J., Mai, J., Cuntz, M., Rebmann, C.,
+        Oswald, S. E., Dietrich, P., Schmidt, U., and Zacharias, S.: Improving calibration and
+        validation of cosmic-ray neutron sensors in the light of spatial sensitivity,
+        Hydrol. Earth Syst. Sci., 21, 5009–5030, https://doi.org/10.5194/hess-21-5009-2017, 2017.
     """
 
-    # Table A1. Parameters for Fi and D86
-    p10 = 8735;       p11 = 17.1758; p12 = 11720;      p13 = 0.00978;   p14 = 7045;      p15 = 0.003632;
-    p20 = 2.7925e-2;  p21 = 5.0399;  p22 = 2.8544e-2;  p23 = 0.002455;  p24 = 6.851e-5;  p25 = 9.2926;
-    p30 = 247970;     p31 = 17.63;   p32 = 374655;     p33 = 0.00191;   p34 = 195725;
-    p40 = 5.4818e-2;  p41 = 15.921;  p42 = 0.6373;     p43 = 5.99e-2;   p44 = 5.425e-4;
-    p50 = 1383702;    p51 = 4.156;   p52 = 5325;       p53 = 0.00238;   p54 = 0.0156;    p55 = 0.130;     p56 = 1521;
-    p60 = 6.031e-5;   p61 = 98.5;    p62 = 1.0466e-3;
-    p70 = 11747;      p71 = 41.66;   p72 = 4521;       p73 = 0.01998;   p74 = 0.00604;   p75 = 2534;      p76 = 0.00475;
-    p80 = 1.543e-2;   p81 = 10.06;   p82 = 1.807e-2;   p83 = 0.0011;    p84 = 8.81e-5;   p85 = 0.0405;    p86 = 20.24;
-    p90 = 8.321;      p91 = 0.14249; p92 = 0.96655;    p93 = 26.42;     p94 = 0.0567;
+    if method=='Kohli_2015':
+
+        # Table A1. Parameters for Fi and D86
+        p10 = 8735;       p11 = 17.1758; p12 = 11720;      p13 = 0.00978;   p14 = 7045;      p15 = 0.003632;
+        p20 = 2.7925e-2;  p21 = 5.0399;  p22 = 2.8544e-2;  p23 = 0.002455;  p24 = 6.851e-5;  p25 = 9.2926;
+        p30 = 247970;     p31 = 17.63;   p32 = 374655;     p33 = 0.00191;   p34 = 195725;
+        p40 = 5.4818e-2;  p41 = 15.921;  p42 = 0.6373;     p43 = 5.99e-2;   p44 = 5.425e-4;
+        p50 = 1383702;    p51 = 4.156;   p52 = 5325;       p53 = 0.00238;   p54 = 0.0156;    p55 = 0.130;     p56 = 1521;
+        p60 = 6.031e-5;   p61 = 98.5;    p62 = 1.0466e-3;
+        p70 = 11747;      p71 = 41.66;   p72 = 4521;       p73 = 0.01998;   p74 = 0.00604;   p75 = 2534;      p76 = 0.00475;
+        p80 = 1.543e-2;   p81 = 10.06;   p82 = 1.807e-2;   p83 = 0.0011;    p84 = 8.81e-5;   p85 = 0.0405;    p86 = 20.24;
+        p90 = 8.321;      p91 = 0.14249; p92 = 0.96655;    p93 = 26.42;     p94 = 0.0567;
 
 
-    # Numerical determination of the penetration depth (86%) (Eq. 8)
-    D86 = 1/rhob*(p90+p91*(p92+np.exp(-1*distances/100))*(p93+theta)/(p94+theta))
+        # Numerical determination of the penetration depth (86%) (Eq. 8)
+        D86 = 1/rhob*(p90+p91*(p92+np.exp(-1*distances/100))*(p93+theta)/(p94+theta))
 
-    # Depth weights (Eq. 7)
-    Wd = np.exp(-2*depth/D86)
+        # Depth weights (Eq. 7)
+        Wd = np.exp(-2*depth/D86)
 
-    if h == 0:
-        W = 1 # skip distance weighting
+        if h == 0:
+            W = 1 # skip distance weighting
 
-    elif (h >= 0.1) and (h<= 50):
-        # Functions for Fi (Appendix A in Köhli et al., 2015)
-        F1 = p10*(1+p13*h)*np.exp(-p11*theta)+p12*(1+p15*h)-p14*theta
-        F2 = ((-p20+p24*h)*np.exp(-p21*theta/(1+p25*theta))+p22)*(1+h*p23)
-        F3 = (p30*(1+p33*h)*np.exp(-p31*theta)+p32-p34*theta)
-        F4 = p40*np.exp(-p41*theta)+p42-p43*theta+p44*h
-        F5 = p50*(0.02-1/p55/(h-p55+p56*theta))*(p54-theta)*np.exp(-p51*(theta-p54))+p52*(0.7-h*theta*p53)
-        F6 = p60*(h+p61)+p62*theta
-        F7 = (p70*(1-p76*h)*np.exp(-p71*theta*(1-h*p74))+p72-p75*theta)*(2+h*p73)
-        F8 = ((-p80+p84*h)*np.exp(-p81*theta/(1+p85*h+p86*theta))+p82)*(2+h*p83)
+        elif (h >= 0.1) and (h<= 50):
+            # Functions for Fi (Appendix A in Köhli et al., 2015)
+            F1 = p10*(1+p13*h)*np.exp(-p11*theta)+p12*(1+p15*h)-p14*theta
+            F2 = ((-p20+p24*h)*np.exp(-p21*theta/(1+p25*theta))+p22)*(1+h*p23)
+            F3 = (p30*(1+p33*h)*np.exp(-p31*theta)+p32-p34*theta)
+            F4 = p40*np.exp(-p41*theta)+p42-p43*theta+p44*h
+            F5 = p50*(0.02-1/p55/(h-p55+p56*theta))*(p54-theta)*np.exp(-p51*(theta-p54))+p52*(0.7-h*theta*p53)
+            F6 = p60*(h+p61)+p62*theta
+            F7 = (p70*(1-p76*h)*np.exp(-p71*theta*(1-h*p74))+p72-p75*theta)*(2+h*p73)
+            F8 = ((-p80+p84*h)*np.exp(-p81*theta/(1+p85*h+p86*theta))+p82)*(2+h*p83)
 
-        # Distance weights (Eq. 3)
-        W = np.ones_like(distances)*np.nan
-        for i in range(len(distances)):
-            if (distances[i]<=50) and (distances[i]>0.5):
-                W[i]=F1[i]*(np.exp(-F2[i]*distances[i]))+F3[i]*np.exp(-F4[i]*distances[i])
+            # Distance weights (Eq. 3)
+            W = np.ones_like(distances)*np.nan
+            for i in range(len(distances)):
+                if (distances[i]<=50) and (distances[i]>0.5):
+                    W[i]=F1[i]*(np.exp(-F2[i]*distances[i]))+F3[i]*np.exp(-F4[i]*distances[i])
 
-            elif (distances[i]>50) and (distances[i]<600):
-                W[i]=F5[i]*(np.exp(-F6[i]*distances[i]))+F7[i]*np.exp(-F8[i]*distances[i])
+                elif (distances[i]>50) and (distances[i]<600):
+                    W[i]=F5[i]*(np.exp(-F6[i]*distances[i]))+F7[i]*np.exp(-F8[i]*distances[i])
 
-            else:
-                raise ValueError('Input distances are not valid.')
+                else:
+                    raise ValueError('Input distances are not valid.')
 
-    else:
-        raise ValueError('Air humidity values are out of range.')
+        else:
+            raise ValueError('Air humidity values are out of range.')
 
 
-    # Combined and normalized weights
-    weights = Wd*W/np.nansum(Wd*W)
+        # Combined and normalized weights
+        weights = Wd*W/np.nansum(Wd*W)
+        return weights
+    elif method=='Schron_2017':
+        # Horizontal distance weights According to Eq. 6 and Table A1 in Schrön et al. (2017)
+        # Method for calculating the horizontal distance weights from 0 to 1m
+        def WrX(r, x, y):
+            x00 = 3.7
+            a00 = 8735; a01 = 22.689; a02 = 11720; a03 = 0.00978; a04 = 9306; a05 = 0.003632
+            a10 = 2.7925e-2; a11 = 6.6577; a12 = 0.028544; a13 = 0.002455; a14 = 6.851e-5; a15 = 12.2755
+            a20 = 247970; a21 = 23.289; a22 = 374655; a23 = 0.00191; a24 = 258552
+            a30 = 5.4818e-2; a31 = 21.032; a32 = 0.6373; a33 = 0.0791; a34 = 5.425e-4
 
-    return weights
+            x0 = x00
+            A0 = (a00 * (1 + a03 * x) * np.exp(-a01 * y) + a02 * (1 + a05 * x) - a04 * y)
+            A1 = ((-a10 + a14 * x) * np.exp(-a11 * y / (1 + a15 * y)) + a12) * (1 + x * a13)
+            A2 = (a20 * (1 + a23 * x) * np.exp(-a21 * y) + a22 - a24 * y)
+            A3 = a30 * np.exp(-a31 * y) + a32 - a33 * y + a34 * x
 
+            return ((A0 * (np.exp(-A1 * r)) + A2 * np.exp(-A3 * r)) * (1 - np.exp(-x0 * r)))
+
+        # Method for calculating the horizontal distance weights from 1 to 50m
+        def WrA(r, x, y):
+            a00 = 8735; a01 = 22.689; a02 = 11720; a03 = 0.00978; a04 = 9306; a05 = 0.003632
+            a10 = 2.7925e-2; a11 = 6.6577; a12 = 0.028544; a13 = 0.002455; a14 = 6.851e-5; a15 = 12.2755
+            a20 = 247970; a21 = 23.289; a22 = 374655; a23 = 0.00191; a24 = 258552
+            a30 = 5.4818e-2; a31 = 21.032; a32 = 0.6373; a33 = 0.0791; a34 = 5.425e-4
+
+            A0 = (a00 * (1 + a03 * x) * np.exp(-a01 * y) + a02 * (1 + a05 * x) - a04 * y)
+            A1 = ((-a10 + a14 * x) * np.exp(-a11 * y / (1 + a15 * y)) + a12) * (1 + x * a13)
+            A2 = (a20 * (1 + a23 * x) * np.exp(-a21 * y) + a22 - a24 * y)
+            A3 = a30 * np.exp(-a31 * y) + a32 - a33 * y + a34 * x
+
+            return A0 * np.exp(-A1 * r) + A2 * np.exp(-A3 * r)
+
+        # Method for calculating the horizontal distance weights from 50 to 600m
+        def WrB(r, x, y):
+            b00 = 39006; b01 = 15002337; b02 = 2009.24; b03 = 0.01181; b04 = 3.146; b05 = 16.7417; b06 = 3727
+            b10 = 6.031e-5; b11 = 98.5; b12 = 0.0013826
+            b20 = 11747; b21 = 55.033; b22 = 4521; b23 = 0.01998; b24 = 0.00604; b25 = 3347.4; b26 = 0.00475
+            b30 = 1.543e-2; b31 = 13.29; b32 = 1.807e-2; b33 = 0.0011; b34 = 8.81e-5; b35 = 0.0405; b36 = 26.74
+
+            B0 = (b00 - b01 / (b02 * y + x - 0.13)) * (b03 - y) * np.exp(-b04 * y) - b05 * x * y + b06
+            B1 = b10 * (x + b11) + b12 * y
+            B2 = (b20 * (1 - b26 * x) * np.exp(-b21 * y * (1 - x * b24)) + b22 - b25 * y) * (2 + x * b23)
+            B3 = ((-b30 + b34 * x) * np.exp(-b31 * y / (1 + b35 * x + b36 * y)) + b32) * (2 + x * b33)
+
+            return B0 * np.exp(-B1 * r) + B2 * np.exp(-B3 * r)
+
+        def rscaled(r, p, Hveg, y):
+            Fp = 0.4922 / (0.86 - np.exp(-p / 1013.25))
+            Fveg = 1 - 0.17 * (1 - np.exp(-0.41 * Hveg)) * (1 + np.exp(-9.25 * y))
+            return r / Fp / Fveg
+
+        # Rename variables to be consistent with the revised paper
+        r = distances
+        x = h
+        y = theta
+        bd = rhob
+
+        if Hveg is not None and p is not None:
+            r = rscaled(r, p, Hveg, y)
+
+        Wr = np.zeros(len(r))
+
+        # See Eq. 6 in Schron et al. (2017)
+        r0_idx = (r <= 1)
+        r1_idx = (r > 1) & (r <= 50)
+        r2_idx = (r > 50) & (r < 600)
+        Wr[r0_idx] = WrX(r[r0_idx], x[r0_idx], y[r0_idx])
+        Wr[r1_idx] = WrA(r[r1_idx], x[r1_idx], y[r1_idx])
+        Wr[r2_idx] = WrB(r[r2_idx], x[r2_idx], y[r2_idx])
+
+        # Vertical distance weights
+        def D86(r, bd, y):
+            return 1 / bd * (8.321 + 0.14249 * (0.96655 + np.exp(-0.01 * r)) * (20 + y) / (0.0429 + y))
+
+        def Wd(d, r, bd, y):
+            return np.exp(-2 * d / D86(r, bd, y))
+
+        # Calculate the vertical distance weights
+        Wd = Wd(d, r, bd, y)
+
+        # Combined and normalized weights
+        # Combined and normalized weights
+        weights = Wd * Wr / np.nansum(Wd * Wr)
+
+        return weights
 
 
 def exp_filter(sm,T=1):
