@@ -687,7 +687,7 @@ def abs_humidity(relative_humidity, temp):
     return abs_h
 
 
-def nrad_weight(h,theta,distances,depth,rhob=1.4, method=None, p=None, Hveg=None)
+def nrad_weight(h,theta,distances,depth,rhob=1.4, method=None, p=None, Hveg=None):
     """Function to compute distance weights corresponding to each soil sample.
 
     Args:
