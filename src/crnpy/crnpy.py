@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import requests
 import io
-
+import utm
 
 from scipy.signal import savgol_filter
 from scipy.interpolate import griddata
@@ -108,12 +108,11 @@ def fill_missing_timestamps(df, timestamp_col='timestamp', freq='H', round_times
     return df
 
 
-def total_raw_counts(counts, nan_strategy=None, timestamp_col=None):
+def total_raw_counts(counts):
     """Compute the sum of uncorrected neutron counts for all detectors.
 
     Args:
         counts (pandas.DataFrame): Dataframe containing only the columns with neutron counts.
-        nan_strategy (str): Strategy to use for NaN values. Options are 'interpolate', 'average', or None. Default is None.
 
     Returns:
         (pandas.DataFrame): Dataframe with the sum of uncorrected neutron counts for all detectors.
@@ -235,7 +234,7 @@ def correction_pressure(pressure, Pref, L):
 
 
     Args:
-        atm_pressure (list or array): Atmospheric pressure readings. Long-term average pressure is recommended.
+        pressure (list or array): Atmospheric pressure readings. Long-term average pressure is recommended.
         Pref (float): Reference atmospheric pressure.
         L (float): Atmospheric attenuation coefficient.
 
@@ -278,7 +277,6 @@ def correction_humidity(abs_humidity, Aref):
 
     Args:
         abs_humidity (list or array): Relative humidity readings.
-        temp (list or array): Temperature readings (Celsius).
         Aref (float): Reference absolute humidity (g/m^3). The day of the instrument calibration is recommended.
 
     Returns:
@@ -377,7 +375,7 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
         Documentation available:https://www.nmdb.eu/nest/help.php#howto
     """
 
-    # Example: get_incoming_flux(station='IRKT',start_date='2020-04-10 11:00:00',end_date='2020-06-18 17:00:00')
+    # Example: get_incoming_neutron_flux(station='IRKT',start_date='2020-04-10 11:00:00',end_date='2020-06-18 17:00:00')
     # Template url = 'http://nest.nmdb.eu/draw_graph.php?formchk=1&stations[]=KERG&output=ascii&tabchoice=revori&dtype=corr_for_efficiency&date_choice=bydate&start_year=2009&start_month=09&start_day=01&start_hour=00&start_min=00&end_year=2009&end_month=09&end_day=05&end_hour=23&end_min=59&yunits=0'
 
 
@@ -388,7 +386,6 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     # Convert local time to UTC
     start_date = start_date - pd.Timedelta(hours=utc_offset)
     end_date = end_date - pd.Timedelta(hours=utc_offset)
-    date_format = '%Y-%m-%d %H:%M:%S'
     root = 'http://www.nmdb.eu/nest/draw_graph.php?'
     url_par = [ 'formchk=1',
                 'stations[]=' + station,
@@ -466,7 +463,7 @@ def get_reference_neutron_flux(station, date = pd.to_datetime("2011-05-01")):
 """
 
     # Get flux for 2011-05-01
-    df_flux = get_incoming_flux(station, date, date + pd.Timedelta(hours=24))
+    df_flux = get_incoming_neutron_flux(station, date, date + pd.Timedelta(hours=24))
     if df_flux is None:
         warnings.warn(f"Reference neutron flux for {station} not available. Returning NaN.")
     else:
@@ -489,6 +486,9 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
         Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020.
         Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9.
         doi.org/10.3389/frwa.2020.00009
+
+        Savitzky, A., & Golay, M. J. (1964). Smoothing and differentiation of data by simplified least squares procedures.
+        Analytical chemistry, 36(8), 1627-1639.
     """
 
     if method == 'moving_average':
@@ -615,7 +615,6 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.
 
 
 def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='Schron_2017'):
-    # Convert docstring to google format
     """Function that computes the estimated sensing depth of the cosmic-ray neutron probe.
     The function offers several methods to compute the depth at which 86 % of the neutrons
     probe the soil profile.
@@ -645,7 +644,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
     # Determine sensing depth (D86)
     if method == 'Schron_2017':
         # See Appendix A of Schrön et al. (2017)
-        Fp = 0.4922 / (0.86 - np.exp(-1 * pressure / p_ref));
+        Fp = 0.4922 / (0.86 - np.exp(-1 * pressure / p_ref))
         Fveg = 0
         results = []
         for d in dist:
@@ -660,7 +659,6 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
         results = 5.8/(bulk_density*Wlat+vwc+0.0829)
     else:
         raise ValueError('Method not recognized. Please select either "Schron_2017" or "Franz_2012".')
-
     return results
 
 def abs_humidity(relative_humidity, temp):
@@ -1044,6 +1042,7 @@ def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
         Rc (float): Cutoff rigidity in GV. Values in range 1.0 to 3.0 GV.
         start_date (datetime): Start date for the period of interest.
         end_date (datetime): End date for the period of interest.
+        verbose (bool): If True, print a expanded output of the incoming neutron flux data.
 
     Returns:
         (list): List of top five stations with closes cutoff rigidity.
@@ -1154,7 +1153,7 @@ def lattice_water(clay_content, total_carbon=None):
     return lattice_water
 
 
-def latlon_to_utm(lat, lon, utm_zone_number, missing_values=None):
+def latlon_to_utm(lat, lon, utm_zone_number=None, utm_zone_letter=None):
     """Convert geographic coordinates (lat, lon) to projected coordinates (utm) using the Military Grid Reference System.
 
     Function only applies to non-polar coordinates.
@@ -1167,7 +1166,8 @@ def latlon_to_utm(lat, lon, utm_zone_number, missing_values=None):
     Args:
         lat (float, array): Latitude in decimal degrees.
         lon (float, array): Longitude in decimal degrees.
-        utm_zone_number (int): Universal Transverse Mercator (UTM) zone.
+        utm_zone_number (int): UTM zone number. If None, the zone number is automatically calculated.
+        utm_zone_letter (str): UTM zone letter. If None, the zone letter is automatically calculated.
 
     Returns:
         (float, float): Tuple of easting and northing coordinates in meters. First element is easting, second is northing.
@@ -1178,68 +1178,12 @@ def latlon_to_utm(lat, lon, utm_zone_number, missing_values=None):
 
          [https://www.maptools.com/tutorials/grid_zone_details#](https://www.maptools.com/tutorials/grid_zone_details#)
     """
+    if utm_zone_number is None or utm_zone_letter is None:
+        easting, northing, zone_number, zone_letter = utm.from_latlon(lat, lon)
+    else:
+        easting, northing, zone_number, zone_letter = utm.from_latlon(lat, lon, utm_zone_number, utm_zone_letter)
 
-
-    # Define constants
-    R = 6_378_137  # Earth's radius at the Equator in meters
-
-    # Convert input data to Numpy arrays
-    if (type(lat) is not np.ndarray) or (type(lon) is not np.ndarray):
-        try:
-            lat = np.array(lat)
-            lon = np.array(lon)
-        except:
-            raise "Input values cannot be converted to Numpy arrays."
-
-    # Check latitude range
-    if np.any(lat < -80) | np.any(lat > 84):
-        raise "One or more latitude values exceed the range -80 to 84"
-
-    # Check longitude range
-    if np.any(lon < -180) | np.any(lon > 180):
-        raise "One or more longitude values exceed the range -180 to 180"
-
-    # Constants
-    K0 = 0.9996
-    E = 0.00669438
-    E_P2 = E / (1 - E)
-
-    M1 = (1 - E / 4 - 3 * E ** 2 / 64 - 5 * E ** 3 / 256)
-    M2 = (3 * E / 8 + 3 * E ** 2 / 32 + 45 * E ** 3 / 1024)
-    M3 = (15 * E ** 2 / 256 + 45 * E ** 3 / 1024)
-    M4 = (35 * E ** 3 / 3072)
-
-    # Trigonometric operations
-    lat_rad = np.radians(lat)
-    lon_rad = np.radians(lon)
-
-    lat_sin = np.sin(lat_rad)
-    lat_cos = np.cos(lat_rad)
-    lat_tan = lat_sin / lat_cos
-    lat_tan2 = lat_tan * lat_tan
-    lat_tan4 = lat_tan2 * lat_tan2
-
-    # Find central meridian.
-    central_lon = (utm_zone_number * 6 - 180) - 3  # Zones are every 6 degrees.
-    central_lon_rad = np.radians(central_lon)
-
-    n = R / np.sqrt(1 - E * lat_sin ** 2)
-    c = E_P2 * lat_cos ** 2
-
-    with np.errstate(divide='ignore', invalid='ignore'):
-        a = lat_cos * (np.remainder(((lon_rad - central_lon_rad) + np.pi), (2 * np.pi)) - np.pi)
-    m = R * (M1 * lat_rad - M2 * np.sin(2 * lat_rad) + M3 * np.sin(4 * lat_rad) - M4 * np.sin(6 * lat_rad))
-
-    easting = K0 * n * (a + a ** 3 / 6 * (1 - lat_tan2 + c) + a ** 5 / 120 * (
-                5 - 18 * lat_tan2 + lat_tan4 + 72 * c - 58 * E_P2)) + 500_000
-    northing = K0 * (m + n * lat_tan * (
-                a ** 2 / 2 + a ** 4 / 24 * (5 - lat_tan2 + 9 * c + 4 * c ** 2) + a ** 6 / 720 * (
-                    61 - 58 * lat_tan2 + lat_tan4 + 600 * c - 330 * E_P2)))
-
-    if np.any(lat < 0):
-        northing += 10_000_000
-
-    return easting, northing
+    return easting, northing, zone_number, zone_letter
 
 def euclidean_distance(px, py, x, y):
     """Function that computes the Euclidean distance between one point
