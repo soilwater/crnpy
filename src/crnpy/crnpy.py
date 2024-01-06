@@ -134,7 +134,7 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
     """Function that tests whether values are outliers using a modified moving z-score based on the median absolute difference.
 
     Args:
-        x (pandas.DataFrame): Variable containing only the columns with neutron counts.
+        x (pd.DataFrame or pd.Series): Variable containing only the columns with neutron counts.
         method (str): Outlier detection method. One of: range, iqr, moviqr, zscore, movzscore, modified_zscore, and scaled_mad
         window (int, optional): Window size for the moving central tendency. Default is 11.
         min_val (int or float): Minimum value for a reading to be considered valid. Default is None.
@@ -490,6 +490,10 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
         Savitzky, A., & Golay, M. J. (1964). Smoothing and differentiation of data by simplified least squares procedures.
         Analytical chemistry, 36(8), 1627-1639.
     """
+
+    if not isinstance(x, pd.Series) and not isinstance(x, pd.DataFrame):
+        raise ValueError('Input must be a pandas Series or DataFrame')
+
 
     if method == 'moving_average':
         corrected_counts = values.rolling(window=window, center=True, min_periods=1).mean()
