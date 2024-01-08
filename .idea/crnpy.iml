@@ -4,11 +4,14 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (crnpy)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.11 (crnpy)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="NUMPY" />
     <option name="myDocStringFormat" value="NumPy" />
+  </component>
+  <component name="SonarLintModuleSettings">
+    <option name="uniqueId" value="7a23bc73-9054-4e8d-9f5a-f0d1afe24c71" />
   </component>
 </module>
