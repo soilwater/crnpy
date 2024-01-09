@@ -706,7 +706,7 @@ def abs_humidity(relative_humidity, temp):
     return abs_h
 
 
-def nrad_weight(h, theta, distances, depth, rhob=1.4, method=None, p=None, Hveg=None):
+def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=None, Hveg=None):
     """Function to compute distance weights corresponding to each soil sample.
 
     Args:
@@ -735,7 +735,6 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method=None, p=None, Hveg=
     """
 
     if method == 'Kohli_2015':
-
         # Table A1. Parameters for Fi and D86
         p10 = 8735;
         p11 = 17.1758;
@@ -1299,6 +1298,12 @@ def latlon_to_utm(lat, lon, utm_zone_number=None, utm_zone_letter=None):
 
          [https://www.maptools.com/tutorials/grid_zone_details#](https://www.maptools.com/tutorials/grid_zone_details#)
     """
+    # utm module requires numpy arrays
+    if not isinstance(lat, np.ndarray):
+        lat = np.array(lat)
+    if not isinstance(lon, np.ndarray):
+        lon = np.array(lon)
+
     if utm_zone_number is None or utm_zone_letter is None:
         easting, northing, zone_number, zone_letter = utm.from_latlon(lat, lon)
     else:

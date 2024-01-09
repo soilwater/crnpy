@@ -31,8 +31,7 @@ def calibration_example():
     df_station = df_station[idx_period]
 
     # Compute total neutron counts by adding the counts from both probe detectors
-    df_station['total_raw_counts'] = crnpy.total_raw_counts(df_station[['counts_1_Tot', 'counts_2_Tot']],
-                                                                    nan_strategy='average')
+    df_station['total_raw_counts'] = crnpy.total_raw_counts(df_station[['counts_1_Tot', 'counts_2_Tot']])
 
     # Atmospheric corrections
 

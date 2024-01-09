@@ -317,12 +317,24 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None,
     Args:
         incoming_neutrons (list or array): Incoming neutron flux readings.
         incoming_Ref (float): Reference incoming neutron flux. Baseline incoming neutron flux.
+        fill_na (float): Value to fill missing data. If None, missing data remains as NaN.
+        Rc_method (str): Optional to correct for differences in cutoff rigidity between the site and the reference station. Possible values are 'McJannetandDesilets2023' or 'Hawdonetal2014'. If None, no correction is performed.
+        Rc_site (float): Cutoff rigidity at the monitoring site.
+        site_atmdepth (float): Atmospheric depth at the monitoring site.
+        Rc_ref (float): Cutoff rigidity at the reference station.
+        ref_atmdepth (float): Atmospheric depth at the reference station.
 
     Returns:
         (list): fi correction factor.
 
     References:
+        Hawdon, A., D. McJannet, and J. Wallace (2014), Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia, Water Resour. Res., 50, 5029–5043, doi:10.1002/2013WR015138.
+
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
+
+        McJannet, D. L., & Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59, e2022WR033889. https://doi.org/10.1029/2022WR033889
+
+
 
 
     """
@@ -694,7 +706,7 @@ def abs_humidity(relative_humidity, temp):
     return abs_h
 
 
-def nrad_weight(h, theta, distances, depth, rhob=1.4, method=None, p=None, Hveg=None):
+def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=None, Hveg=None):
     """Function to compute distance weights corresponding to each soil sample.
 
     Args:
@@ -723,7 +735,6 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method=None, p=None, Hveg=
     """
 
     if method == 'Kohli_2015':
-
         # Table A1. Parameters for Fi and D86
         p10 = 8735;
         p11 = 17.1758;
@@ -1287,6 +1298,12 @@ def latlon_to_utm(lat, lon, utm_zone_number=None, utm_zone_letter=None):
 
          [https://www.maptools.com/tutorials/grid_zone_details#](https://www.maptools.com/tutorials/grid_zone_details#)
     """
+    # utm module requires numpy arrays
+    if not isinstance(lat, np.ndarray):
+        lat = np.array(lat)
+    if not isinstance(lon, np.ndarray):
+        lon = np.array(lon)
+
     if utm_zone_number is None or utm_zone_letter is None:
         easting, northing, zone_number, zone_letter = utm.from_latlon(lat, lon)
     else:

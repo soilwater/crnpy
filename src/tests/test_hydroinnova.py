@@ -22,7 +22,7 @@ def hydroinnova_example_mean_value():
     df.reset_index(drop=True, inplace=True)
 
     # Convert Lat and Lon to X and Y
-    df['x'], df['y'] = crnpy.latlon_to_utm(df['LatDec'], df['LongDec'], 14, missing_values=0.0)
+    df['x'], df['y'], zone_letter, zone_number = crnpy.latlon_to_utm(df['LatDec'], df['LongDec'])
     df['x'], df['y'] = crnpy.rover_centered_coordinates(df['x'], df['y'])  # Estimate the center of the observation
 
     # Define columns names

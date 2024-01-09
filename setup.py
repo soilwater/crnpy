@@ -19,6 +19,7 @@ setuptools.setup(
         "numpy",
         "pandas",
         "scipy",
-        "requests"
+        "requests",
+        "utm"
     ],
 )
