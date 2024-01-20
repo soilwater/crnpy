@@ -306,7 +306,7 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None,
     - fi: incoming neutron flux correction factor
 
     $$
-    f_i = \frac{I_{ref}}{I}
+    f_i = \frac{I}{I_{ref}}
     $$
 
     where:
@@ -961,7 +961,7 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
             return np.exp(-2 * d / D86(r, bd, y))
 
         # Calculate the vertical distance weights
-        Wd = Wd(d, r, bd, y)
+        Wd = Wd(depth, r, bd, y)
 
         # Combined and normalized weights
         # Combined and normalized weights
@@ -1088,7 +1088,7 @@ def atmospheric_depth(elevation, latitude):
     density_of_rock = 2670  # Density of rock in kg/m3
     air_pressure_sea_level = 1013.25  # Air pressure at sea level in hPa
     air_molar_mass = 0.0289644  # Air molar mass in kg/mol
-    universal_gas_constant = 8.3144598  # Universal gas constant in J/(mol*K)
+    universal_gas_constant = 8.31432  # Universal gas constant in J/(mol*K)
     reference_temperature = 288.15  # Reference temperature Kelvin
     temperature_lapse_rate = -0.0065  # Temperature lapse rate in K/m
 
