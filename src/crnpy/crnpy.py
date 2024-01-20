@@ -241,6 +241,8 @@ def correction_pressure(pressure, Pref, L):
         (list): fp pressure correction factor.
 
     References:
+        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System, Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.
+
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
     """
 
@@ -282,6 +284,8 @@ def correction_humidity(abs_humidity, Aref):
         (list): fw correction factor.
 
     References:
+        Rosolem, R., W. J. Shuttleworth, M. Zreda, T. E. Franz, X. Zeng, and S. A. Kurc, 2013: The Effect of Atmospheric Water Vapor on Neutron Count in the Cosmic-Ray Soil Moisture Observing System. J. Hydrometeor., 14, 1659–1671, https://doi.org/10.1175/JHM-D-12-0120.1.
+
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
     """
     A = abs_humidity
@@ -306,7 +310,7 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None,
     - fi: incoming neutron flux correction factor
 
     $$
-    f_i = \frac{I_{ref}}{I}
+    f_i = \frac{I}{I_{ref}}
     $$
 
     where:
@@ -333,10 +337,6 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None,
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
 
         McJannet, D. L., & Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59, e2022WR033889. https://doi.org/10.1029/2022WR033889
-
-
-
-
     """
     if incoming_Ref is None and not isinstance(incoming_neutrons, type(None)):
         incoming_Ref = incoming_neutrons[0]
@@ -961,7 +961,7 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
             return np.exp(-2 * d / D86(r, bd, y))
 
         # Calculate the vertical distance weights
-        Wd = Wd(d, r, bd, y)
+        Wd = Wd(depth, r, bd, y)
 
         # Combined and normalized weights
         # Combined and normalized weights
@@ -1088,7 +1088,7 @@ def atmospheric_depth(elevation, latitude):
     density_of_rock = 2670  # Density of rock in kg/m3
     air_pressure_sea_level = 1013.25  # Air pressure at sea level in hPa
     air_molar_mass = 0.0289644  # Air molar mass in kg/mol
-    universal_gas_constant = 8.3144598  # Universal gas constant in J/(mol*K)
+    universal_gas_constant = 8.31432  # Universal gas constant in J/(mol*K)
     reference_temperature = 288.15  # Reference temperature Kelvin
     temperature_lapse_rate = -0.0065  # Temperature lapse rate in K/m
 
@@ -1098,7 +1098,7 @@ def atmospheric_depth(elevation, latitude):
     # Free air correction
     free_air = -3.086 * 10 ** -6 * elevation
     # Bouguer correction
-    bouguer_corr = 4.194 * 10 ** -10 * density_of_rock * elevation
+    bouguer_corr = 4.193 * 10 ** -10 * density_of_rock * elevation
     # Total gravity
     gravity = gravity_sea_level + free_air + bouguer_corr
 
