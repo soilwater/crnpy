@@ -473,7 +473,7 @@ def get_reference_neutron_flux(station, date=pd.to_datetime("2011-05-01")):
 """
 
     # Get flux for 2011-05-01
-    df_flux = get_incoming_neutron_flux(station, date, date + pd.Timedelta(hours=24))
+    df_flux = get_incoming_neutron_flux(date, date + pd.Timedelta(hours=24), station=station)
     if df_flux is None:
         warnings.warn(f"Reference neutron flux for {station} not available. Returning NaN.")
     else:
@@ -502,7 +502,7 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
         Analytical chemistry, 36(8), 1627-1639.
     """
 
-    if not isinstance(x, pd.Series) and not isinstance(x, pd.DataFrame):
+    if not isinstance(values, pd.Series) and not isinstance(x, pd.DataFrame):
         raise ValueError('Input must be a pandas Series or DataFrame')
 
     if method == 'moving_average':
@@ -1228,26 +1228,29 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
     """Function to interpolate incoming neutron flux to match the timestamps of the observations.
 
     Args:
-        nmdb_timestamps (pd.Series): Series of timestamps in datetime format from the NMDB.
-        nmdb_counts (pd.Series): Series of neutron counts from the NMDB
-        crnp_timestamps (pd.Series): Series of timestamps in datetime format from the station or device.
+        nmdb_timestamps (pd.Series or np.array): Series or array of timestamps in datetime format from the NMDB
+        nmdb_counts (pd.Series or np.array): Series or array of incoming neutron flux counts from the NMDB
+        crnp_timestamps (pd.Series or np.array): Series or array of timestamps in datetime format from the CRNP device
 
     Returns:
         (pd.Series): Series containing interpolated incoming neutron flux. Length of Series is the same as crnp_timestamps
     """
-    incoming_flux = np.array([])
-    for k, timestamp in enumerate(crnp_timestamps):
-        if timestamp in nmdb_timestamps.values:
-            idx = timestamp == nmdb_timestamps
-            incoming_flux = np.append(incoming_flux, nmdb_counts.loc[idx])
-        else:
-            incoming_flux = np.append(incoming_flux, np.nan)
+    # Create a DataFrame from nmdb timestamps and counts
+    df_nmdb = pd.DataFrame({'timestamp': nmdb_timestamps, 'counts': nmdb_counts})
 
-    # Interpolate nan values
-    incoming_flux = pd.Series(incoming_flux).interpolate(method='nearest', limit_direction='both')
+    # Set the Timestamp column as the index
+    df_nmdb.set_index('timestamp', inplace=True)
 
-    # Return only the values for the selected timestamps
-    return incoming_flux
+    # Reindex the DataFrame to the timestamps from the CRNP device using the nearest method
+    # This will match each CRNP timestamp with the nearest NMDB timestamp
+    interpolated_flux = df_nmdb.reindex(crnp_timestamps, method='nearest')['counts'].values
+
+    #drop NaN values
+    interpolated_flux = interpolated_flux[~np.isnan(interpolated_flux)]
+
+    assert len(interpolated_flux) == len(crnp_timestamps), "Length of interpolated flux does not match length of CRNP timestamps"
+
+    return interpolated_flux
 
 
 def lattice_water(clay_content, total_carbon=None):
@@ -1290,7 +1293,7 @@ def latlon_to_utm(lat, lon, utm_zone_number=None, utm_zone_letter=None):
         utm_zone_letter (str): UTM zone letter. If None, the zone letter is automatically calculated.
 
     Returns:
-        (float, float): Tuple of easting and northing coordinates in meters. First element is easting, second is northing.
+        (float, float, int, str): Tuple of easting, northing, zone number and zone letter. First element is easting, second is northing, third is zone number and fourth is zone letter.
 
     References:
          Code adapted from utm module created by Tobias Bieniek (Github username: Turbo87)

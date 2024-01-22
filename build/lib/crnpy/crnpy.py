@@ -241,6 +241,8 @@ def correction_pressure(pressure, Pref, L):
         (list): fp pressure correction factor.
 
     References:
+        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System, Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.
+
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
     """
 
@@ -282,6 +284,8 @@ def correction_humidity(abs_humidity, Aref):
         (list): fw correction factor.
 
     References:
+        Rosolem, R., W. J. Shuttleworth, M. Zreda, T. E. Franz, X. Zeng, and S. A. Kurc, 2013: The Effect of Atmospheric Water Vapor on Neutron Count in the Cosmic-Ray Soil Moisture Observing System. J. Hydrometeor., 14, 1659–1671, https://doi.org/10.1175/JHM-D-12-0120.1.
+
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
     """
     A = abs_humidity
@@ -333,10 +337,6 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None,
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
 
         McJannet, D. L., & Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59, e2022WR033889. https://doi.org/10.1029/2022WR033889
-
-
-
-
     """
     if incoming_Ref is None and not isinstance(incoming_neutrons, type(None)):
         incoming_Ref = incoming_neutrons[0]
@@ -473,7 +473,7 @@ def get_reference_neutron_flux(station, date=pd.to_datetime("2011-05-01")):
 """
 
     # Get flux for 2011-05-01
-    df_flux = get_incoming_neutron_flux(station, date, date + pd.Timedelta(hours=24))
+    df_flux = get_incoming_neutron_flux(date, date + pd.Timedelta(hours=24), station=station)
     if df_flux is None:
         warnings.warn(f"Reference neutron flux for {station} not available. Returning NaN.")
     else:
@@ -502,7 +502,7 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
         Analytical chemistry, 36(8), 1627-1639.
     """
 
-    if not isinstance(x, pd.Series) and not isinstance(x, pd.DataFrame):
+    if not isinstance(values, pd.Series) and not isinstance(x, pd.DataFrame):
         raise ValueError('Input must be a pandas Series or DataFrame')
 
     if method == 'moving_average':
@@ -1098,7 +1098,7 @@ def atmospheric_depth(elevation, latitude):
     # Free air correction
     free_air = -3.086 * 10 ** -6 * elevation
     # Bouguer correction
-    bouguer_corr = 4.194 * 10 ** -10 * density_of_rock * elevation
+    bouguer_corr = 4.193 * 10 ** -10 * density_of_rock * elevation
     # Total gravity
     gravity = gravity_sea_level + free_air + bouguer_corr
 
@@ -1228,26 +1228,29 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
     """Function to interpolate incoming neutron flux to match the timestamps of the observations.
 
     Args:
-        nmdb_timestamps (pd.Series): Series of timestamps in datetime format from the NMDB.
-        nmdb_counts (pd.Series): Series of neutron counts from the NMDB
-        crnp_timestamps (pd.Series): Series of timestamps in datetime format from the station or device.
+        nmdb_timestamps (pd.Series or np.array): Series or array of timestamps in datetime format from the NMDB
+        nmdb_counts (pd.Series or np.array): Series or array of incoming neutron flux counts from the NMDB
+        crnp_timestamps (pd.Series or np.array): Series or array of timestamps in datetime format from the CRNP device
 
     Returns:
         (pd.Series): Series containing interpolated incoming neutron flux. Length of Series is the same as crnp_timestamps
     """
-    incoming_flux = np.array([])
-    for k, timestamp in enumerate(crnp_timestamps):
-        if timestamp in nmdb_timestamps.values:
-            idx = timestamp == nmdb_timestamps
-            incoming_flux = np.append(incoming_flux, nmdb_counts.loc[idx])
-        else:
-            incoming_flux = np.append(incoming_flux, np.nan)
+    # Create a DataFrame from nmdb timestamps and counts
+    df_nmdb = pd.DataFrame({'timestamp': nmdb_timestamps, 'counts': nmdb_counts})
 
-    # Interpolate nan values
-    incoming_flux = pd.Series(incoming_flux).interpolate(method='nearest', limit_direction='both')
+    # Set the Timestamp column as the index
+    df_nmdb.set_index('timestamp', inplace=True)
 
-    # Return only the values for the selected timestamps
-    return incoming_flux
+    # Reindex the DataFrame to the timestamps from the CRNP device using the nearest method
+    # This will match each CRNP timestamp with the nearest NMDB timestamp
+    interpolated_flux = df_nmdb.reindex(crnp_timestamps, method='nearest')['counts'].values
+
+    #drop NaN values
+    interpolated_flux = interpolated_flux[~np.isnan(interpolated_flux)]
+
+    assert len(interpolated_flux) == len(crnp_timestamps), "Length of interpolated flux does not match length of CRNP timestamps"
+
+    return interpolated_flux
 
 
 def lattice_water(clay_content, total_carbon=None):
@@ -1290,7 +1293,7 @@ def latlon_to_utm(lat, lon, utm_zone_number=None, utm_zone_letter=None):
         utm_zone_letter (str): UTM zone letter. If None, the zone letter is automatically calculated.
 
     Returns:
-        (float, float): Tuple of easting and northing coordinates in meters. First element is easting, second is northing.
+        (float, float, int, str): Tuple of easting, northing, zone number and zone letter. First element is easting, second is northing, third is zone number and fourth is zone letter.
 
     References:
          Code adapted from utm module created by Tobias Bieniek (Github username: Turbo87)
