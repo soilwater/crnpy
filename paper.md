@@ -70,7 +70,7 @@ The CRNPy library integrates standard routines for processing CRNP data, with fe
 
 # Acknowledgements
 
-This work was supported by the USDA National Institute of Food and Agriculture through the Agriculture and Food Research Initiative Competitive Grant no. 2019-68012-29888 and through Multistate project W4188. The authors declare no competing interests. This is contribution no. 24-179-J of the Kansas Agricultural Experiment Station
+This work was supported by the USDA National Institute of Food and Agriculture through the Agriculture and Food Research Initiative Competitive Grant no. 2019-68012-29888 and through Multistate project W4188. The authors declare no competing interests. This is contribution no. 24-179-J of the Kansas Agricultural Experiment Station.
 
 # References
 
