@@ -52,7 +52,7 @@ The CRNPy library integrates standard routines for processing CRNP data, with fe
 - Detection of possible outliers using range detection based on user-provided lower and upper boundaries, interquartile range, z-scores, and a scaled mean absolute difference  [@iglewicz1993volume].
 - Corrections for atmospheric pressure as described by @zreda2012cosmos, air humidity [@rosolem2013], and incoming neutron flux following the guidelines from @zreda2012cosmos; @hawdon2014calibration; @mcjannet2023incoming. The article by @andreasen2017status provides an overall description of these correction methods included in CRNPy (\autoref{fig:output_stationary}a and \autoref{fig:output_stationary}b).
 - Corrections to account for additional hydrogen pools in above- and below-ground plant biomass [@baatz2015empirical; @wahbi2018situ].
-- Corrections to account for the impact of road soil moisture conditions during roving surveys [@schron2018cosmic].
+- Corrections to account for the impact of road soil moisture conditions during roving surveys [@schron2018roads].
 - Conversion of corrected counts into volumetric soil water content following the approach suggested by @desilets2010nature.
 - Determination of neutron count uncertainty following the method detailed in @jakobi2020error (see \autoref{fig:output_stationary}c). 
 - Estimation of sensing depth by determining the volume that accounts for 86% of the origin of the counted neutrons [@franz2012measurement; @schron2017improving].
@@ -70,7 +70,7 @@ The CRNPy library integrates standard routines for processing CRNP data, with fe
 
 # Acknowledgements
 
-This work was supported by the USDA National Institute of Food and Agriculture through the Agriculture and Food Research Initiative Competitive Grant no. 2019-68012-29888 and through Multistate project W4188. The authors declare no competing interests.
+This work was supported by the USDA National Institute of Food and Agriculture through the Agriculture and Food Research Initiative Competitive Grant no. 2019-68012-29888 and through Multistate project W4188. The authors declare no competing interests. This is contribution no. 24-179-J of the Kansas Agricultural Experiment Station
 
 # References
 
