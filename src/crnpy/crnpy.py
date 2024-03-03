@@ -670,7 +670,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
 
             # Compute soil depth that accounts for 86% of the neutron flux
             D86 = 1 / bulk_density * (8.321 + 0.14249 * (0.96655 + np.exp(-0.01 * r_start)) * (20 + (Wlat + vwc)) / (
-                        0.0429 + (Wlat + vwc)))
+                    0.0429 + (Wlat + vwc)))
             results.append(D86)
 
     elif method == 'Franz_2012':
@@ -1104,8 +1104,8 @@ def atmospheric_depth(elevation, latitude):
 
     # Air pressure calculation
     reference_air_pressure = air_pressure_sea_level * (
-                1 + temperature_lapse_rate / reference_temperature * elevation) ** ((-gravity * air_molar_mass) / (
-                universal_gas_constant * temperature_lapse_rate))
+            1 + temperature_lapse_rate / reference_temperature * elevation) ** ((-gravity * air_molar_mass) / (
+            universal_gas_constant * temperature_lapse_rate))
 
     # Atmospheric depth calculation
     atmospheric_depth = (10 * reference_air_pressure) / gravity
@@ -1149,7 +1149,7 @@ def location_factor(site_atmospheric_depth, site_Rc, reference_atmospheric_depth
 
     # Calculate the result using the provided parameters
     tau = epsilon * norm_factor * (c0 * site_atmospheric_depth + c1) * (
-                1 - np.exp(-(c2 * site_atmospheric_depth + c3) * site_Rc ** (c4 * site_atmospheric_depth + c5)))
+            1 - np.exp(-(c2 * site_atmospheric_depth + c3) * site_Rc ** (c4 * site_atmospheric_depth + c5)))
     return tau
 
 
@@ -1245,10 +1245,11 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
     # This will match each CRNP timestamp with the nearest NMDB timestamp
     interpolated_flux = df_nmdb.reindex(crnp_timestamps, method='nearest')['counts'].values
 
-    #drop NaN values
+    # drop NaN values
     interpolated_flux = interpolated_flux[~np.isnan(interpolated_flux)]
 
-    assert len(interpolated_flux) == len(crnp_timestamps), "Length of interpolated flux does not match length of CRNP timestamps"
+    assert len(interpolated_flux) == len(
+        crnp_timestamps), "Length of interpolated flux does not match length of CRNP timestamps"
 
     return interpolated_flux
 
