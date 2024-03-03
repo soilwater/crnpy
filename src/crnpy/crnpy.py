@@ -5,20 +5,19 @@
  Created by Joaquin Peraza and Andres Patrignani.
 """
 
+import io
+import numbers
 # Import modules
 import sys
 import warnings
-import numbers
+
+import crnpy.data as data
 import numpy as np
 import pandas as pd
 import requests
-import io
-
-
-from scipy.signal import savgol_filter
 from scipy.interpolate import griddata
+from scipy.signal import savgol_filter
 from scipy.special import erfcinv
-import crnpy.data as data
 
 # Define python version
 python_version = (3, 7)  # tuple of (major, minor) version requirement
@@ -42,24 +41,24 @@ def remove_incomplete_intervals(df, timestamp_col, integration_time, remove_firs
     Returns:
         (pandas.DataFrame): 
     """
-    
+
     # Check format of timestamp column
     if df[timestamp_col].dtype != 'datetime64[ns]':
         raise TypeError('timestamp_col must be datetime64. Use `pd.to_datetime()` to fix this issue.')
 
     # Check if differences in timestamps are below or above the provided integration time
     idx_delta = df[timestamp_col].diff().dt.total_seconds() != integration_time
-    
+
     if remove_first:
         idx_delta[0] = True
-        
+
     # Select rows that meet the specified integration time
     df = df[~idx_delta]
     df.reset_index(drop=True, inplace=True)
 
     # Notify user about the number of rows that have been removed
     print(f"Removed a total of {sum(idx_delta)} rows.")
-    
+
     return df
 
 
@@ -94,17 +93,17 @@ def fill_missing_timestamps(df, timestamp_col='timestamp', freq='H', round_times
     for date in date_range:
         if date not in df[timestamp_col].values:
             if verbose:
-                print('Adding missing date:',date)
-            new_line = pd.DataFrame({timestamp_col:date}, index=[-1]) # By default fills columns with np.nan
-            df = pd.concat([df,new_line])
+                print('Adding missing date:', date)
+            new_line = pd.DataFrame({timestamp_col: date}, index=[-1])  # By default fills columns with np.nan
+            df = pd.concat([df, new_line])
             counter += 1
 
     df.sort_values(by=timestamp_col, inplace=True)
     df.reset_index(drop=True, inplace=True)
-    
+
     # Notify user about the number of rows that have been removed
     print(f"Added a total of {counter} missing timestamps.")
-    
+
     return df
 
 
@@ -120,14 +119,14 @@ def total_raw_counts(counts, nan_strategy=None, timestamp_col=None):
     """
 
     if counts.shape[0] > 1:
-        counts = counts.apply(lambda x: x.fillna(counts.mean(axis=1)),axis=0)
+        counts = counts.apply(lambda x: x.fillna(counts.mean(axis=1)), axis=0)
 
     # Compute sum of counts
     total_raw_counts = counts.sum(axis=1)
-    
+
     # Replace zeros with NaN
     total_raw_counts = total_raw_counts.replace(0, np.nan)
-    
+
     return total_raw_counts
 
 
@@ -147,7 +146,7 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
     References:
         Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
     """
-        
+
     if not isinstance(x, pd.Series):
         raise TypeError('x must of type pandas.Series')
 
@@ -164,24 +163,24 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
         iqr = q3 - q1
         high_fence = q3 + (1.5 * iqr)
         low_fence = q1 - (1.5 * iqr)
-        idx_outliers = (x<low_fence ) | (x>high_fence )
+        idx_outliers = (x < low_fence) | (x > high_fence)
 
     elif method == 'moviqr':
         q1 = x.rolling(window, center=True).quantile(0.25)
         q3 = x.rolling(window, center=True).quantile(0.75)
         iqr = q3 - q1
-        ub = q3 + (1.5 * iqr) # Upper boundary
-        lb = q1 - (1.5 * iqr) # Lower boundary
+        ub = q3 + (1.5 * iqr)  # Upper boundary
+        lb = q1 - (1.5 * iqr)  # Lower boundary
         idx_outliers = (x < lb) | (x > ub)
 
     elif method == 'zscore':
-        zscore = (x - x.mean())/x.std()
+        zscore = (x - x.mean()) / x.std()
         idx_outliers = (zscore < -3) | (zscore > 3)
 
     elif method == 'movzscore':
         movmean = x.rolling(window=window, center=True).mean()
         movstd = x.rolling(window=window, center=True).std()
-        movzscore = (x - movmean)/movstd
+        movzscore = (x - movmean) / movstd
         idx_outliers = (movzscore < -3) | (movzscore > 3)
 
     elif method == 'modified_zscore':
@@ -196,10 +195,10 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
 
     elif method == 'scaled_mad':
         # Returns true for elements more than three scaled MAD from the median. 
-        c = -1 / (np.sqrt(2)*erfcinv(3/2))
+        c = -1 / (np.sqrt(2) * erfcinv(3 / 2))
         median = np.nanmedian(x)
-        mad = c*np.nanmedian(np.abs(x - median))
-        idx_outliers = x > (median + 3*mad)
+        mad = c * np.nanmedian(np.abs(x - median))
+        idx_outliers = x > (median + 3 * mad)
 
     else:
         raise TypeError('Outlier detection method not found.')
@@ -247,7 +246,7 @@ def correction_pressure(pressure, Pref, L):
     """
 
     # Compute pressure correction factor
-    fp = np.exp((Pref - pressure) / L) # Zreda et al. 2017 Eq 5.
+    fp = np.exp((Pref - pressure) / L)  # Zreda et al. 2017 Eq 5.
 
     return fp
 
@@ -288,8 +287,9 @@ def correction_humidity(abs_humidity, Aref):
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
     """
     A = abs_humidity
-    fw = 1 + 0.0054*(A - Aref) # Zreda et al. 2017 Eq 6.
+    fw = 1 + 0.0054 * (A - Aref)  # Zreda et al. 2017 Eq 6.
     return fw
+
 
 def correction_incoming_flux(incoming_neutrons, incoming_Ref=None):
     r"""Correction factor for incoming neutron flux.
@@ -357,7 +357,6 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     # Example: get_incoming_flux(station='IRKT',start_date='2020-04-10 11:00:00',end_date='2020-06-18 17:00:00')
     # Template url = 'http://nest.nmdb.eu/draw_graph.php?formchk=1&stations[]=KERG&output=ascii&tabchoice=revori&dtype=corr_for_efficiency&date_choice=bydate&start_year=2009&start_month=09&start_day=01&start_hour=00&start_min=00&end_year=2009&end_month=09&end_day=05&end_hour=23&end_min=59&yunits=0'
 
-
     # Expand the time window by 1 hour to ensure an extra observation is included in the request.
     start_date -= pd.Timedelta(hours=expand_window)
     end_date += pd.Timedelta(hours=expand_window)
@@ -367,24 +366,24 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     end_date = end_date - pd.Timedelta(hours=utc_offset)
     date_format = '%Y-%m-%d %H:%M:%S'
     root = 'http://www.nmdb.eu/nest/draw_graph.php?'
-    url_par = [ 'formchk=1',
-                'stations[]=' + station,
-                'output=ascii',
-                'tabchoice=revori',
-                'dtype=corr_for_efficiency',
-                'tresolution=' + str(60),
-                'date_choice=bydate',
-                'start_year=' + str(start_date.year),
-                'start_month=' + str(start_date.month),
-                'start_day=' + str(start_date.day),
-                'start_hour=' + str(start_date.hour),
-                'start_min=' + str(start_date.minute),
-                'end_year=' + str(end_date.year),
-                'end_month=' + str(end_date.month),
-                'end_day=' + str(end_date.day),
-                'end_hour=' + str(end_date.hour),
-                'end_min=' + str(end_date.minute),
-                'yunits=0']
+    url_par = ['formchk=1',
+               'stations[]=' + station,
+               'output=ascii',
+               'tabchoice=revori',
+               'dtype=corr_for_efficiency',
+               'tresolution=' + str(60),
+               'date_choice=bydate',
+               'start_year=' + str(start_date.year),
+               'start_month=' + str(start_date.month),
+               'start_day=' + str(start_date.day),
+               'start_hour=' + str(start_date.hour),
+               'start_min=' + str(start_date.minute),
+               'end_year=' + str(end_date.year),
+               'end_month=' + str(end_date.month),
+               'end_day=' + str(end_date.day),
+               'end_hour=' + str(end_date.hour),
+               'end_min=' + str(end_date.minute),
+               'yunits=0']
 
     url = root + '&'.join(url_par)
 
@@ -398,9 +397,9 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     start = r.find("RCORR_E\n") + 8
     end = r.find('\n</code></pre><br>Total') - 1
     s = r[start:end]
-    s2 = ''.join([row.replace(';',',') for row in s])
+    s2 = ''.join([row.replace(';', ',') for row in s])
     try:
-        df_flux = pd.read_csv(io.StringIO(s2), names=['timestamp','counts'])
+        df_flux = pd.read_csv(io.StringIO(s2), names=['timestamp', 'counts'])
     except:
         if verbose:
             print(f"Error retrieving data from {url}")
@@ -422,7 +421,6 @@ the origin by a sentence like 'We acknowledge the NMDB database (www.nmdb.eu) fo
 (Physikalisches Institut, University of Bern, Switzerland)"""
 
     return df_flux
-
 
 
 def smooth_1d(values, window=5, order=3, method='moving_median'):
@@ -454,13 +452,14 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
             print('Dataframe contains NaN values. Please remove NaN values before smoothing the data.')
 
         if type(values) == pd.core.series.Series:
-            filtered = savgol_filter(values,window,order)
-            corrected_counts = pd.DataFrame(filtered,columns=['smoothed'], index=values.index)
+            filtered = savgol_filter(values, window, order)
+            corrected_counts = pd.DataFrame(filtered, columns=['smoothed'], index=values.index)
         elif type(values) == pd.core.frame.DataFrame:
             for col in values.columns:
-                values[col] = savgol_filter(values[col],window,order)
+                values[col] = savgol_filter(values[col], window, order)
     else:
-        raise ValueError('Invalid method. Please select a valid filtering method., options are: moving_average, moving_median, savitzky_golay')
+        raise ValueError(
+            'Invalid method. Please select a valid filtering method., options are: moving_average, moving_median, savitzky_golay')
     corrected_counts = corrected_counts.ffill(limit=window).bfill(limit=window).copy()
     return corrected_counts
 
@@ -483,7 +482,8 @@ def correction_bwe(counts, bwe, r2_N0=0.05):
         Water Resour. Res., 51, 2030–2046, doi:10.1002/ 2014WR016443.
     """
 
-    return counts/(1 - bwe*r2_N0)
+    return counts / (1 - bwe * r2_N0)
+
 
 def biomass_to_bwe(biomass_dry, biomass_fresh, fWE=0.494):
     """Function to convert biomass to biomass water equivalent.
@@ -505,7 +505,8 @@ def biomass_to_bwe(biomass_dry, biomass_fresh, fWE=0.494):
     return (biomass_fresh - biomass_dry) + fWE * biomass_dry
 
 
-def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0.12, p0=0.42, p1=0.5, p2=1.06, p3=4, p4=0.16, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
+def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0.12, p0=0.42, p1=0.5, p2=1.06, p3=4,
+                    p4=0.16, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
     """Function to correct for road effects in neutron counts.
     following the approach described in Schrön et al., 2018.
 
@@ -525,7 +526,7 @@ def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0
         of field soil moisture and the influence of roads.WaterResources Research,54,6441–6459.
         https://doi. org/10.1029/2017WR021719
     """
-    F1 = p0 * (1-np.exp(-p1*road_width))
+    F1 = p0 * (1 - np.exp(-p1 * road_width))
     F2 = -p2 - p3 * theta_road - ((p4 + theta_road) / (theta_N))
     F3 = p6 * np.exp(-p7 * (road_width ** -p8) * road_distance ** 4) + (1 - p6) * np.exp(-p9 * road_distance)
 
@@ -535,7 +536,8 @@ def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0
 
     return corrected_counts
 
-def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.115):
+
+def counts_to_vwc(counts, N0, Wlat, Wsoc, bulk_density, a0=0.0808, a1=0.372, a2=0.115):
     r"""Function to convert corrected and filtered neutron counts into volumetric water content.
 
     This method implements soil moisture estimation using the non-linear relationship between neutron count and soil volumetric water content following the approach described in Desilets et al., 2010.
@@ -562,9 +564,8 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc ,bulk_density, a0=0.0808,a1=0.372,a2=0.
     """
 
     # Convert neutron counts into vwc
-    vwc = (a0 / (counts/N0-a1) - a2 - Wlat - Wsoc) * bulk_density
+    vwc = (a0 / (counts / N0 - a1) - a2 - Wlat - Wsoc) * bulk_density
     return vwc
-
 
 
 def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='Schron_2017'):
@@ -603,18 +604,20 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
         results = []
         for d in dist:
             # Compute r_star
-            r_start = d/Fp
+            r_start = d / Fp
 
             # Compute soil depth that accounts for 86% of the neutron flux
-            D86 = 1/ bulk_density * (8.321+0.14249*(0.96655 + np.exp(-0.01*r_start))*(20+(Wlat+vwc)) / (0.0429+(Wlat+vwc)))
+            D86 = 1 / bulk_density * (8.321 + 0.14249 * (0.96655 + np.exp(-0.01 * r_start)) * (20 + (Wlat + vwc)) / (
+                        0.0429 + (Wlat + vwc)))
             results.append(D86)
 
     elif method == 'Franz_2012':
-        results = 5.8/(bulk_density*Wlat+vwc+0.0829)
+        results = 5.8 / (bulk_density * Wlat + vwc + 0.0829)
     else:
         raise ValueError('Method not recognized. Please select either "Schron_2017" or "Franz_2012".')
 
     return results
+
 
 def abs_humidity(relative_humidity, temp):
     """
@@ -631,7 +634,7 @@ def abs_humidity(relative_humidity, temp):
     ### Atmospheric water vapor factor
     # Saturation vapor pressure
     e_sat = 0.611 * np.exp(17.502 * temp / (
-                temp + 240.97)) * 1000  # in Pascals Eq. 3.8 p.41 Environmental Biophysics (Campbell and Norman)
+            temp + 240.97)) * 1000  # in Pascals Eq. 3.8 p.41 Environmental Biophysics (Campbell and Norman)
 
     # Vapor pressure Pascals
     Pw = e_sat * relative_humidity / 100
@@ -642,7 +645,7 @@ def abs_humidity(relative_humidity, temp):
     return abs_h
 
 
-def nrad_weight(h,theta,distances,depth,rhob=1.4):
+def nrad_weight(h, theta, distances, depth, rhob=1.4):
     """Function to compute distance weights corresponding to each soil sample.
 
     Args:
@@ -662,45 +665,87 @@ def nrad_weight(h,theta,distances,depth,rhob=1.4):
     """
 
     # Table A1. Parameters for Fi and D86
-    p10 = 8735;       p11 = 17.1758; p12 = 11720;      p13 = 0.00978;   p14 = 7045;      p15 = 0.003632;
-    p20 = 2.7925e-2;  p21 = 5.0399;  p22 = 2.8544e-2;  p23 = 0.002455;  p24 = 6.851e-5;  p25 = 9.2926;
-    p30 = 247970;     p31 = 17.63;   p32 = 374655;     p33 = 0.00191;   p34 = 195725;
-    p40 = 5.4818e-2;  p41 = 15.921;  p42 = 0.6373;     p43 = 5.99e-2;   p44 = 5.425e-4;
-    p50 = 1383702;    p51 = 4.156;   p52 = 5325;       p53 = 0.00238;   p54 = 0.0156;    p55 = 0.130;     p56 = 1521;
-    p60 = 6.031e-5;   p61 = 98.5;    p62 = 1.0466e-3;
-    p70 = 11747;      p71 = 41.66;   p72 = 4521;       p73 = 0.01998;   p74 = 0.00604;   p75 = 2534;      p76 = 0.00475;
-    p80 = 1.543e-2;   p81 = 10.06;   p82 = 1.807e-2;   p83 = 0.0011;    p84 = 8.81e-5;   p85 = 0.0405;    p86 = 20.24;
-    p90 = 8.321;      p91 = 0.14249; p92 = 0.96655;    p93 = 26.42;     p94 = 0.0567;
-
+    p10 = 8735;
+    p11 = 17.1758;
+    p12 = 11720;
+    p13 = 0.00978;
+    p14 = 7045;
+    p15 = 0.003632;
+    p20 = 2.7925e-2;
+    p21 = 5.0399;
+    p22 = 2.8544e-2;
+    p23 = 0.002455;
+    p24 = 6.851e-5;
+    p25 = 9.2926;
+    p30 = 247970;
+    p31 = 17.63;
+    p32 = 374655;
+    p33 = 0.00191;
+    p34 = 195725;
+    p40 = 5.4818e-2;
+    p41 = 15.921;
+    p42 = 0.6373;
+    p43 = 5.99e-2;
+    p44 = 5.425e-4;
+    p50 = 1383702;
+    p51 = 4.156;
+    p52 = 5325;
+    p53 = 0.00238;
+    p54 = 0.0156;
+    p55 = 0.130;
+    p56 = 1521;
+    p60 = 6.031e-5;
+    p61 = 98.5;
+    p62 = 1.0466e-3;
+    p70 = 11747;
+    p71 = 41.66;
+    p72 = 4521;
+    p73 = 0.01998;
+    p74 = 0.00604;
+    p75 = 2534;
+    p76 = 0.00475;
+    p80 = 1.543e-2;
+    p81 = 10.06;
+    p82 = 1.807e-2;
+    p83 = 0.0011;
+    p84 = 8.81e-5;
+    p85 = 0.0405;
+    p86 = 20.24;
+    p90 = 8.321;
+    p91 = 0.14249;
+    p92 = 0.96655;
+    p93 = 26.42;
+    p94 = 0.0567;
 
     # Numerical determination of the penetration depth (86%) (Eq. 8)
-    D86 = 1/rhob*(p90+p91*(p92+np.exp(-1*distances/100))*(p93+theta)/(p94+theta))
+    D86 = 1 / rhob * (p90 + p91 * (p92 + np.exp(-1 * distances / 100)) * (p93 + theta) / (p94 + theta))
 
     # Depth weights (Eq. 7)
-    Wd = np.exp(-2*depth/D86)
+    Wd = np.exp(-2 * depth / D86)
 
     if h == 0:
-        W = 1 # skip distance weighting
+        W = 1  # skip distance weighting
 
-    elif (h >= 0.1) and (h<= 50):
+    elif (h >= 0.1) and (h <= 50):
         # Functions for Fi (Appendix A in Köhli et al., 2015)
-        F1 = p10*(1+p13*h)*np.exp(-p11*theta)+p12*(1+p15*h)-p14*theta
-        F2 = ((-p20+p24*h)*np.exp(-p21*theta/(1+p25*theta))+p22)*(1+h*p23)
-        F3 = (p30*(1+p33*h)*np.exp(-p31*theta)+p32-p34*theta)
-        F4 = p40*np.exp(-p41*theta)+p42-p43*theta+p44*h
-        F5 = p50*(0.02-1/p55/(h-p55+p56*theta))*(p54-theta)*np.exp(-p51*(theta-p54))+p52*(0.7-h*theta*p53)
-        F6 = p60*(h+p61)+p62*theta
-        F7 = (p70*(1-p76*h)*np.exp(-p71*theta*(1-h*p74))+p72-p75*theta)*(2+h*p73)
-        F8 = ((-p80+p84*h)*np.exp(-p81*theta/(1+p85*h+p86*theta))+p82)*(2+h*p83)
+        F1 = p10 * (1 + p13 * h) * np.exp(-p11 * theta) + p12 * (1 + p15 * h) - p14 * theta
+        F2 = ((-p20 + p24 * h) * np.exp(-p21 * theta / (1 + p25 * theta)) + p22) * (1 + h * p23)
+        F3 = (p30 * (1 + p33 * h) * np.exp(-p31 * theta) + p32 - p34 * theta)
+        F4 = p40 * np.exp(-p41 * theta) + p42 - p43 * theta + p44 * h
+        F5 = p50 * (0.02 - 1 / p55 / (h - p55 + p56 * theta)) * (p54 - theta) * np.exp(-p51 * (theta - p54)) + p52 * (
+                    0.7 - h * theta * p53)
+        F6 = p60 * (h + p61) + p62 * theta
+        F7 = (p70 * (1 - p76 * h) * np.exp(-p71 * theta * (1 - h * p74)) + p72 - p75 * theta) * (2 + h * p73)
+        F8 = ((-p80 + p84 * h) * np.exp(-p81 * theta / (1 + p85 * h + p86 * theta)) + p82) * (2 + h * p83)
 
         # Distance weights (Eq. 3)
-        W = np.ones_like(distances)*np.nan
+        W = np.ones_like(distances) * np.nan
         for i in range(len(distances)):
-            if (distances[i]<=50) and (distances[i]>0.5):
-                W[i]=F1[i]*(np.exp(-F2[i]*distances[i]))+F3[i]*np.exp(-F4[i]*distances[i])
+            if (distances[i] <= 50) and (distances[i] > 0.5):
+                W[i] = F1[i] * (np.exp(-F2[i] * distances[i])) + F3[i] * np.exp(-F4[i] * distances[i])
 
-            elif (distances[i]>50) and (distances[i]<600):
-                W[i]=F5[i]*(np.exp(-F6[i]*distances[i]))+F7[i]*np.exp(-F8[i]*distances[i])
+            elif (distances[i] > 50) and (distances[i] < 600):
+                W[i] = F5[i] * (np.exp(-F6[i] * distances[i])) + F7[i] * np.exp(-F8[i] * distances[i])
 
             else:
                 raise ValueError('Input distances are not valid.')
@@ -708,15 +753,13 @@ def nrad_weight(h,theta,distances,depth,rhob=1.4):
     else:
         raise ValueError('Air humidity values are out of range.')
 
-
     # Combined and normalized weights
-    weights = Wd*W/np.nansum(Wd*W)
+    weights = Wd * W / np.nansum(Wd * W)
 
     return weights
 
 
-
-def exp_filter(sm,T=1):
+def exp_filter(sm, T=1):
     """Exponential filter to estimate soil moisture in the rootzone from surface observtions.
 
     Args:
@@ -738,7 +781,6 @@ def exp_filter(sm,T=1):
         Soil Science Society of America Journal.
     """
 
-
     # Parameters
     t_delta = 1
     sm_min = np.min(sm)
@@ -746,18 +788,18 @@ def exp_filter(sm,T=1):
     ms = (sm - sm_min) / (sm_max - sm_min)
 
     # Pre-allocate soil water index array and recursive constant K
-    SWI = np.ones_like(ms)*np.nan
-    K = np.ones_like(ms)*np.nan
+    SWI = np.ones_like(ms) * np.nan
+    K = np.ones_like(ms) * np.nan
 
     # Initial conditions
     SWI[0] = ms[0]
     K[0] = 1
 
     # Values from 2 to N
-    for n in range(1,len(SWI)):
-        if ~np.isnan(ms[n]) & ~np.isnan(ms[n-1]):
-            K[n] = K[n-1] / (K[n-1] + np.exp(-t_delta/T))
-            SWI[n] = SWI[n-1] + K[n]*(ms[n] - SWI[n-1])
+    for n in range(1, len(SWI)):
+        if ~np.isnan(ms[n]) & ~np.isnan(ms[n - 1]):
+            K[n] = K[n - 1] / (K[n - 1] + np.exp(-t_delta / T))
+            SWI[n] = SWI[n - 1] + K[n] * (ms[n] - SWI[n - 1])
         else:
             continue
 
@@ -767,7 +809,7 @@ def exp_filter(sm,T=1):
     return sm_subsurface
 
 
-def cutoff_rigidity(lat,lon):
+def cutoff_rigidity(lat, lon):
     """Function to estimate the approximate cutoff rigidity for any point on Earth according to the
     tabulated data of Smart and Shea, 2019. The returned value can be used to select the appropriate
     neutron monitor station to estimate the cosmic-ray neutron intensity at the location of interest.
@@ -798,16 +840,16 @@ def cutoff_rigidity(lat,lon):
     yq = lat
 
     if xq < 0:
-        xq = xq*-1 + 180
+        xq = xq * -1 + 180
     Z = np.array(data.cutoff_rigidity)
     x = np.linspace(0, 360, Z.shape[1])
     y = np.linspace(90, -90, Z.shape[0])
     X, Y = np.meshgrid(x, y)
-    points = np.array( (X.flatten(), Y.flatten()) ).T
+    points = np.array((X.flatten(), Y.flatten())).T
     values = Z.flatten()
-    zq = griddata(points, values, (xq,yq))
+    zq = griddata(points, values, (xq, yq))
 
-    return np.round(zq,2)
+    return np.round(zq, 2)
 
 
 def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
@@ -846,7 +888,7 @@ def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
     """
 
     # Load file with list of neutron monitoring stations
-    stations = pd.DataFrame(data.neutron_detectors, columns=["STID","NAME","R","Altitude_m"])
+    stations = pd.DataFrame(data.neutron_detectors, columns=["STID", "NAME", "R", "Altitude_m"])
 
     # Sort stations by closest cutoff rigidity
     idx_R = (stations['R'] - Rc).abs().argsort()
@@ -857,7 +899,7 @@ def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
             station = stations.iloc[idx_R[i]]["STID"]
             try:
                 if get_incoming_neutron_flux(start_date, end_date, station, verbose=verbose) is not None:
-                    stations.iloc[idx_R[i],-1] = True
+                    stations.iloc[idx_R[i], -1] = True
             except:
                 pass
         if sum(stations["Period available"] == True) == 0:
@@ -871,7 +913,8 @@ def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
 
     # Print results
     print('')
-    print("""Select a station with an altitude similar to that of your location. For more information go to: 'https://www.nmdb.eu/nest/help.php#helpstations""")
+    print(
+        """Select a station with an altitude similar to that of your location. For more information go to: 'https://www.nmdb.eu/nest/help.php#helpstations""")
     print('')
     print(f"Your cutoff rigidity is {Rc} GV")
     print(result)
@@ -890,7 +933,7 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
         (pd.Series): Series containing interpolated incoming neutron flux. Length of Series is the same as crnp_timestamps
     """
     incoming_flux = np.array([])
-    for k,timestamp in enumerate(crnp_timestamps):
+    for k, timestamp in enumerate(crnp_timestamps):
         if timestamp in nmdb_timestamps.values:
             idx = timestamp == nmdb_timestamps
             incoming_flux = np.append(incoming_flux, nmdb_counts.loc[idx])
@@ -952,7 +995,6 @@ def latlon_to_utm(lat, lon, utm_zone_number, missing_values=None):
          [https://www.maptools.com/tutorials/grid_zone_details#](https://www.maptools.com/tutorials/grid_zone_details#)
     """
 
-
     # Define constants
     R = 6_378_137  # Earth's radius at the Equator in meters
 
@@ -1004,15 +1046,16 @@ def latlon_to_utm(lat, lon, utm_zone_number, missing_values=None):
     m = R * (M1 * lat_rad - M2 * np.sin(2 * lat_rad) + M3 * np.sin(4 * lat_rad) - M4 * np.sin(6 * lat_rad))
 
     easting = K0 * n * (a + a ** 3 / 6 * (1 - lat_tan2 + c) + a ** 5 / 120 * (
-                5 - 18 * lat_tan2 + lat_tan4 + 72 * c - 58 * E_P2)) + 500_000
+            5 - 18 * lat_tan2 + lat_tan4 + 72 * c - 58 * E_P2)) + 500_000
     northing = K0 * (m + n * lat_tan * (
-                a ** 2 / 2 + a ** 4 / 24 * (5 - lat_tan2 + 9 * c + 4 * c ** 2) + a ** 6 / 720 * (
-                    61 - 58 * lat_tan2 + lat_tan4 + 600 * c - 330 * E_P2)))
+            a ** 2 / 2 + a ** 4 / 24 * (5 - lat_tan2 + 9 * c + 4 * c ** 2) + a ** 6 / 720 * (
+            61 - 58 * lat_tan2 + lat_tan4 + 600 * c - 330 * E_P2)))
 
     if np.any(lat < 0):
         northing += 10_000_000
 
     return easting, northing
+
 
 def euclidean_distance(px, py, x, y):
     """Function that computes the Euclidean distance between one point
@@ -1068,7 +1111,6 @@ def spatial_average(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=Fa
         distances = euclidean_distance(px, py, x, y)
         idx_within_buffer = distances <= buffer
 
-
         if np.isnan(z[k]):
             z_new_val = np.nan
         elif len(distances[idx_within_buffer]) > min_neighbours:
@@ -1079,7 +1121,7 @@ def spatial_average(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=Fa
             else:
                 raise f"Method {method} does not exist. Provide either 'mean' or 'median'."
         else:
-            z_new_val = z[k] # If there are not enough neighbours, keep the original value
+            z_new_val = z[k]  # If there are not enough neighbours, keep the original value
 
         # Append smoothed value to array
         z_smooth = np.append(z_smooth, z_new_val)
@@ -1160,7 +1202,8 @@ def interpolate_2d(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
     z = z[~idx_nan]
 
     if idx_nan.any():
-        print(f"WARNING: {np.isnan(x).sum()}, {np.isnan(y).sum()}, and {np.isnan(z).sum()} NaN values were dropped from x, y, and z.")
+        print(
+            f"WARNING: {np.isnan(x).sum()}, {np.isnan(y).sum()}, and {np.isnan(z).sum()} NaN values were dropped from x, y, and z.")
 
     # Create 2D grid for interpolation
     Nx = round((np.max(x) - np.min(x)) / dx) + 1
@@ -1195,9 +1238,9 @@ def rover_centered_coordinates(x, y):
     """
 
     # Make it datatype agnostic
-    if(isinstance(x, pd.Series)):
+    if (isinstance(x, pd.Series)):
         x = x.values
-    if(isinstance(y, pd.Series)):
+    if (isinstance(y, pd.Series)):
         y = y.values
 
     # Do the average of the two points
@@ -1207,7 +1250,6 @@ def rover_centered_coordinates(x, y):
     # Add the first point to match the length of the original array
     x_est = np.insert(x_est, 0, x[0])
     y_est = np.insert(y_est, 0, y[0])
-
 
     return x_est, y_est
 
@@ -1242,13 +1284,13 @@ def uncertainty_counts(raw_counts, metric="std", fp=1, fw=1, fi=1):
     if metric == "std":
         uncertainty = np.sqrt(raw_counts) * s
     elif metric == "cv":
-        uncertainty = 1 /  np.sqrt(raw_counts) * s
+        uncertainty = 1 / np.sqrt(raw_counts) * s
     else:
         raise f"Metric {metric} does not exist. Provide either 'std' or 'cv' for standard deviation or coefficient of variation."
     return uncertainty
 
 
-def uncertainty_vwc(raw_counts, N0, bulk_density, fp=1, fw=1, fi=1, a0=0.0808,a1=0.372,a2=0.115):
+def uncertainty_vwc(raw_counts, N0, bulk_density, fp=1, fw=1, fi=1, a0=0.0808, a1=0.372, a2=0.115):
     r"""Function to estimate the uncertainty propagated to volumetric water content.
 
     The uncertainty of the volumetric water content is estimated by propagating the uncertainty of the raw counts.
@@ -1275,17 +1317,8 @@ def uncertainty_vwc(raw_counts, N0, bulk_density, fp=1, fw=1, fi=1, a0=0.0808,a1
 
     Ncorr = raw_counts * fw / (fp * fi)
     sigma_N = uncertainty_counts(raw_counts, metric="std", fp=fp, fw=fw, fi=fi)
-    sigma_GWC = sigma_N * ((a0*N0) / ((Ncorr - a1*N0)**4)) * np.sqrt((Ncorr - a1 * N0)**4 + 8 * sigma_N**2 * (Ncorr - a1 * N0)**2 + 15 * sigma_N**4)
+    sigma_GWC = sigma_N * ((a0 * N0) / ((Ncorr - a1 * N0) ** 4)) * np.sqrt(
+        (Ncorr - a1 * N0) ** 4 + 8 * sigma_N ** 2 * (Ncorr - a1 * N0) ** 2 + 15 * sigma_N ** 4)
     sigma_VWC = sigma_GWC * bulk_density
 
     return sigma_VWC
-
-
-
-
-
-
-
-
-
-
