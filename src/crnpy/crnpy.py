@@ -929,7 +929,7 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
 
             return B0 * np.exp(-B1 * r) + B2 * np.exp(-B3 * r)
 
-        def rscaled(r, p, Hveg, y):
+        def rscaled(r, p, y, Hveg = 0):
             Fp = 0.4922 / (0.86 - np.exp(-p / 1013.25))
             Fveg = 1 - 0.17 * (1 - np.exp(-0.41 * Hveg)) * (1 + np.exp(-9.25 * y))
             return r / Fp / Fveg
@@ -940,8 +940,7 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
         y = theta
         bd = rhob
 
-        if Hveg is not None and p is not None:
-            r = rscaled(r, p, Hveg, y)
+        r = rscaled(r, p, y, Hveg)
 
         Wr = np.zeros(len(r))
 
