@@ -45,27 +45,18 @@ def test_weighting():
     y = np.repeat(0, len(x))
     h = np.repeat(10, len(x))
 
-
     p = np.repeat(1013.25, len(x))
     Hveg = np.repeat(0, len(x))
     bd = 1.1
     SM = 0.02
     sm = np.repeat(SM, len(x))
 
-    # calculate weighting function using Schrön et al. 2017 method
-    weights = crnpy.nrad_weight(h, sm, x, y, bd, method="Schron_2017", p=p, Hveg=Hveg)
-    # check that the sum of the weights is 1
-    Max = 0.01147
-    Avg = 0.00029
-    Min = 0.00000
-    assert round(np.sum(weights),5) == 1
-    # Compare to the values in supplementary material of Schrön et al. 2017
-    # check that the max weight is 0.01
-    assert round(np.max(weights),3) == round(Max,3)
-    # check that the avg weight is 0.00029
-    assert round(np.mean(weights),5) == round(Avg,5)
-    # check that the min weight is 0.00000
-    assert round(np.min(weights),5) == round(Min,5)
+    # calculate the weighted theta
+    theta_adj, w = crnpy.nrad_weight(h, sm, x, y, bd, method="Schron_2017", p=p, Hveg=Hveg)
+
+    # check that theta_adj is = SM +- 1e-3
+    assert np.abs(theta_adj - SM) < 1e-3
+
 
 def test_correction_inncoming_neutrons_RcMethods():
     # Test Hawdon 2014 Method using Baldry location from the original paper

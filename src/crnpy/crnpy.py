@@ -706,7 +706,7 @@ def abs_humidity(relative_humidity, temp):
     return abs_h
 
 
-def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=None, Hveg=None):
+def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=None, Hveg=0, tol=0.01):
     """Function to compute distance weights corresponding to each soil sample.
 
     Args:
@@ -718,9 +718,11 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
         p (np.array or pd.Series): Atmospheric pressure in hPa. Required for the 'Schron_2017' method.
         Hveg (np.array or pd.Series): Vegetation height in m. Required for the 'Schron_2017' method.
         method (str): Method to compute the distance weights. Options are 'Kohli_2015' or 'Schron_2017'.
+        tol (float): Tolerance for the iterative solution. Default is 0.01. Required for the 'Schron_2017' method.
 
     Returns:
-        (array or pd.Series or pd.DataFrame): Distance weights for each sample.
+        theta_new (np.array or pd.Series): Weighted soil moisture values.
+        weights (np.array or pd.Series): Distance weights for each sample. For the 'Schron_2017' method, the weights are computed for each distance.
 
     References:
         Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., and Zacharias, S. (2015).
@@ -826,7 +828,10 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
 
         # Combined and normalized weights
         weights = Wd * W / np.nansum(Wd * W)
-        return weights
+
+        theta_new = np.sum(theta * weights)
+
+        return theta_new, weights
     elif method == 'Schron_2017':
         # Horizontal distance weights According to Eq. 6 and Table A1 in Schrön et al. (2017)
         # Method for calculating the horizontal distance weights from 0 to 1m
@@ -929,6 +934,17 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
 
             return B0 * np.exp(-B1 * r) + B2 * np.exp(-B3 * r)
 
+        # Wrapper method for calculating the horizontal distance weights
+        def Wr(r, x, y):
+            if r <= 1:
+                return WrX(r, x, y)
+            elif r <= 50:
+                return WrA(r, x, y)
+            elif r <= 600:
+                return WrB(r, x, y)
+            else:
+                raise ValueError("r must be between 1 and 600m when using 'Schron_2017' method")
+
         def rscaled(r, p, y, Hveg = 0):
             Fp = 0.4922 / (0.86 - np.exp(-p / 1013.25))
             Fveg = 1 - 0.17 * (1 - np.exp(-0.41 * Hveg)) * (1 + np.exp(-9.25 * y))
@@ -936,37 +952,52 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
 
         # Rename variables to be consistent with the revised paper
         r = distances
-        x = h
-        y = theta
-        bd = rhob
+        theta_ = np.mean(theta) # Start with the mean value of theta as initial guess
+        bd = np.mean(rhob) # Neutrons are impacted by the bulk density across the whole area and not just the sample area. https://github.com/soilwater/crnpy/issues/9#issuecomment-2003813777
 
-        r = rscaled(r, p, y, Hveg)
-
-        Wr = np.zeros(len(r))
-
-        # See Eq. 6 in Schron et al. (2017)
-        r0_idx = (r <= 1)
-        r1_idx = (r > 1) & (r <= 50)
-        r2_idx = (r > 50) & (r < 600)
-        Wr[r0_idx] = WrX(r[r0_idx], x[r0_idx], y[r0_idx])
-        Wr[r1_idx] = WrA(r[r1_idx], x[r1_idx], y[r1_idx])
-        Wr[r2_idx] = WrB(r[r2_idx], x[r2_idx], y[r2_idx])
-
-        # Vertical distance weights
+        # Vertical distance weights functions
         def D86(r, bd, y):
             return 1 / bd * (8.321 + 0.14249 * (0.96655 + np.exp(-0.01 * r)) * (20 + y) / (0.0429 + y))
 
         def Wd(d, r, bd, y):
             return np.exp(-2 * d / D86(r, bd, y))
 
-        # Calculate the vertical distance weights
-        Wd = Wd(depth, r, bd, y)
+        step = 0
+        diff = 1
+        while diff > tol:
+            step += 1
+            print(f"Step {step}, diff = {diff}", end="\r")
+            # Calculate the scaled distance and D86
+            r = rscaled(distances, p, theta_, Hveg)
 
-        # Combined and normalized weights
-        # Combined and normalized weights
-        weights = Wd * Wr / np.nansum(Wd * Wr)
+            # Calculate the vertical average for each profile
+            P = np.unique(distances)
+            theta_P = []
+            r_stars = []
+            for i in range(len(P)):
+                profile = P[i]
+                idx = distances == profile
+                depths_P = depth[idx]
+                r_P = r[idx]
+                theta_Pi = theta[idx]
+                # Calculate the vertical distance weights
+                Wd_P = Wd(depths_P, r_P, bd, theta_Pi)
+                # Calculate the vertical average of theta
+                theta_P_i = np.sum(Wd_P * theta_Pi) / np.sum(Wd_P)
+                theta_P.append(theta_P_i)
+                r_stars.append(np.mean(r_P))
 
-        return weights
+            # Calculate the horizontal distance weights
+            Wrs = np.array([Wr(r_star, theta_p, Hveg) for r_star, theta_p in zip(r_stars, theta_P)])
+            theta_new = np.sum(Wrs * theta_P) / np.sum(Wrs)
+            diff = np.abs(theta_new - theta_)
+            theta_ = theta_new
+
+        print(f"Solution converged after {step} steps, the average soil moisture is {theta_new}")
+
+        return theta_new, [theta_P, r_stars, Wrs]
+    else:
+        raise ValueError(f"Method {method} not recognized. Please use one of the following methods: 'Kohli_2015' or 'Schron_2017'")
 
 
 def exp_filter(sm, T=1):
