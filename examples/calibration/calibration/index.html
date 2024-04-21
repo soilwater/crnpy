@@ -1994,8 +1994,8 @@ df_station['total_corrected_neutrons'] = df_station['total_raw_counts'] * df_sta
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=457e6db7-a5ab-4424-a93b-7b0f4a46fe45">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=457e6db7-a5ab-4424-a93b-7b0f4a46fe45">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2013,20 +2013,33 @@ df_station['total_corrected_neutrons'] = df_station['total_raw_counts'] * df_sta
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Compute the weights of each sample for the field average</span>
-<span class="n">nrad_weights</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">nrad_weight</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">'abs_humidity'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">'theta_v'</span><span class="p">],</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">'distance_from_station'</span><span class="p">],</span> <span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">'bottom_depth'</span><span class="p">]</span><span class="o">+</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">'top_depth'</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">rhob</span><span class="o">=</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">'bulk_density'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Weight the samples for the field average</span>
+<span class="c1">#field_theta_v, w = crnpy.nrad_weight(df_station['abs_humidity'].mean(), df_soil['theta_v'], df_soil['distance_from_station'], (df_soil['bottom_depth']+df_soil['top_depth'])/2, rhob=df_soil['bulk_density'].mean(), method="Kohli_2015")</span>
+<span class="n">field_theta_v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">crnpy</span><span class="o">.</span><span class="n">nrad_weight</span><span class="p">(</span><span class="n">df_station</span><span class="p">[</span><span class="s1">'abs_humidity'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">'theta_v'</span><span class="p">],</span> <span class="n">df_soil</span><span class="p">[</span><span class="s1">'distance_from_station'</span><span class="p">],</span> <span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">'bottom_depth'</span><span class="p">]</span><span class="o">+</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">'top_depth'</span><span class="p">])</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">rhob</span><span class="o">=</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">'bulk_density'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span><span class="n">p</span><span class="o">=</span><span class="n">df_station</span><span class="p">[</span><span class="s1">'barometric_pressure_Avg'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">method</span> <span class="o">=</span> <span class="s2">"Schron_2017"</span><span class="p">)</span>
 
 <span class="c1"># Apply distance weights to volumetric water content and bulk density</span>
-<span class="n">field_theta_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">'theta_v'</span><span class="p">]</span><span class="o">*</span><span class="n">nrad_weights</span><span class="p">)</span>
-<span class="n">field_bulk_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">'bulk_density'</span><span class="p">]</span><span class="o">*</span><span class="n">nrad_weights</span><span class="p">)</span>
+<span class="n">field_bulk_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">df_soil</span><span class="p">[</span><span class="s1">'bulk_density'</span><span class="p">])</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-11"># Compute the weights of each sample for the field average
-nrad_weights = crnpy.nrad_weight(df_station['abs_humidity'].mean(), df_soil['theta_v'], df_soil['distance_from_station'], (df_soil['bottom_depth']+df_soil['top_depth'])/2, rhob=df_soil['bulk_density'].mean())
+<div class="clipboard-copy-txt" id="cell-11"># Weight the samples for the field average
+#field_theta_v, w = crnpy.nrad_weight(df_station['abs_humidity'].mean(), df_soil['theta_v'], df_soil['distance_from_station'], (df_soil['bottom_depth']+df_soil['top_depth'])/2, rhob=df_soil['bulk_density'].mean(), method="Kohli_2015")
+field_theta_v, w = crnpy.nrad_weight(df_station['abs_humidity'].mean(), df_soil['theta_v'], df_soil['distance_from_station'], (df_soil['bottom_depth']+df_soil['top_depth'])/2, rhob=df_soil['bulk_density'].mean(),p=df_station['barometric_pressure_Avg'].mean(), method = "Schron_2017")
 
 # Apply distance weights to volumetric water content and bulk density
-field_theta_v = np.sum(df_soil['theta_v']*nrad_weights)
-field_bulk_density = np.sum(df_soil['bulk_density']*nrad_weights)
+field_bulk_density = np.mean(df_soil['bulk_density'])
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Solution converged after 2 steps, the average soil moisture is 0.2197191482091855
+</pre>
 </div>
 </div>
 </div>
@@ -2076,7 +2089,7 @@ print(f"Mean corrected counts during calibration: {round(mean_cal_counts)} count
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Mean volumetric Water content during calibration survey: 0.263
+<pre>Mean volumetric Water content during calibration survey: 0.22
 Mean corrected counts during calibration: 1543 counts
 </pre>
 </div>
@@ -2149,7 +2162,7 @@ print(f"The solved value for N0 is: {sol}")
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>The solved value for N0 is: 2645
+<pre>The solved value for N0 is: 2470
 </pre>
 </div>
 </div>
@@ -2166,6 +2179,33 @@ print(f"The solved value for N0 is: {sol}")
 <h2 id="references">References:<a class="anchor-link" href="#references">¶</a></h2><p>Desilets, D., Zreda, M., &amp; Ferré, T. P. (2010). Nature's neutron probe: Land surface hydrology at an elusive scale with cosmic rays. Water Resources Research, 46(11).</p>
 <p>Dong, J., &amp; Ochsner, T. E. (2018). Soil texture often exerts a stronger influence than precipitation on mesoscale soil moisture patterns. Water Resources Research, 54(3), 2199-2211.</p>
 <p>Patrignani, A., Ochsner, T. E., Montag, B., &amp; Bellinger, S. (2021). A novel lithium foil cosmic-ray neutron detector for measuring field-scale soil moisture. Frontiers in Water, 3, 673185.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=af515744-a25e-4fb0-8fd0-3559b0fea276">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy for="cell-14">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-14"></div>
+</div>
+</div>
 </div>
 </div>
 </div>
