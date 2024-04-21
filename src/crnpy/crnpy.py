@@ -503,7 +503,7 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
         Analytical chemistry, 36(8), 1627-1639.
     """
 
-    if not isinstance(values, pd.Series) and not isinstance(x, pd.DataFrame):
+    if not isinstance(values, pd.Series) and not isinstance(values, pd.DataFrame):
         raise ValueError('Input must be a pandas Series or DataFrame')
 
     if method == 'moving_average':
