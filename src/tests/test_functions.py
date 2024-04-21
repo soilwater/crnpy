@@ -42,6 +42,7 @@ def test_count_to_vwc():
 def test_weighting():
     # create vector from 0 to 350 m with .1 spacing
     x = np.arange(0, 350, 0.1)
+    IDs = np.arange(0, 3500, 1)
     y = np.repeat(0, len(x))
     h = np.repeat(10, len(x))
 
@@ -51,8 +52,9 @@ def test_weighting():
     SM = 0.02
     sm = np.repeat(SM, len(x))
 
+
     # calculate the weighted theta
-    theta_adj, w = crnpy.nrad_weight(h, sm, x, y, bd, method="Schron_2017", p=p, Hveg=Hveg)
+    theta_adj, w = crnpy.nrad_weight(h, sm, x, y, profiles=IDs, rhob = bd, method="Schron_2017", p=p, Hveg=Hveg)
 
     # check that theta_adj is = SM +- 1e-3
     assert np.abs(theta_adj - SM) < 1e-3

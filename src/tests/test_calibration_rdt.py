@@ -10,6 +10,8 @@ def calibration_example():
     url_soil_samples = "https://raw.githubusercontent.com/soilwater/crnpy/main/docs/examples/calibration/soil_data.csv"
     df_soil = pd.read_csv(url_soil_samples)
 
+    df_soil['ID'] = df_soil['latitude'].astype(str) +'_'+ df_soil['longitude'].astype(str)
+
     # Define start and end of field survey calibration
     calibration_start = pd.to_datetime("2021-10-22 08:00")
     calibration_end = pd.to_datetime("2021-10-22 16:00")
@@ -71,7 +73,9 @@ def calibration_example():
                                          df_soil['distance_from_station'],
                                          (df_soil['bottom_depth'] + df_soil['top_depth']) / 2,
                                          rhob=df_soil['bulk_density'].mean(),
-                                         p=df_station['barometric_pressure_Avg'].mean(), method="Schron_2017")
+                                         p=df_station['barometric_pressure_Avg'].mean(),
+                                         profiles=df_soil['ID'],
+                                         method="Schron_2017")
 
     # Apply distance weights to volumetric water content and bulk density
     field_bulk_density = np.sum(df_soil['bulk_density'].mean())

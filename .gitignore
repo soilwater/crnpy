@@ -10,3 +10,4 @@ site/*
 .pytest_cache/*
 crnpy.egg-info/*
 .idea/*
+/.idea

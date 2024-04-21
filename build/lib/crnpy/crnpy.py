@@ -706,7 +706,7 @@ def abs_humidity(relative_humidity, temp):
     return abs_h
 
 
-def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=None, Hveg=0, tol=0.01):
+def nrad_weight(h, theta, distances, depth, profiles=None, rhob=1.4, method="Kohli_2015", p=None, Hveg=0, tol=0.01):
     """Function to compute distance weights corresponding to each soil sample.
 
     Args:
@@ -714,6 +714,7 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
         theta (np.array or pd.Series): Soil Moisture for each sample (0.02 - 0.50 m^3/m^3)
         distances (np.array or pd.Series): Distances from the location of each sample to the origin (0.5 - 600 m)
         depth (np.array or pd.Series): Depths for each sample (m)
+        profiles (np.array or pd.Series): Soil profiles id for each sample. Required for the 'Schron_2017' method.
         rhob (np.array or pd.Series): Bulk density in g/cm^3
         p (np.array or pd.Series): Atmospheric pressure in hPa. Required for the 'Schron_2017' method.
         Hveg (np.array or pd.Series): Vegetation height in m. Required for the 'Schron_2017' method.
@@ -950,6 +951,9 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
             Fveg = 1 - 0.17 * (1 - np.exp(-0.41 * Hveg)) * (1 + np.exp(-9.25 * y))
             return r / Fp / Fveg
 
+        if profiles is None:
+            raise ValueError("Profile ID's must be provided when using 'Schron_2017' method")
+
         # Rename variables to be consistent with the revised paper
         r = distances
         theta_ = np.mean(theta) # Start with the mean value of theta as initial guess
@@ -971,12 +975,12 @@ def nrad_weight(h, theta, distances, depth, rhob=1.4, method="Kohli_2015", p=Non
             r = rscaled(distances, p, theta_, Hveg)
 
             # Calculate the vertical average for each profile
-            P = np.unique(distances)
+            P = np.unique(profiles)
             theta_P = []
             r_stars = []
             for i in range(len(P)):
                 profile = P[i]
-                idx = distances == profile
+                idx = profiles == profile
                 depths_P = depth[idx]
                 r_P = r[idx]
                 theta_Pi = theta[idx]
