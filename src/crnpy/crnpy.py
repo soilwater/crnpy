@@ -295,6 +295,7 @@ def correction_humidity(abs_humidity, Aref):
 
 def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None, Rc_method=None, Rc_site=None,
                              site_atmdepth=None, Rc_ref=None, ref_atmdepth=None):
+
     r"""Correction factor for incoming neutron flux.
 
     This function corrects neutron counts for incoming neutron flux using the method described in Anderson et al. (2017). The correction is performed using the following equation:
@@ -671,6 +672,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
             # Compute soil depth that accounts for 86% of the neutron flux
             D86 = 1 / bulk_density * (8.321 + 0.14249 * (0.96655 + np.exp(-0.01 * r_start)) * (20 + (Wlat + vwc)) / (
                     0.0429 + (Wlat + vwc)))
+
             results.append(D86)
 
     elif method == 'Franz_2012':
@@ -1100,7 +1102,6 @@ def cutoff_rigidity(lat, lon):
 
     return np.round(zq, 2)
 
-
 def atmospheric_depth(elevation, latitude):
     """Function to estimate the atmospheric depth for any point on Earth according to McJannet and Desilets, 2023
 
@@ -1187,6 +1188,7 @@ def location_factor(site_atmospheric_depth, site_Rc, reference_atmospheric_depth
     return tau
 
 
+
 def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
     """Search for potential reference neutron monitoring stations based on cutoff rigidity.
 
@@ -1271,6 +1273,7 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
     """
     # Create a DataFrame from nmdb timestamps and counts
     df_nmdb = pd.DataFrame({'timestamp': nmdb_timestamps, 'counts': nmdb_counts})
+
 
     # Set the Timestamp column as the index
     df_nmdb.set_index('timestamp', inplace=True)

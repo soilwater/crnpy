@@ -11,3 +11,4 @@ site/*
 crnpy.egg-info/*
 .idea/*
 /.idea
+.idea/*
