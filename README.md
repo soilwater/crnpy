@@ -22,7 +22,6 @@ CRNPs are a valuable tool for non-invasive soil moisture estimation at the hecto
 - Modular: The library is designed to be modular, allowing users to easily customize the processing workflow to their needs.
 
 
-
 ## Installation
 To install the CRNPy library, you can use Python's package manager. Open a terminal and type:
 
@@ -38,6 +37,12 @@ Ideally dependencies should be installed automatically. If not, you can install 
 
 The CRNPy library is compatible with Python 3.7 and above.
 See [requirements.txt](https://github.com/soilwater/crnpy/blob/main/requirements.txt) for a list of dependencies.
+
+## Examples
+
+- [https://soilwater.github.io/crnpy/examples/stationary/example_RDT_station/](Processing and analyzing data from a stationary detector)
+- [https://soilwater.github.io/crnpy/examples/rover/Hydroinnova_rover_example/](Processing and analyzing data from a roving detector)
+- [https://soilwater.github.io/crnpy/examples/calibration/calibration/](Device-specific field calibration)
 
 ## Authors
 The CRNPy library was developed at the Kansas State University Soil Water Processes Lab by:

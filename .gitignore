@@ -8,4 +8,7 @@
 site/*
 .cache/*
 .pytest_cache/*
+crnpy.egg-info/*
+.idea/*
+/.idea
 .idea/*
