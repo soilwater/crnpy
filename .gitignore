@@ -12,3 +12,4 @@ crnpy.egg-info/*
 .idea/*
 /.idea
 .idea/*
+src/crnpy.egg-info/*
