@@ -16,7 +16,7 @@ authors:
 - name: Peraza Rud, Joaquin
   orcid: "0009-0007-9337-830X"
   affiliation: 1
-- name: Tyson Ochsner
+- name: Ochsner, Tyson E.
   orcid: "0000-0003-0875-4491"
   affiliation: 2
 - name: Andres Patrignani
