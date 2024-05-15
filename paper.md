@@ -13,7 +13,7 @@ output:
     df_print: paged
   word_document: default
 authors:
-- name: Peraza Rud, Joaquin
+- name: Peraza Rud, Joaquin A.
   orcid: "0009-0007-9337-830X"
   affiliation: 1
 - name: Ochsner, Tyson E.
