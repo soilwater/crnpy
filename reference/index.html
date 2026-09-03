@@ -1481,12 +1481,13 @@ air temperature (Celsius). The saturation vapor pressure follows Eq. 3.8 of Camp
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Campbell, G. S., &amp; Norman, J. M. (1998). An Introduction to Environmental Biophysics, 2nd ed. Springer, New York.</p>
+  <p>Campbell, G. S., &amp; Norman, J. M. (1998). An introduction to environmental biophysics (2nd ed.). Springer.</p>
 </details>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src\crnpy\crnpy.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">739</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">738</span>
+<span class="normal">739</span>
 <span class="normal">740</span>
 <span class="normal">741</span>
 <span class="normal">742</span>
@@ -1512,8 +1513,7 @@ air temperature (Celsius). The saturation vapor pressure follows Eq. 3.8 of Camp
 <span class="normal">762</span>
 <span class="normal">763</span>
 <span class="normal">764</span>
-<span class="normal">765</span>
-<span class="normal">766</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">abs_humidity</span><span class="p">(</span><span class="n">relative_humidity</span><span class="p">,</span> <span class="n">temp</span><span class="p">):</span>
+<span class="normal">765</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">abs_humidity</span><span class="p">(</span><span class="n">relative_humidity</span><span class="p">,</span> <span class="n">temp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute the absolute humidity (mass of water vapor per volume of air) in g m^-3 from relative humidity (%) and</span>
 <span class="sd">    air temperature (Celsius). The saturation vapor pressure follows Eq. 3.8 of Campbell and Norman (1998).</span>
@@ -1526,7 +1526,7 @@ air temperature (Celsius). The saturation vapor pressure follows Eq. 3.8 of Camp
 <span class="sd">        (float): Absolute humidity (g m^-3)</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Campbell, G. S., &amp; Norman, J. M. (1998). An Introduction to Environmental Biophysics, 2nd ed. Springer, New York.</span>
+<span class="sd">        Campbell, G. S., &amp; Norman, J. M. (1998). An introduction to environmental biophysics (2nd ed.). Springer.</span>
 <span class="sd">    """</span>
 
     <span class="c1">### Atmospheric water vapor factor</span>
@@ -1634,8 +1634,8 @@ air temperature (Celsius). The saturation vapor pressure follows Eq. 3.8 of Camp
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Atmosphere, U. S. (1976). US standard atmosphere. National Oceanic and Atmospheric Administration.</p>
-<p>McJannet, D. L., &amp; Desilets, D. (2023). Incoming Neutron Flux Corrections for Cosmic‐Ray Soil and Snow Sensors Using the Global Neutron Monitor Network. Water Resources Research, 59(4), e2022WR033889.</p>
+  <p>National Oceanic and Atmospheric Administration. (1976). U.S. standard atmosphere, 1976. U.S. Government Printing Office.</p>
+<p>McJannet, D. L., &amp; Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59(4), e2022WR033889. https://doi.org/10.1029/2022WR033889</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -1695,9 +1695,9 @@ air temperature (Celsius). The saturation vapor pressure follows Eq. 3.8 of Camp
 <span class="sd">        (float): Atmospheric depth in g/cm2</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Atmosphere, U. S. (1976). US standard atmosphere. National Oceanic and Atmospheric Administration.</span>
+<span class="sd">        National Oceanic and Atmospheric Administration. (1976). U.S. standard atmosphere, 1976. U.S. Government Printing Office.</span>
 
-<span class="sd">        McJannet, D. L., &amp; Desilets, D. (2023). Incoming Neutron Flux Corrections for Cosmic‐Ray Soil and Snow Sensors Using the Global Neutron Monitor Network. Water Resources Research, 59(4), e2022WR033889.</span>
+<span class="sd">        McJannet, D. L., &amp; Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59(4), e2022WR033889. https://doi.org/10.1029/2022WR033889</span>
 <span class="sd">    """</span>
 
     <span class="n">density_of_rock</span> <span class="o">=</span> <span class="mi">2670</span>  <span class="c1"># Density of rock in kg/m3</span>
@@ -1834,9 +1834,9 @@ Default is 0.494 (Wahbi &amp; Avery, 2018).</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Wahbi, A., Avery, W. (2018). In Situ Destructive Sampling. In:
-Cosmic Ray Neutron Sensing: Estimation of Agricultural Crop Biomass Water Equivalent.
-Springer, Cham. https://doi.org/10.1007/978-3-319-69539-6_2</p>
+  <p>Wahbi, A., &amp; Avery, W. (2018). In situ destructive sampling. In Cosmic ray neutron sensing:
+Estimation of agricultural crop biomass water equivalent (pp. 5–9). Springer.
+https://doi.org/10.1007/978-3-319-69539-6_2</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -1871,9 +1871,9 @@ Springer, Cham. https://doi.org/10.1007/978-3-319-69539-6_2</p>
 <span class="sd">        (array or pd.Series or pd.DataFrame): Biomass water equivalent in kg m-2.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Wahbi, A., Avery, W. (2018). In Situ Destructive Sampling. In:</span>
-<span class="sd">        Cosmic Ray Neutron Sensing: Estimation of Agricultural Crop Biomass Water Equivalent.</span>
-<span class="sd">        Springer, Cham. https://doi.org/10.1007/978-3-319-69539-6_2</span>
+<span class="sd">        Wahbi, A., &amp; Avery, W. (2018). In situ destructive sampling. In Cosmic ray neutron sensing:</span>
+<span class="sd">        Estimation of agricultural crop biomass water equivalent (pp. 5–9). Springer.</span>
+<span class="sd">        https://doi.org/10.1007/978-3-319-69539-6_2</span>
 <span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">biomass_fresh</span> <span class="o">-</span> <span class="n">biomass_dry</span><span class="p">)</span> <span class="o">+</span> <span class="n">fWE</span> <span class="o">*</span> <span class="n">biomass_dry</span>
 </code></pre></div></td></tr></tbody></table></div>
@@ -1986,9 +1986,9 @@ biomass water equivalent. Default is 0.0053 (r2 = 6.4 cph per kg m-2 BWE and N0 
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Baatz, R., H. R. Bogena, H.-J. Hendricks Franssen, J. A. Huisman, C. Montzka, and H. Vereecken (2015),
-An empirical vegetation correction for soil water content quantification using cosmic ray probes,
-Water Resour. Res., 51, 2030–2046, doi:10.1002/2014WR016443.</p>
+  <p>Baatz, R., Bogena, H. R., Hendricks Franssen, H.-J., Huisman, J. A., Montzka, C., &amp; Vereecken, H. (2015).
+An empirical vegetation correction for soil water content quantification using cosmic ray probes.
+Water Resources Research, 51(4), 2030–2046. https://doi.org/10.1002/2014WR016443</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -2026,9 +2026,9 @@ Water Resour. Res., 51, 2030–2046, doi:10.1002/2014WR016443.</p>
 <span class="sd">        (array or pd.Series or pd.DataFrame): Array of corrected neutron counts for biomass effects.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Baatz, R., H. R. Bogena, H.-J. Hendricks Franssen, J. A. Huisman, C. Montzka, and H. Vereecken (2015),</span>
-<span class="sd">        An empirical vegetation correction for soil water content quantification using cosmic ray probes,</span>
-<span class="sd">        Water Resour. Res., 51, 2030–2046, doi:10.1002/2014WR016443.</span>
+<span class="sd">        Baatz, R., Bogena, H. R., Hendricks Franssen, H.-J., Huisman, J. A., Montzka, C., &amp; Vereecken, H. (2015).</span>
+<span class="sd">        An empirical vegetation correction for soil water content quantification using cosmic ray probes.</span>
+<span class="sd">        Water Resources Research, 51(4), 2030–2046. https://doi.org/10.1002/2014WR016443</span>
 <span class="sd">    """</span>
 
     <span class="k">return</span> <span class="n">counts</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">bwe</span> <span class="o">*</span> <span class="n">r2_N0</span><span class="p">)</span>
@@ -2142,8 +2142,8 @@ $$</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Rosolem, R., W. J. Shuttleworth, M. Zreda, T. E. Franz, X. Zeng, and S. A. Kurc, 2013: The Effect of Atmospheric Water Vapor on Neutron Count in the Cosmic-Ray Soil Moisture Observing System. J. Hydrometeor., 14, 1659–1671, https://doi.org/10.1175/JHM-D-12-0120.1.</p>
-<p>M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086</p>
+  <p>Rosolem, R., Shuttleworth, W. J., Zreda, M., Franz, T. E., Zeng, X., &amp; Kurc, S. A. (2013). The effect of atmospheric water vapor on neutron count in the cosmic-ray soil moisture observing system. Journal of Hydrometeorology, 14(5), 1659–1671. https://doi.org/10.1175/JHM-D-12-0120.1</p>
+<p>Andreasen, M., Jensen, K. H., Desilets, D., Franz, T. E., Zreda, M., Bogena, H. R., &amp; Looms, M. C. (2017). Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone Journal, 16(8), 1–11. https://doi.org/10.2136/vzj2017.04.0086</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -2218,9 +2218,9 @@ $$</p>
 <span class="sd">        (list): fw correction factor.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Rosolem, R., W. J. Shuttleworth, M. Zreda, T. E. Franz, X. Zeng, and S. A. Kurc, 2013: The Effect of Atmospheric Water Vapor on Neutron Count in the Cosmic-Ray Soil Moisture Observing System. J. Hydrometeor., 14, 1659–1671, https://doi.org/10.1175/JHM-D-12-0120.1.</span>
+<span class="sd">        Rosolem, R., Shuttleworth, W. J., Zreda, M., Franz, T. E., Zeng, X., &amp; Kurc, S. A. (2013). The effect of atmospheric water vapor on neutron count in the cosmic-ray soil moisture observing system. Journal of Hydrometeorology, 14(5), 1659–1671. https://doi.org/10.1175/JHM-D-12-0120.1</span>
 
-<span class="sd">        M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086</span>
+<span class="sd">        Andreasen, M., Jensen, K. H., Desilets, D., Franz, T. E., Zreda, M., Bogena, H. R., &amp; Looms, M. C. (2017). Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone Journal, 16(8), 1–11. https://doi.org/10.2136/vzj2017.04.0086</span>
 <span class="sd">    """</span>
     <span class="n">A</span> <span class="o">=</span> <span class="n">abs_humidity</span>
     <span class="n">fw</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mf">0.0054</span> <span class="o">*</span> <span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">Aref</span><span class="p">)</span>  <span class="c1"># Rosolem et al. (2013); Andreasen et al. (2017) Eq. 3</span>
@@ -2431,9 +2431,9 @@ $$</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Hawdon, A., D. McJannet, and J. Wallace (2014), Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia, Water Resour. Res., 50, 5029–5043, doi:10.1002/2013WR015138.</p>
-<p>M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086</p>
-<p>McJannet, D. L., &amp; Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59, e2022WR033889. https://doi.org/10.1029/2022WR033889</p>
+  <p>Hawdon, A., McJannet, D., &amp; Wallace, J. (2014). Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029–5043. https://doi.org/10.1002/2013WR015138</p>
+<p>Andreasen, M., Jensen, K. H., Desilets, D., Franz, T. E., Zreda, M., Bogena, H. R., &amp; Looms, M. C. (2017). Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone Journal, 16(8), 1–11. https://doi.org/10.2136/vzj2017.04.0086</p>
+<p>McJannet, D. L., &amp; Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59(4), e2022WR033889. https://doi.org/10.1029/2022WR033889</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -2552,11 +2552,11 @@ $$</p>
 <span class="sd">        (list): fi correction factor.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Hawdon, A., D. McJannet, and J. Wallace (2014), Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia, Water Resour. Res., 50, 5029–5043, doi:10.1002/2013WR015138.</span>
+<span class="sd">        Hawdon, A., McJannet, D., &amp; Wallace, J. (2014). Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029–5043. https://doi.org/10.1002/2013WR015138</span>
 
-<span class="sd">        M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086</span>
+<span class="sd">        Andreasen, M., Jensen, K. H., Desilets, D., Franz, T. E., Zreda, M., Bogena, H. R., &amp; Looms, M. C. (2017). Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone Journal, 16(8), 1–11. https://doi.org/10.2136/vzj2017.04.0086</span>
 
-<span class="sd">        McJannet, D. L., &amp; Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59, e2022WR033889. https://doi.org/10.1029/2022WR033889</span>
+<span class="sd">        McJannet, D. L., &amp; Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59(4), e2022WR033889. https://doi.org/10.1029/2022WR033889</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">incoming_Ref</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">incoming_neutrons</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)):</span>
         <span class="n">incoming_Ref</span> <span class="o">=</span> <span class="n">incoming_neutrons</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -2716,8 +2716,8 @@ It varies from about 128 g cm-2 at high latitudes to 142 g cm-2 at the equator (
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System, Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.</p>
-<p>M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086</p>
+  <p>Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., &amp; Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079–4099. https://doi.org/10.5194/hess-16-4079-2012</p>
+<p>Andreasen, M., Jensen, K. H., Desilets, D., Franz, T. E., Zreda, M., Bogena, H. R., &amp; Looms, M. C. (2017). Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone Journal, 16(8), 1–11. https://doi.org/10.2136/vzj2017.04.0086</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -2804,9 +2804,9 @@ It varies from about 128 g cm-2 at high latitudes to 142 g cm-2 at the equator (
 <span class="sd">        (list): fp pressure correction factor.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System, Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.</span>
+<span class="sd">        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., &amp; Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079–4099. https://doi.org/10.5194/hess-16-4079-2012</span>
 
-<span class="sd">        M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086</span>
+<span class="sd">        Andreasen, M., Jensen, K. H., Desilets, D., Franz, T. E., Zreda, M., Bogena, H. R., &amp; Looms, M. C. (2017). Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone Journal, 16(8), 1–11. https://doi.org/10.2136/vzj2017.04.0086</span>
 <span class="sd">    """</span>
 
     <span class="c1"># Compute pressure correction factor</span>
@@ -2957,7 +2957,7 @@ moisture term, and p6 to p9 for the distance term.</p>
 <details class="references" open="">
   <summary>References</summary>
   <p>Schrön, M., Rosolem, R., Köhli, M., Piussi, L., Schröter, I., Iwema, J., et al. (2018). Cosmic-ray neutron rover surveys
-of field soil moisture and the influence of roads. Water Resources Research, 54, 6441–6459.
+of field soil moisture and the influence of roads. Water Resources Research, 54(9), 6441–6459.
 https://doi.org/10.1029/2017WR021719</p>
 </details>
 
@@ -3018,7 +3018,7 @@ https://doi.org/10.1029/2017WR021719</p>
 
 <span class="sd">    References:</span>
 <span class="sd">        Schrön, M., Rosolem, R., Köhli, M., Piussi, L., Schröter, I., Iwema, J., et al. (2018). Cosmic-ray neutron rover surveys</span>
-<span class="sd">        of field soil moisture and the influence of roads. Water Resources Research, 54, 6441–6459.</span>
+<span class="sd">        of field soil moisture and the influence of roads. Water Resources Research, 54(9), 6441–6459.</span>
 <span class="sd">        https://doi.org/10.1029/2017WR021719</span>
 <span class="sd">    """</span>
     <span class="n">road_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">road_width</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -3228,11 +3228,10 @@ units as in Eq. 7 of Hawdon et al. (2014):</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Desilets, D., M. Zreda, and T.P.A. Ferré. 2010. Nature’s neutron probe:
-Land surface hydrology at an elusive scale with cosmic rays. Water Resour. Res. 46:W11505.
-doi.org/10.1029/2009WR008726</p>
-<p>Hawdon, A., D. McJannet, and J. Wallace (2014), Calibration and correction procedures for cosmic-ray neutron
-soil moisture probes located across Australia, Water Resour. Res., 50, 5029–5043, doi:10.1002/2013WR015138.</p>
+  <p>Desilets, D., Zreda, M., &amp; Ferré, T. P. A. (2010). Nature’s neutron probe: Land surface hydrology at an
+elusive scale with cosmic rays. Water Resources Research, 46(11), W11505. https://doi.org/10.1029/2009WR008726</p>
+<p>Hawdon, A., McJannet, D., &amp; Wallace, J. (2014). Calibration and correction procedures for cosmic-ray neutron
+soil moisture probes located across Australia. Water Resources Research, 50(6), 5029–5043. https://doi.org/10.1002/2013WR015138</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -3269,8 +3268,7 @@ soil moisture probes located across Australia, Water Resour. Res., 50, 5029–50
 <span class="normal">681</span>
 <span class="normal">682</span>
 <span class="normal">683</span>
-<span class="normal">684</span>
-<span class="normal">685</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">counts_to_vwc</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">N0</span><span class="p">,</span> <span class="n">Wlat</span><span class="p">,</span> <span class="n">Wsoc</span><span class="p">,</span> <span class="n">bulk_density</span><span class="p">,</span> <span class="n">a0</span><span class="o">=</span><span class="mf">0.0808</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="mf">0.372</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="mf">0.115</span><span class="p">):</span>
+<span class="normal">684</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">counts_to_vwc</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">N0</span><span class="p">,</span> <span class="n">Wlat</span><span class="p">,</span> <span class="n">Wsoc</span><span class="p">,</span> <span class="n">bulk_density</span><span class="p">,</span> <span class="n">a0</span><span class="o">=</span><span class="mf">0.0808</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="mf">0.372</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="mf">0.115</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">"""Function to convert corrected and filtered neutron counts into volumetric water content.</span>
 
 <span class="sd">    This method implements soil moisture estimation using the non-linear relationship between neutron count and soil water content</span>
@@ -3293,12 +3291,11 @@ soil moisture probes located across Australia, Water Resour. Res., 50, 5029–50
 <span class="sd">        (array or pd.Series or pd.DataFrame): Volumetric water content in m3 m-3.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Desilets, D., M. Zreda, and T.P.A. Ferré. 2010. Nature’s neutron probe:</span>
-<span class="sd">        Land surface hydrology at an elusive scale with cosmic rays. Water Resour. Res. 46:W11505.</span>
-<span class="sd">        doi.org/10.1029/2009WR008726</span>
+<span class="sd">        Desilets, D., Zreda, M., &amp; Ferré, T. P. A. (2010). Nature’s neutron probe: Land surface hydrology at an</span>
+<span class="sd">        elusive scale with cosmic rays. Water Resources Research, 46(11), W11505. https://doi.org/10.1029/2009WR008726</span>
 
-<span class="sd">        Hawdon, A., D. McJannet, and J. Wallace (2014), Calibration and correction procedures for cosmic-ray neutron</span>
-<span class="sd">        soil moisture probes located across Australia, Water Resour. Res., 50, 5029–5043, doi:10.1002/2013WR015138.</span>
+<span class="sd">        Hawdon, A., McJannet, D., &amp; Wallace, J. (2014). Calibration and correction procedures for cosmic-ray neutron</span>
+<span class="sd">        soil moisture probes located across Australia. Water Resources Research, 50(6), 5029–5043. https://doi.org/10.1002/2013WR015138</span>
 <span class="sd">    """</span>
 
     <span class="c1"># Convert neutron counts into vwc</span>
@@ -3410,7 +3407,7 @@ with the largest deviations (about 1.5 GV) in South America.</p>
 <details class="references" open="">
   <summary>References</summary>
   <p>Smart, D. F., &amp; Shea, M. A. (2008). World grid of calculated cosmic ray vertical cutoff rigidities
-for epoch 1995.0. Proceedings of the 30th International Cosmic Ray Conference (Mérida), 1, 733-736.</p>
+for epoch 1995.0. Proceedings of the 30th International Cosmic Ray Conference (Mérida), 1, 733–736.</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -3478,7 +3475,7 @@ for epoch 1995.0. Proceedings of the 30th International Cosmic Ray Conference (M
 
 <span class="sd">    References:</span>
 <span class="sd">        Smart, D. F., &amp; Shea, M. A. (2008). World grid of calculated cosmic ray vertical cutoff rigidities</span>
-<span class="sd">        for epoch 1995.0. Proceedings of the 30th International Cosmic Ray Conference (Mérida), 1, 733-736.</span>
+<span class="sd">        for epoch 1995.0. Proceedings of the 30th International Cosmic Ray Conference (Mérida), 1, 733–736.</span>
 <span class="sd">    """</span>
     <span class="n">xq</span> <span class="o">=</span> <span class="n">lon</span>
     <span class="n">yq</span> <span class="o">=</span> <span class="n">lat</span>
@@ -3740,18 +3737,20 @@ in space and one or more points.</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J.C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B. and Martin, E., 2008.
-From near-surface to root-zone soil moisture using an exponential filter: an assessment of the method based on in-situ observations and model
-simulations. Hydrology and Earth System Sciences, 12(6), pp.1323-1337.</p>
-<p>Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020.
-Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9.</p>
-<p>Rossini, P. and Patrignani, A., 2021. Predicting rootzone soil moisture from surface observations in cropland using an exponential filter.
+  <p>Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J. C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B., &amp; Martin, E. (2008).
+From near-surface to root-zone soil moisture using an exponential filter: An assessment of the method based on in-situ observations and model
+simulations. Hydrology and Earth System Sciences, 12(6), 1323–1337. https://doi.org/10.5194/hess-12-1323-2008</p>
+<p>Franz, T. E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L., &amp; Wagner, W. (2020).
+Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, 9.
+https://doi.org/10.3389/frwa.2020.00009</p>
+<p>Rossini, P., &amp; Patrignani, A. (2021). Predicting rootzone soil moisture from surface observations in cropland using an exponential filter.
 Soil Science Society of America Journal.</p>
 </details>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src\crnpy\crnpy.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 982</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 981</span>
+<span class="normal"> 982</span>
 <span class="normal"> 983</span>
 <span class="normal"> 984</span>
 <span class="normal"> 985</span>
@@ -3815,14 +3814,15 @@ Soil Science Society of America Journal.</p>
 <span class="sd">        sm_subsurface (list or array): Subsurface soil moisture in the same units as the input.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J.C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B. and Martin, E., 2008.</span>
-<span class="sd">        From near-surface to root-zone soil moisture using an exponential filter: an assessment of the method based on in-situ observations and model</span>
-<span class="sd">        simulations. Hydrology and Earth System Sciences, 12(6), pp.1323-1337.</span>
+<span class="sd">        Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J. C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B., &amp; Martin, E. (2008).</span>
+<span class="sd">        From near-surface to root-zone soil moisture using an exponential filter: An assessment of the method based on in-situ observations and model</span>
+<span class="sd">        simulations. Hydrology and Earth System Sciences, 12(6), 1323–1337. https://doi.org/10.5194/hess-12-1323-2008</span>
 
-<span class="sd">        Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020.</span>
-<span class="sd">        Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9.</span>
+<span class="sd">        Franz, T. E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L., &amp; Wagner, W. (2020).</span>
+<span class="sd">        Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, 9.</span>
+<span class="sd">        https://doi.org/10.3389/frwa.2020.00009</span>
 
-<span class="sd">        Rossini, P. and Patrignani, A., 2021. Predicting rootzone soil moisture from surface observations in cropland using an exponential filter.</span>
+<span class="sd">        Rossini, P., &amp; Patrignani, A. (2021). Predicting rootzone soil moisture from surface observations in cropland using an exponential filter.</span>
 <span class="sd">        Soil Science Society of America Journal.</span>
 <span class="sd">    """</span>
 
@@ -4857,9 +4857,9 @@ The acknowledgement text is printed when <code>verbose=True</code>.</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., &amp; Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079-4099.</p>
-<p>Hawdon, A., McJannet, D., &amp; Wallace, J. (2014). Calibration and correction procedures for cosmic‐ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029-5043.</p>
-<p>Bogena, H. R., Schrön, M., Jakobi, J., Ney, P., Zacharias, S., Andreasen, M., ... &amp; Vereecken, H. (2022). COSMOS-Europe: a European network of cosmic-ray neutron soil moisture sensors. Earth System Science Data, 14(3), 1125-1151.</p>
+  <p>Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., &amp; Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079–4099. https://doi.org/10.5194/hess-16-4079-2012</p>
+<p>Hawdon, A., McJannet, D., &amp; Wallace, J. (2014). Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029–5043. https://doi.org/10.1002/2013WR015138</p>
+<p>Bogena, H. R., Schrön, M., Jakobi, J., Ney, P., Zacharias, S., Andreasen, M., … &amp; Vereecken, H. (2022). COSMOS-Europe: A European network of cosmic-ray neutron soil moisture sensors. Earth System Science Data, 14(3), 1125–1151. https://doi.org/10.5194/essd-14-1125-2022</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -4899,11 +4899,11 @@ The acknowledgement text is printed when <code>verbose=True</code>.</p>
 <span class="sd">        (float): Reference neutron flux in counts per hour.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., &amp; Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079-4099.</span>
+<span class="sd">        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., &amp; Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079–4099. https://doi.org/10.5194/hess-16-4079-2012</span>
 
-<span class="sd">        Hawdon, A., McJannet, D., &amp; Wallace, J. (2014). Calibration and correction procedures for cosmic‐ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029-5043.</span>
+<span class="sd">        Hawdon, A., McJannet, D., &amp; Wallace, J. (2014). Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029–5043. https://doi.org/10.1002/2013WR015138</span>
 
-<span class="sd">        Bogena, H. R., Schrön, M., Jakobi, J., Ney, P., Zacharias, S., Andreasen, M., ... &amp; Vereecken, H. (2022). COSMOS-Europe: a European network of cosmic-ray neutron soil moisture sensors. Earth System Science Data, 14(3), 1125-1151.</span>
+<span class="sd">        Bogena, H. R., Schrön, M., Jakobi, J., Ney, P., Zacharias, S., Andreasen, M., … &amp; Vereecken, H. (2022). COSMOS-Europe: A European network of cosmic-ray neutron soil moisture sensors. Earth System Science Data, 14(3), 1125–1151. https://doi.org/10.5194/essd-14-1125-2022</span>
 
 <span class="sd">"""</span>
 
@@ -5776,7 +5776,7 @@ The range check defined by <code>min_val</code> and <code>max_val</code> is alwa
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.</p>
+  <p>Iglewicz, B., &amp; Hoaglin, D. C. (1993). How to detect and handle outliers (Vol. 16). ASQC Quality Press.</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -5875,7 +5875,7 @@ The range check defined by <code>min_val</code> and <code>max_val</code> is alwa
 <span class="sd">        (pandas.Series): Boolean indicating outliers.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.</span>
+<span class="sd">        Iglewicz, B., &amp; Hoaglin, D. C. (1993). How to detect and handle outliers (Vol. 16). ASQC Quality Press.</span>
 <span class="sd">    """</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
@@ -6441,7 +6441,7 @@ lattice water directly as a g/g fraction; the regression with carbon must be use
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>McJannet, D. L., &amp; Desilets, D. (2023). Incoming Neutron Flux Corrections for Cosmic‐Ray Soil and Snow Sensors Using the Global Neutron Monitor Network. Water Resources Research, 59(4), e2022WR033889.</p>
+  <p>McJannet, D. L., &amp; Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59(4), e2022WR033889. https://doi.org/10.1029/2022WR033889</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -6499,7 +6499,7 @@ lattice water directly as a g/g fraction; the regression with carbon must be use
 <span class="sd">        (float): Location-dependent correction factor.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        McJannet, D. L., &amp; Desilets, D. (2023). Incoming Neutron Flux Corrections for Cosmic‐Ray Soil and Snow Sensors Using the Global Neutron Monitor Network. Water Resources Research, 59(4), e2022WR033889.</span>
+<span class="sd">        McJannet, D. L., &amp; Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59(4), e2022WR033889. https://doi.org/10.1029/2022WR033889</span>
 
 <span class="sd">    """</span>
 
@@ -6738,19 +6738,20 @@ footprint weighting functions of Schrön et al. (2017).</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., and Zacharias, S. (2015).
+  <p>Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., &amp; Zacharias, S. (2015).
 Footprint characteristics revised for field-scale soil moisture monitoring with cosmic-ray
-neutrons. Water Resour. Res. 51, 5772–5790. doi:10.1002/2015WR017169</p>
+neutrons. Water Resources Research, 51(7), 5772–5790. https://doi.org/10.1002/2015WR017169</p>
 <p>Schrön, M., Köhli, M., Scheiffele, L., Iwema, J., Bogena, H. R., Lv, L.,
 Martini, E., Baroni, G., Rosolem, R., Weimar, J., Mai, J., Cuntz, M., Rebmann, C.,
-Oswald, S. E., Dietrich, P., Schmidt, U., and Zacharias, S.: Improving calibration and
-validation of cosmic-ray neutron sensors in the light of spatial sensitivity,
-Hydrol. Earth Syst. Sci., 21, 5009–5030, https://doi.org/10.5194/hess-21-5009-2017, 2017.</p>
+Oswald, S. E., Dietrich, P., Schmidt, U., &amp; Zacharias, S. (2017). Improving calibration and
+validation of cosmic-ray neutron sensors in the light of spatial sensitivity.
+Hydrology and Earth System Sciences, 21, 5009–5030. https://doi.org/10.5194/hess-21-5009-2017</p>
 </details>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src\crnpy\crnpy.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">769</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">768</span>
+<span class="normal">769</span>
 <span class="normal">770</span>
 <span class="normal">771</span>
 <span class="normal">772</span>
@@ -6959,8 +6960,7 @@ Hydrol. Earth Syst. Sci., 21, 5009–5030, https://doi.org/10.5194/hess-21-5009-
 <span class="normal">975</span>
 <span class="normal">976</span>
 <span class="normal">977</span>
-<span class="normal">978</span>
-<span class="normal">979</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">nrad_weight</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">profiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rhob</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Hveg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+<span class="normal">978</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">nrad_weight</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">profiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rhob</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Hveg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Function to compute distance weights corresponding to each soil sample following the revised</span>
 <span class="sd">    footprint weighting functions of Schrön et al. (2017).</span>
 
@@ -6980,15 +6980,15 @@ Hydrol. Earth Syst. Sci., 21, 5009–5030, https://doi.org/10.5194/hess-21-5009-
 <span class="sd">        weights (list): [theta_P, r_stars, Wrs] with the vertically averaged soil moisture, the scaled distance and the horizontal weight of each profile.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., and Zacharias, S. (2015).</span>
+<span class="sd">        Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., &amp; Zacharias, S. (2015).</span>
 <span class="sd">        Footprint characteristics revised for field-scale soil moisture monitoring with cosmic-ray</span>
-<span class="sd">        neutrons. Water Resour. Res. 51, 5772–5790. doi:10.1002/2015WR017169</span>
+<span class="sd">        neutrons. Water Resources Research, 51(7), 5772–5790. https://doi.org/10.1002/2015WR017169</span>
 
 <span class="sd">        Schrön, M., Köhli, M., Scheiffele, L., Iwema, J., Bogena, H. R., Lv, L.,</span>
 <span class="sd">        Martini, E., Baroni, G., Rosolem, R., Weimar, J., Mai, J., Cuntz, M., Rebmann, C.,</span>
-<span class="sd">        Oswald, S. E., Dietrich, P., Schmidt, U., and Zacharias, S.: Improving calibration and</span>
-<span class="sd">        validation of cosmic-ray neutron sensors in the light of spatial sensitivity,</span>
-<span class="sd">        Hydrol. Earth Syst. Sci., 21, 5009–5030, https://doi.org/10.5194/hess-21-5009-2017, 2017.</span>
+<span class="sd">        Oswald, S. E., Dietrich, P., Schmidt, U., &amp; Zacharias, S. (2017). Improving calibration and</span>
+<span class="sd">        validation of cosmic-ray neutron sensors in the light of spatial sensitivity.</span>
+<span class="sd">        Hydrology and Earth System Sciences, 21, 5009–5030. https://doi.org/10.5194/hess-21-5009-2017</span>
 <span class="sd">    """</span>
 
     <span class="c1"># Horizontal distance weights According to Eq. 6 and Table A1 in Schrön et al. (2017)</span>
@@ -7685,17 +7685,18 @@ probe the soil profile.</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Franz, T.E., Zreda, M., Ferre, T.P.A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X. and Shuttleworth, W.J., 2012.
+  <p>Franz, T. E., Zreda, M., Ferré, T. P. A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X., &amp; Shuttleworth, W. J. (2012).
 Measurement depth of the cosmic ray soil moisture probe affected by hydrogen from various sources.
-Water Resources Research, 48(8). doi.org/10.1029/2012WR011871</p>
+Water Resources Research, 48(8), W08515. https://doi.org/10.1029/2012WR011871</p>
 <p>Schrön, M., Köhli, M., Scheiffele, L., Iwema, J., Bogena, H. R., Lv, L., et al. (2017).
 Improving calibration and validation of cosmic-ray neutron sensors in the light of spatial sensitivity.
-Hydrol. Earth Syst. Sci. 21, 5009–5030. doi.org/10.5194/hess-21-5009-2017</p>
+Hydrology and Earth System Sciences, 21, 5009–5030. https://doi.org/10.5194/hess-21-5009-2017</p>
 </details>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src\crnpy\crnpy.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">688</span>
+              <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">687</span>
+<span class="normal">688</span>
 <span class="normal">689</span>
 <span class="normal">690</span>
 <span class="normal">691</span>
@@ -7742,8 +7743,7 @@ Hydrol. Earth Syst. Sci. 21, 5009–5030. doi.org/10.5194/hess-21-5009-2017</p>
 <span class="normal">732</span>
 <span class="normal">733</span>
 <span class="normal">734</span>
-<span class="normal">735</span>
-<span class="normal">736</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sensing_depth</span><span class="p">(</span><span class="n">vwc</span><span class="p">,</span> <span class="n">pressure</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="n">bulk_density</span><span class="p">,</span> <span class="n">Wlat</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'Schron_2017'</span><span class="p">):</span>
+<span class="normal">735</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">sensing_depth</span><span class="p">(</span><span class="n">vwc</span><span class="p">,</span> <span class="n">pressure</span><span class="p">,</span> <span class="n">p_ref</span><span class="p">,</span> <span class="n">bulk_density</span><span class="p">,</span> <span class="n">Wlat</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'Schron_2017'</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Function that computes the estimated sensing depth of the cosmic-ray neutron probe.</span>
 <span class="sd">    The function offers several methods to compute the depth at which 86 % of the neutrons</span>
 <span class="sd">    probe the soil profile.</span>
@@ -7761,13 +7761,13 @@ Hydrol. Earth Syst. Sci. 21, 5009–5030. doi.org/10.5194/hess-21-5009-2017</p>
 <span class="sd">        (array or pd.Series or pd.DataFrame): Estimated sensing depth in cm.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Franz, T.E., Zreda, M., Ferre, T.P.A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X. and Shuttleworth, W.J., 2012.</span>
+<span class="sd">        Franz, T. E., Zreda, M., Ferré, T. P. A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X., &amp; Shuttleworth, W. J. (2012).</span>
 <span class="sd">        Measurement depth of the cosmic ray soil moisture probe affected by hydrogen from various sources.</span>
-<span class="sd">        Water Resources Research, 48(8). doi.org/10.1029/2012WR011871</span>
+<span class="sd">        Water Resources Research, 48(8), W08515. https://doi.org/10.1029/2012WR011871</span>
 
 <span class="sd">        Schrön, M., Köhli, M., Scheiffele, L., Iwema, J., Bogena, H. R., Lv, L., et al. (2017).</span>
 <span class="sd">        Improving calibration and validation of cosmic-ray neutron sensors in the light of spatial sensitivity.</span>
-<span class="sd">        Hydrol. Earth Syst. Sci. 21, 5009–5030. doi.org/10.5194/hess-21-5009-2017</span>
+<span class="sd">        Hydrology and Earth System Sciences, 21, 5009–5030. https://doi.org/10.5194/hess-21-5009-2017</span>
 <span class="sd">    """</span>
 
     <span class="c1"># Determine sensing depth (D86)</span>
@@ -7917,11 +7917,11 @@ Options are 'moving_average', 'moving_median' and 'savitzky_golay'.</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020.
-Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9.
-doi.org/10.3389/frwa.2020.00009</p>
+  <p>Franz, T. E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L., &amp; Wagner, W. (2020).
+Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, 9.
+https://doi.org/10.3389/frwa.2020.00009</p>
 <p>Savitzky, A., &amp; Golay, M. J. (1964). Smoothing and differentiation of data by simplified least squares procedures.
-Analytical chemistry, 36(8), 1627-1639.</p>
+Analytical Chemistry, 36(8), 1627–1639. https://doi.org/10.1021/ac60214a047</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -7985,12 +7985,12 @@ Analytical chemistry, 36(8), 1627-1639.</p>
 <span class="sd">        (pd.DataFrame): DataFrame with smoothed values.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020.</span>
-<span class="sd">        Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9.</span>
-<span class="sd">        doi.org/10.3389/frwa.2020.00009</span>
+<span class="sd">        Franz, T. E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L., &amp; Wagner, W. (2020).</span>
+<span class="sd">        Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, 9.</span>
+<span class="sd">        https://doi.org/10.3389/frwa.2020.00009</span>
 
 <span class="sd">        Savitzky, A., &amp; Golay, M. J. (1964). Smoothing and differentiation of data by simplified least squares procedures.</span>
-<span class="sd">        Analytical chemistry, 36(8), 1627-1639.</span>
+<span class="sd">        Analytical Chemistry, 36(8), 1627–1639. https://doi.org/10.1021/ac60214a047</span>
 <span class="sd">    """</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
@@ -8560,10 +8560,10 @@ The CV% can be expressed as $ N^{-1/2} $</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With
-Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010</p>
-<p>Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System,
-Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.</p>
+  <p>Jakobi, J., Huisman, J. A., Schrön, M., Fiedler, J., Brogi, C., Vereecken, H., &amp; Bogena, H. R. (2020). Error estimation for soil moisture
+measurements with cosmic ray neutron sensing and implications for rover surveys. Frontiers in Water, 2, 10. https://doi.org/10.3389/frwa.2020.00010</p>
+<p>Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., &amp; Rosolem, R. (2012). COSMOS: The cosmic-ray soil
+moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079–4099. https://doi.org/10.5194/hess-16-4079-2012</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -8621,11 +8621,11 @@ Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-
 <span class="sd">        uncertainty (float): Uncertainty of raw counts.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With</span>
-<span class="sd">        Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010</span>
+<span class="sd">        Jakobi, J., Huisman, J. A., Schrön, M., Fiedler, J., Brogi, C., Vereecken, H., &amp; Bogena, H. R. (2020). Error estimation for soil moisture</span>
+<span class="sd">        measurements with cosmic ray neutron sensing and implications for rover surveys. Frontiers in Water, 2, 10. https://doi.org/10.3389/frwa.2020.00010</span>
 
-<span class="sd">        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System,</span>
-<span class="sd">        Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.</span>
+<span class="sd">        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., &amp; Rosolem, R. (2012). COSMOS: The cosmic-ray soil</span>
+<span class="sd">        moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079–4099. https://doi.org/10.5194/hess-16-4079-2012</span>
 
 <span class="sd">    """</span>
 
@@ -8800,8 +8800,8 @@ $$</p>
 
 <details class="references" open="">
   <summary>References</summary>
-  <p>Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With
-Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010</p>
+  <p>Jakobi, J., Huisman, J. A., Schrön, M., Fiedler, J., Brogi, C., Vereecken, H., &amp; Bogena, H. R. (2020). Error estimation for soil moisture
+measurements with cosmic ray neutron sensing and implications for rover surveys. Frontiers in Water, 2, 10. https://doi.org/10.3389/frwa.2020.00010</p>
 </details>
 
             <details class="mkdocstrings-source">
@@ -8858,8 +8858,8 @@ Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10
 <span class="sd">        sigma_VWC (float): Uncertainty in terms of volumetric water content.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With</span>
-<span class="sd">        Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010</span>
+<span class="sd">        Jakobi, J., Huisman, J. A., Schrön, M., Fiedler, J., Brogi, C., Vereecken, H., &amp; Bogena, H. R. (2020). Error estimation for soil moisture</span>
+<span class="sd">        measurements with cosmic ray neutron sensing and implications for rover surveys. Frontiers in Water, 2, 10. https://doi.org/10.3389/frwa.2020.00010</span>
 <span class="sd">    """</span>
 
     <span class="n">Ncorr</span> <span class="o">=</span> <span class="n">raw_counts</span> <span class="o">*</span> <span class="n">fw</span> <span class="o">/</span> <span class="p">(</span><span class="n">fp</span> <span class="o">*</span> <span class="n">fi</span><span class="p">)</span>
