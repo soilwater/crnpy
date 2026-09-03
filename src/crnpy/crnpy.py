@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import requests
 import sys
+import time
 import utm
 import warnings
 
@@ -20,7 +21,7 @@ from scipy.signal import savgol_filter
 from scipy.special import erfcinv
 
 # Define python version
-python_version = (3, 7)  # tuple of (major, minor) version requirement
+python_version = (3, 8)  # tuple of (major, minor) version requirement
 python_version_str = str(python_version[0]) + "." + str(python_version[1])
 
 # produce an error message if the python version is less than required
@@ -43,17 +44,17 @@ def remove_incomplete_intervals(df, timestamp_col, integration_time, remove_firs
     """
 
     # Check format of timestamp column
-    if df[timestamp_col].dtype != 'datetime64[ns]':
+    if not pd.api.types.is_datetime64_any_dtype(df[timestamp_col]):
         raise TypeError('timestamp_col must be datetime64. Use `pd.to_datetime()` to fix this issue.')
 
     # Check if differences in timestamps are below or above the provided integration time
     idx_delta = df[timestamp_col].diff().dt.total_seconds() != integration_time
 
-    if remove_first:
-        idx_delta[0] = True
+    # The first row has no preceding interval (NaT difference), so keep it unless remove_first is requested
+    idx_delta.iloc[0] = bool(remove_first)
 
-    # Select rows that meet the specified integration time
-    df = df[~idx_delta]
+    # Select rows that meet the specified integration time (copy so later column assignments never act on a view)
+    df = df[~idx_delta].copy()
     df.reset_index(drop=True, inplace=True)
 
     # Notify user about the number of rows that have been removed
@@ -62,15 +63,16 @@ def remove_incomplete_intervals(df, timestamp_col, integration_time, remove_firs
     return df
 
 
-def fill_missing_timestamps(df, timestamp_col='timestamp', freq='H', round_timestamp=True, verbose=False):
+def fill_missing_timestamps(df, timestamp_col='timestamp', freq='h', round_timestamp=True, verbose=False):
     """Helper function to fill rows with missing timestamps in datetime record. Rows are filled with NaN values.
 
      Args:
          df (pandas.DataFrame): Pandas DataFrame.
          timestamp_col (str, optional): Column with the timestamp. Must be in datetime format. Default column name is 'timestamp'.
-         freq (str, optional): Timestamp frequency. 'H' for hourly, 'M' for minute, or None. Can also use '3H' for a 3 hour frequency. Default is 'H'.
+         freq (str, optional): Timestamp frequency using pandas offset aliases: 'h' for hourly, 'min' for minute,
+             or e.g. '3h' for a 3 hour frequency. Default is 'h'.
          round_timestamp (bool, optional): Whether to round timestamps to the nearest frequency. Default is True.
-         verbose (bool, optional): Prints the missing timestamps added to the DatFrame.
+         verbose (bool, optional): Prints the missing timestamps added to the DataFrame.
 
      Returns:
          (pandas.DataFrame): DataFrame with filled missing timestamps.
@@ -78,10 +80,10 @@ def fill_missing_timestamps(df, timestamp_col='timestamp', freq='H', round_times
      """
 
     # Check format of timestamp column
-    if df[timestamp_col].dtype != 'datetime64[ns]':
+    if not pd.api.types.is_datetime64_any_dtype(df[timestamp_col]):
         raise TypeError('timestamp_col must be datetime64. Use `pd.to_datetime()` to fix this issue.')
 
-    # Round timestamps to nearest frequency. This steps must preced the filling of rows.
+    # Round timestamps to nearest frequency. This step must precede the filling of rows.
     if round_timestamp:
         df[timestamp_col] = df[timestamp_col].dt.round(freq)
 
@@ -117,7 +119,8 @@ def total_raw_counts(counts):
         (pandas.DataFrame): Dataframe with the sum of uncorrected neutron counts for all detectors.
     """
 
-    if counts.shape[0] > 1:
+    # With more than one detector, fill missing values of a detector with the mean of the other detectors in that row
+    if counts.shape[1] > 1:
         counts = counts.apply(lambda x: x.fillna(counts.mean(axis=1)), axis=0)
 
     # Compute sum of counts
@@ -130,33 +133,39 @@ def total_raw_counts(counts):
 
 
 def is_outlier(x, method, window=11, min_val=None, max_val=None):
-    """Function that tests whether values are outliers using a modified moving z-score based on the median absolute difference.
+    """Function that tests whether values are outliers using a range check and/or a dispersion-based method.
 
     Args:
-        x (pd.DataFrame or pd.Series): Variable containing only the columns with neutron counts.
-        method (str): Outlier detection method. One of: range, iqr, moviqr, zscore, movzscore, modified_zscore, and scaled_mad
+        x (pd.Series): Series with the variable to test, typically neutron counts.
+        method (str): Outlier detection method. One of: range, iqr, moviqr, zscore, movzscore, modified_zscore, and scaled_mad.
+            The range check defined by `min_val` and `max_val` is always applied in addition to the selected method.
         window (int, optional): Window size for the moving central tendency. Default is 11.
         min_val (int or float): Minimum value for a reading to be considered valid. Default is None.
         max_val(int or float): Maximum value for a reading to be considered valid. Default is None.
 
     Returns:
-        (pandas.DataFrame): Boolean indicating outliers.
+        (pandas.Series): Boolean indicating outliers.
 
     References:
         Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
     """
 
     if not isinstance(x, pd.Series):
-        raise TypeError('x must of type pandas.Series')
+        raise TypeError('x must be of type pandas.Series')
 
     # Separate this method to allow usage together with other methods below
     if isinstance(min_val, numbers.Number) and isinstance(max_val, numbers.Number):
         idx_range_outliers = (x < min_val) | (x > max_val)
     else:
-        idx_range_outliers = np.full_like(x, False)
+        idx_range_outliers = pd.Series(False, index=x.index)
 
     # Apply other methods in addition to a range check
-    if method == 'iqr':
+    if method == 'range':
+        if not (isinstance(min_val, numbers.Number) and isinstance(max_val, numbers.Number)):
+            raise ValueError("The 'range' method requires min_val and max_val.")
+        idx_outliers = idx_range_outliers
+
+    elif method == 'iqr':
         q1 = x.quantile(0.25)
         q3 = x.quantile(0.75)
         iqr = q3 - q1
@@ -193,14 +202,14 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
         idx_outliers = (modified_z_score < -3.5) | (modified_z_score > 3.5)
 
     elif method == 'scaled_mad':
-        # Returns true for elements more than three scaled MAD from the median. 
+        # Returns true for elements more than three scaled MAD from the median (as in MATLAB isoutlier).
         c = -1 / (np.sqrt(2) * erfcinv(3 / 2))
         median = np.nanmedian(x)
         mad = c * np.nanmedian(np.abs(x - median))
-        idx_outliers = x > (median + 3 * mad)
+        idx_outliers = np.abs(x - median) > 3 * mad
 
     else:
-        raise TypeError('Outlier detection method not found.')
+        raise ValueError('Outlier detection method not found.')
 
     return idx_outliers | idx_range_outliers
 
@@ -229,13 +238,14 @@ def correction_pressure(pressure, Pref, L):
 
     - P: atmospheric pressure
     - Pref: reference atmospheric pressure
-    - L: Atmospheric attenuation coefficient.
+    - L: mass attenuation length for high-energy neutrons.
 
 
     Args:
-        pressure (list or array): Atmospheric pressure readings. Long-term average pressure is recommended.
-        Pref (float): Reference atmospheric pressure.
-        L (float): Atmospheric attenuation coefficient.
+        pressure (list or array): Atmospheric pressure readings, in the same units as Pref and L (e.g. hPa).
+        Pref (float): Reference atmospheric pressure. The long-term average pressure at the site is recommended (Zreda et al., 2012).
+        L (float): Mass attenuation length for high-energy neutrons, in the same units as the pressure (hPa) or in g cm-2.
+            It varies from about 128 g cm-2 at high latitudes to 142 g cm-2 at the equator (Zreda et al., 2012).
 
     Returns:
         (list): fp pressure correction factor.
@@ -247,7 +257,7 @@ def correction_pressure(pressure, Pref, L):
     """
 
     # Compute pressure correction factor
-    fp = np.exp((Pref - pressure) / L)  # Zreda et al. 2017 Eq 5.
+    fp = np.exp((Pref - pressure) / L)  # Zreda et al. (2012) Eq. 5
 
     return fp
 
@@ -255,7 +265,7 @@ def correction_pressure(pressure, Pref, L):
 def correction_humidity(abs_humidity, Aref):
     r"""Correction factor for absolute humidity.
 
-    This function corrects neutron counts for absolute humidity using the method described in Rosolem et al. (2013) and Anderson et al. (2017). The correction is performed using the following equation:
+    This function corrects neutron counts for absolute humidity using the method described in Rosolem et al. (2013) and Andreasen et al. (2017). The correction is performed using the following equation:
 
     $$
     C_{corrected} = C_{raw} \cdot f_w
@@ -277,8 +287,8 @@ def correction_humidity(abs_humidity, Aref):
     - Aref: reference absolute humidity
 
     Args:
-        abs_humidity (list or array): Relative humidity readings.
-        Aref (float): Reference absolute humidity (g/m^3). The day of the instrument calibration is recommended.
+        abs_humidity (list or array): Absolute humidity readings (g/m^3). See `abs_humidity()`.
+        Aref (float): Reference absolute humidity (g/m^3). The value on the day of the instrument calibration is recommended.
 
     Returns:
         (list): fw correction factor.
@@ -289,7 +299,7 @@ def correction_humidity(abs_humidity, Aref):
         M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
     """
     A = abs_humidity
-    fw = 1 + 0.0054 * (A - Aref)  # Zreda et al. 2017 Eq 6.
+    fw = 1 + 0.0054 * (A - Aref)  # Rosolem et al. (2013); Andreasen et al. (2017) Eq. 3
     return fw
 
 
@@ -298,7 +308,7 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None,
 
     r"""Correction factor for incoming neutron flux.
 
-    This function corrects neutron counts for incoming neutron flux using the method described in Anderson et al. (2017). The correction is performed using the following equation:
+    This function corrects neutron counts for incoming neutron flux using the method described in Andreasen et al. (2017). The correction is performed using the following equation:
 
     $$
     C_{corrected} = \frac{C_{raw}}{f_i}
@@ -352,7 +362,9 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None,
 
         if Rc_method == 'McJannetandDesilets2023':
             tau = location_factor(site_atmdepth, Rc_site, ref_atmdepth, Rc_ref)
-            fi = 1 / (tau * fi + 1 - tau)
+            # McJannet and Desilets (2023) Eq. 10 give the multiplicative factor [tau*I/Iref + 1 - tau]^-1.
+            # This library divides counts by fi (C_corrected = C_raw / fi), so fi is the bracket itself.
+            fi = tau * fi + 1 - tau
 
         elif Rc_method == 'Hawdonetal2014':
             Rc_corr = -0.075 * (Rc_site - Rc_ref) + 1.0
@@ -382,6 +394,12 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     Returns:
         (pandas.DataFrame): Neutron flux in counts per hour and timestamps.
 
+    Note:
+        Data retrieved via NMDB are the property of the individual data providers and are free for non-commercial use
+        within the restrictions imposed by the providers. Please acknowledge the NMDB database (www.nmdb.eu), founded
+        under the European Union's FP7 programme (contract no. 213007), and the PIs of the individual neutron monitors.
+        The acknowledgement text is printed when `verbose=True`.
+
     References:
         Documentation available:https://www.nmdb.eu/nest/help.php#howto
     """
@@ -389,7 +407,7 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     # Example: get_incoming_neutron_flux(station='IRKT',start_date='2020-04-10 11:00:00',end_date='2020-06-18 17:00:00')
     # Template url = 'http://nest.nmdb.eu/draw_graph.php?formchk=1&stations[]=KERG&output=ascii&tabchoice=revori&dtype=corr_for_efficiency&date_choice=bydate&start_year=2009&start_month=09&start_day=01&start_hour=00&start_min=00&end_year=2009&end_month=09&end_day=05&end_hour=23&end_min=59&yunits=0'
 
-    # Expand the time window by 1 hour to ensure an extra observation is included in the request.
+    # Expand the time window by `expand_window` hours to ensure extra observations are included in the request.
     start_date -= pd.Timedelta(hours=expand_window)
     end_date += pd.Timedelta(hours=expand_window)
 
@@ -421,10 +439,29 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     if verbose:
         print(f"Retrieving data from {url}")
 
-    r = requests.get(url).content.decode('utf-8')
+    # The NMDB draw_graph.php endpoint occasionally returns the HTML page without the ASCII data block,
+    # even when data are available, and appears to rate-limit rapid requests. Try at most 3 times, pausing
+    # between attempts, when the 'RCORR_E' marker is missing.
+    n_attempts = 3
+    wait_seconds = 5
+    for attempt in range(n_attempts):
+        r = requests.get(url).content.decode('utf-8')
+        if "RCORR_E" in r:
+            break
+        if attempt < n_attempts - 1:
+            print(f"Request to NMDB unsuccessful, retrying in {wait_seconds} seconds "
+                  f"(attempt {attempt + 1} of {n_attempts})...")
+            time.sleep(wait_seconds)
 
-    # Subtract 1 hour to restore the last date included in the request.
-    end_date -= pd.Timedelta('1H')
+    # If the data block is still missing after the retries, no data were returned for the request. The NMDB
+    # server appears to limit the number of requests per minute, so waiting before trying again usually helps.
+    if "RCORR_E" not in r:
+        print("Could not retrieve data from NMDB after "
+              f"{n_attempts} attempts. The server may be limiting requests; please wait a minute and try again.")
+        if verbose:
+            print(f"Error retrieving data from {url}")
+        return None
+
     start = r.find("RCORR_E\n") + 8
     end = r.find('\n</code></pre><br>Total') - 1
     s = r[start:end]
@@ -450,6 +487,8 @@ use to within the restriction imposed by the providers. If you use such data for
 the origin by a sentence like 'We acknowledge the NMDB database (www.nmdb.eu) founded under the European Union's FP7 programme 
 (contract no. 213007), and the PIs of individual neutron monitors at: IGY Jungfraujoch 
 (Physikalisches Institut, University of Bern, Switzerland)"""
+    if verbose:
+        print(acknowledgement)
 
     return df_flux
 
@@ -485,7 +524,7 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
     """Use a Savitzky-Golay filter to smooth the signal of corrected neutron counts or another one-dimensional array (e.g. computed volumetric water content).
 
     Args:
-        values (pd.DataFrame or pd.Serie): Dataframe containing the values to smooth.
+        values (pd.DataFrame or pd.Series): Dataframe containing the values to smooth.
         window (int): Window size for the Savitzky-Golay filter. Default is 5.
         method (str): Method to use for smoothing the data. Default is 'moving_median'.
             Options are 'moving_average', 'moving_median' and 'savitzky_golay'.
@@ -512,15 +551,16 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
         corrected_counts = values.rolling(window=window, center=True, min_periods=1).median()
 
     elif method == 'savitzky_golay':
-        if values.isna().any():
+        if np.any(values.isna().values):
             print('Dataframe contains NaN values. Please remove NaN values before smoothing the data.')
 
         if type(values) == pd.core.series.Series:
             filtered = savgol_filter(values, window, order)
             corrected_counts = pd.DataFrame(filtered, columns=['smoothed'], index=values.index)
         elif type(values) == pd.core.frame.DataFrame:
+            corrected_counts = values.copy()
             for col in values.columns:
-                values[col] = savgol_filter(values[col], window, order)
+                corrected_counts[col] = savgol_filter(values[col], window, order)
     else:
         raise ValueError(
             'Invalid method. Please select a valid filtering method., options are: moving_average, moving_median, savitzky_golay')
@@ -528,22 +568,23 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
     return corrected_counts
 
 
-def correction_bwe(counts, bwe, r2_N0=0.05):
+def correction_bwe(counts, bwe, r2_N0=0.0053):
     """Function to correct for biomass effects in neutron counts.
     following the approach described in Baatz et al., 2015.
 
     Args:
-        counts (array or pd.Series or pd.DataFrame): Array of ephithermal neutron counts.
+        counts (array or pd.Series or pd.DataFrame): Array of epithermal neutron counts.
         bwe (float): Biomass water equivalent kg m-2.
-        r2_N0 (float): Ratio of neutron counts with biomass to neutron counts without biomass. Default is 0.05.
+        r2_N0 (float): Ratio r2/N0 of Baatz et al. (2015), i.e. the fractional reduction in neutron counts per kg m-2 of
+            biomass water equivalent. Default is 0.0053 (r2 = 6.4 cph per kg m-2 BWE and N0 = 1210 cph, about 0.5% per kg m-2).
 
     Returns:
         (array or pd.Series or pd.DataFrame): Array of corrected neutron counts for biomass effects.
 
     References:
         Baatz, R., H. R. Bogena, H.-J. Hendricks Franssen, J. A. Huisman, C. Montzka, and H. Vereecken (2015),
-        An empiricalvegetation correction for soil water content quantification using cosmic ray probes,
-        Water Resour. Res., 51, 2030–2046, doi:10.1002/ 2014WR016443.
+        An empirical vegetation correction for soil water content quantification using cosmic ray probes,
+        Water Resour. Res., 51, 2030–2046, doi:10.1002/2014WR016443.
     """
 
     return counts / (1 - bwe * r2_N0)
@@ -570,29 +611,36 @@ def biomass_to_bwe(biomass_dry, biomass_fresh, fWE=0.494):
 
 
 def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0.12, p0=0.42, p1=0.5, p2=1.06, p3=4,
-                    p4=0.16, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
+                    p4=0.16, p5=0.39, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
     """Function to correct for road effects in neutron counts.
-    following the approach described in Schrön et al., 2018.
+    following the approach described in Schrön et al., 2018. The parameters p0 to p9 of the correction function
+    default to the values of Table 1 in Schrön et al. (2018): p0 and p1 for the geometry term, p2 to p5 for the
+    moisture term, and p6 to p9 for the distance term.
 
     Args:
-        counts (array or pd.Series or pd.DataFrame): Array of ephithermal neutron counts.
+        counts (array or pd.Series or pd.DataFrame): Array of epithermal neutron counts.
         theta_N (float): Volumetric water content of the soil estimated from the uncorrected neutron counts.
         road_width (float): Width of the road in m.
         road_distance (float): Distance of the road from the sensor in m. Default is 0.0.
         theta_road (float): Volumetric water content of the road. Default is 0.12.
-        p0-p9 (float): Parameters of the correction function. Default values are from Schrön et al., 2018.
 
     Returns:
         (array or pd.Series or pd.DataFrame): Array of corrected neutron counts for road effects.
 
     References:
-        Schrön,M.,Rosolem,R.,Köhli,M., Piussi,L.,Schröter,I.,Iwema,J.,etal. (2018).Cosmic-ray neutron rover surveys
-        of field soil moisture and the influence of roads.WaterResources Research,54,6441–6459.
-        https://doi. org/10.1029/2017WR021719
+        Schrön, M., Rosolem, R., Köhli, M., Piussi, L., Schröter, I., Iwema, J., et al. (2018). Cosmic-ray neutron rover surveys
+        of field soil moisture and the influence of roads. Water Resources Research, 54, 6441–6459.
+        https://doi.org/10.1029/2017WR021719
     """
+    road_width = np.asarray(road_width, dtype=float)
     F1 = p0 * (1 - np.exp(-p1 * road_width))
-    F2 = -p2 - p3 * theta_road - ((p4 + theta_road) / (theta_N))
-    F3 = p6 * np.exp(-p7 * (road_width ** -p8) * road_distance ** 4) + (1 - p6) * np.exp(-p9 * road_distance)
+    # Moisture term F2' of Schrön et al. (2018), Eq. 6 and Table 1, which uses the soil moisture
+    # estimated from the uncorrected counts instead of prior knowledge of the field soil moisture.
+    F2 = p2 - p3 * theta_road - (p4 + theta_road) / (p5 + theta_N)
+    # For a road width of zero F1 = 0 and no correction is applied (Schrön et al., 2018, requirement 4);
+    # the width is replaced by 1 m inside F3 only to avoid raising zero to a negative power.
+    width_safe = np.where(road_width > 0, road_width, 1.0)
+    F3 = p6 * np.exp(-p7 * (width_safe ** -p8) * road_distance ** 4) + (1 - p6) * np.exp(-p9 * road_distance)
 
     C_roads = 1 + F1 * F2 * F3
 
@@ -604,19 +652,21 @@ def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0
 def counts_to_vwc(counts, N0, Wlat, Wsoc, bulk_density, a0=0.0808, a1=0.372, a2=0.115):
     r"""Function to convert corrected and filtered neutron counts into volumetric water content.
 
-    This method implements soil moisture estimation using the non-linear relationship between neutron count and soil volumetric water content following the approach described in Desilets et al., 2010.
+    This method implements soil moisture estimation using the non-linear relationship between neutron count and soil water content
+    of Desilets et al. (2010), extended with the lattice water and soil organic matter terms and the conversion to volumetric
+    units as in Eq. 7 of Hawdon et al. (2014):
 
-    $\theta(N) =\frac{a_0}{(\frac{N}{N_0}) - a_1} - a_2 $
+    $\theta_v = \left( \frac{a_0}{N/N_0 - a_1} - a_2 - W_{lat} - W_{soc} \right) \rho_b$
 
     Args:
         counts (array or pd.Series or pd.DataFrame): Array of corrected and filtered neutron counts.
-        N0 (float): Device-specific neutron calibration constant.
-        Wlat (float): Lattice water content.
-        Wsoc (float): Soil organic carbon content.
-        bulk_density (float): Soil bulk density.
-        a0 (float): Parameter given in Zreda et al., 2012. Default is 0.0808.
-        a1 (float): Parameter given in Zreda et al., 2012. Default is 0.372.
-        a2 (float): Parameter given in Zreda et al., 2012. Default is 0.115.
+        N0 (float): Device-specific neutron calibration constant (neutron intensity above dry soil).
+        Wlat (float): Gravimetric lattice water content in g of water per g of dry soil.
+        Wsoc (float): Water equivalent of soil organic matter in g of water per g of dry soil.
+        bulk_density (float): Soil dry bulk density in g cm-3.
+        a0 (float): Parameter given in Desilets et al., 2010. Default is 0.0808.
+        a1 (float): Parameter given in Desilets et al., 2010. Default is 0.372.
+        a2 (float): Parameter given in Desilets et al., 2010. Default is 0.115.
 
     Returns:
         (array or pd.Series or pd.DataFrame): Volumetric water content in m3 m-3.
@@ -625,6 +675,9 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc, bulk_density, a0=0.0808, a1=0.372, a2=
         Desilets, D., M. Zreda, and T.P.A. Ferré. 2010. Nature’s neutron probe:
         Land surface hydrology at an elusive scale with cosmic rays. Water Resour. Res. 46:W11505.
         doi.org/10.1029/2009WR008726
+
+        Hawdon, A., D. McJannet, and J. Wallace (2014), Calibration and correction procedures for cosmic-ray neutron
+        soil moisture probes located across Australia, Water Resour. Res., 50, 5029–5043, doi:10.1002/2013WR015138.
     """
 
     # Convert neutron counts into vwc
@@ -647,7 +700,7 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
         dist (list or array): List of radial distances at which to estimate the sensing depth. Only used for the 'Schron_2017' method.
 
     Returns:
-        (array or pd.Series or pd.DataFrame): Estimated sensing depth in m.
+        (array or pd.Series or pd.DataFrame): Estimated sensing depth in cm.
 
     References:
         Franz, T.E., Zreda, M., Ferre, T.P.A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X. and Shuttleworth, W.J., 2012.
@@ -663,15 +716,16 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
     if method == 'Schron_2017':
         # See Appendix A of Schrön et al. (2017)
         Fp = 0.4922 / (0.86 - np.exp(-1 * pressure / p_ref))
-        Fveg = 0
         results = []
         for d in dist:
             # Compute r_star
             r_start = d / Fp
 
             # Compute soil depth that accounts for 86% of the neutron flux
-            D86 = 1 / bulk_density * (8.321 + 0.14249 * (0.96655 + np.exp(-0.01 * r_start)) * (20 + (Wlat + vwc)) / (
-                    0.0429 + (Wlat + vwc)))
+            # theta is the total volumetric water equivalent, theta_sm + theta_lw (Schrön et al., 2017, Eq. 2),
+            # so gravimetric lattice water is converted with the bulk density as in Franz et al. (2012, Eq. 3)
+            D86 = 1 / bulk_density * (8.321 + 0.14249 * (0.96655 + np.exp(-0.01 * r_start)) * (20 + (bulk_density * Wlat + vwc)) / (
+                    0.0429 + (bulk_density * Wlat + vwc)))
 
             results.append(D86)
 
@@ -684,14 +738,18 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
 
 def abs_humidity(relative_humidity, temp):
     """
-    Compute the actual vapor pressure (e) in g m^-3 using RH (%) and current temperature (c) observations.
+    Compute the absolute humidity (mass of water vapor per volume of air) in g m^-3 from relative humidity (%) and
+    air temperature (Celsius). The saturation vapor pressure follows Eq. 3.8 of Campbell and Norman (1998).
 
     Args:
         relative_humidity (float): relative humidity (%)
         temp (float): temperature (Celsius)
 
     Returns:
-        float: actual vapor pressure (g m^-3)
+        (float): Absolute humidity (g m^-3)
+
+    References:
+        Campbell, G. S., & Norman, J. M. (1998). An Introduction to Environmental Biophysics, 2nd ed. Springer, New York.
     """
 
     ### Atmospheric water vapor factor
@@ -708,24 +766,24 @@ def abs_humidity(relative_humidity, temp):
     return abs_h
 
 
-def nrad_weight(h, theta, distances, depth, profiles=None, rhob=1.4, method="Kohli_2015", p=None, Hveg=0, tol=0.01):
-    """Function to compute distance weights corresponding to each soil sample.
+def nrad_weight(h, theta, distances, depth, profiles=None, rhob=1.4, p=None, Hveg=0, tol=0.01):
+    """Function to compute distance weights corresponding to each soil sample following the revised
+    footprint weighting functions of Schrön et al. (2017).
 
     Args:
-        h (np.array or pd.Series): Air Humidity  from 0.1  to 50 in g/m^3. When h=0, the function will skip the distance weighting.
+        h (float): Air humidity from 0.1 to 50 g/m^3. A single value for the calibration period is expected (e.g. mean humidity over the calibration hours). If an array is provided its mean is used.
         theta (np.array or pd.Series): Soil Moisture for each sample (0.02 - 0.50 m^3/m^3)
         distances (np.array or pd.Series): Distances from the location of each sample to the origin (0.5 - 600 m)
-        depth (np.array or pd.Series): Depths for each sample (m)
-        profiles (np.array or pd.Series): Soil profiles ID for each sample. Required for the 'Schron_2017' method.
+        depth (np.array or pd.Series): Depths for each sample (cm)
+        profiles (np.array or pd.Series): Soil profiles ID for each sample. Required.
         rhob (np.array or pd.Series): Bulk density in g/cm^3
-        p (np.array or pd.Series): Atmospheric pressure in hPa. Required for the 'Schron_2017' method.
-        Hveg (np.array or pd.Series): Vegetation height in m. Required for the 'Schron_2017' method.
-        method (str): Method to compute the distance weights. Options are 'Kohli_2015' or 'Schron_2017'.
-        tol (float): Tolerance for the iterative solution. Default is 0.01. Required for the 'Schron_2017' method.
+        p (float): Atmospheric pressure in hPa. A single value for the calibration period is expected. Required.
+        Hveg (np.array or pd.Series): Vegetation height in m.
+        tol (float): Tolerance for the iterative solution. Default is 0.01.
 
     Returns:
-        theta_new (np.array or pd.Series): Weighted soil moisture values.
-        weights (np.array or pd.Series): Distance weights for each sample. For the 'Schron_2017' method, the weights are computed for each distance.
+        theta_new (float): Weighted soil moisture values.
+        weights (list): [theta_P, r_stars, Wrs] with the vertically averaged soil moisture, the scaled distance and the horizontal weight of each profile.
 
     References:
         Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., and Zacharias, S. (2015).
@@ -739,275 +797,190 @@ def nrad_weight(h, theta, distances, depth, profiles=None, rhob=1.4, method="Koh
         Hydrol. Earth Syst. Sci., 21, 5009–5030, https://doi.org/10.5194/hess-21-5009-2017, 2017.
     """
 
-    if method == 'Kohli_2015':
-        # Table A1. Parameters for Fi and D86
-        p10 = 8735;
-        p11 = 17.1758;
-        p12 = 11720;
-        p13 = 0.00978;
-        p14 = 7045;
-        p15 = 0.003632;
-        p20 = 2.7925e-2;
-        p21 = 5.0399;
-        p22 = 2.8544e-2;
-        p23 = 0.002455;
-        p24 = 6.851e-5;
-        p25 = 9.2926;
-        p30 = 247970;
-        p31 = 17.63;
-        p32 = 374655;
-        p33 = 0.00191;
-        p34 = 195725;
-        p40 = 5.4818e-2;
-        p41 = 15.921;
-        p42 = 0.6373;
-        p43 = 5.99e-2;
-        p44 = 5.425e-4;
-        p50 = 1383702;
-        p51 = 4.156;
-        p52 = 5325;
-        p53 = 0.00238;
-        p54 = 0.0156;
-        p55 = 0.130;
-        p56 = 1521;
-        p60 = 6.031e-5;
-        p61 = 98.5;
-        p62 = 1.0466e-3;
-        p70 = 11747;
-        p71 = 41.66;
-        p72 = 4521;
-        p73 = 0.01998;
-        p74 = 0.00604;
-        p75 = 2534;
-        p76 = 0.00475;
-        p80 = 1.543e-2;
-        p81 = 10.06;
-        p82 = 1.807e-2;
-        p83 = 0.0011;
-        p84 = 8.81e-5;
-        p85 = 0.0405;
-        p86 = 20.24;
-        p90 = 8.321;
-        p91 = 0.14249;
-        p92 = 0.96655;
-        p93 = 26.42;
-        p94 = 0.0567;
+    # Horizontal distance weights According to Eq. 6 and Table A1 in Schrön et al. (2017)
+    # Method for calculating the horizontal distance weights from 0 to 1m
+    def WrX(r, x, y):
+        x00 = 3.7
+        a00 = 8735;
+        a01 = 22.689;
+        a02 = 11720;
+        a03 = 0.00978;
+        a04 = 9306;
+        a05 = 0.003632
+        a10 = 2.7925e-2;
+        a11 = 6.6577;
+        a12 = 0.028544;
+        a13 = 0.002455;
+        a14 = 6.851e-5;
+        a15 = 12.2755
+        a20 = 247970;
+        a21 = 23.289;
+        a22 = 374655;
+        a23 = 0.00191;
+        a24 = 258552
+        a30 = 5.4818e-2;
+        a31 = 21.032;
+        a32 = 0.6373;
+        a33 = 0.0791;
+        a34 = 5.425e-4
 
-        # Numerical determination of the penetration depth (86%) (Eq. 8)
-        D86 = 1 / rhob * (p90 + p91 * (p92 + np.exp(-1 * distances / 100)) * (p93 + theta) / (p94 + theta))
+        x0 = x00
+        A0 = (a00 * (1 + a03 * x) * np.exp(-a01 * y) + a02 * (1 + a05 * x) - a04 * y)
+        A1 = ((-a10 + a14 * x) * np.exp(-a11 * y / (1 + a15 * y)) + a12) * (1 + x * a13)
+        A2 = (a20 * (1 + a23 * x) * np.exp(-a21 * y) + a22 - a24 * y)
+        A3 = a30 * np.exp(-a31 * y) + a32 - a33 * y + a34 * x
 
-        # Depth weights (Eq. 7)
-        Wd = np.exp(-2 * depth / D86)
+        return ((A0 * (np.exp(-A1 * r)) + A2 * np.exp(-A3 * r)) * (1 - np.exp(-x0 * r)))
 
-        if h == 0:
-            W = 1  # skip distance weighting
+    # Method for calculating the horizontal distance weights from 1 to 50m
+    def WrA(r, x, y):
+        a00 = 8735;
+        a01 = 22.689;
+        a02 = 11720;
+        a03 = 0.00978;
+        a04 = 9306;
+        a05 = 0.003632
+        a10 = 2.7925e-2;
+        a11 = 6.6577;
+        a12 = 0.028544;
+        a13 = 0.002455;
+        a14 = 6.851e-5;
+        a15 = 12.2755
+        a20 = 247970;
+        a21 = 23.289;
+        a22 = 374655;
+        a23 = 0.00191;
+        a24 = 258552
+        a30 = 5.4818e-2;
+        a31 = 21.032;
+        a32 = 0.6373;
+        a33 = 0.0791;
+        a34 = 5.425e-4
 
-        elif (h >= 0.1) and (h <= 50):
-            # Functions for Fi (Appendix A in Köhli et al., 2015)
-            F1 = p10 * (1 + p13 * h) * np.exp(-p11 * theta) + p12 * (1 + p15 * h) - p14 * theta
-            F2 = ((-p20 + p24 * h) * np.exp(-p21 * theta / (1 + p25 * theta)) + p22) * (1 + h * p23)
-            F3 = (p30 * (1 + p33 * h) * np.exp(-p31 * theta) + p32 - p34 * theta)
-            F4 = p40 * np.exp(-p41 * theta) + p42 - p43 * theta + p44 * h
-            F5 = p50 * (0.02 - 1 / p55 / (h - p55 + p56 * theta)) * (p54 - theta) * np.exp(
-                -p51 * (theta - p54)) + p52 * (0.7 - h * theta * p53)
-            F6 = p60 * (h + p61) + p62 * theta
-            F7 = (p70 * (1 - p76 * h) * np.exp(-p71 * theta * (1 - h * p74)) + p72 - p75 * theta) * (2 + h * p73)
-            F8 = ((-p80 + p84 * h) * np.exp(-p81 * theta / (1 + p85 * h + p86 * theta)) + p82) * (2 + h * p83)
+        A0 = (a00 * (1 + a03 * x) * np.exp(-a01 * y) + a02 * (1 + a05 * x) - a04 * y)
+        A1 = ((-a10 + a14 * x) * np.exp(-a11 * y / (1 + a15 * y)) + a12) * (1 + x * a13)
+        A2 = (a20 * (1 + a23 * x) * np.exp(-a21 * y) + a22 - a24 * y)
+        A3 = a30 * np.exp(-a31 * y) + a32 - a33 * y + a34 * x
 
-            # Distance weights (Eq. 3)
-            W = np.ones_like(distances) * np.nan
-            for i in range(len(distances)):
-                if (distances[i] <= 50) and (distances[i] > 0.5):
-                    W[i] = F1[i] * (np.exp(-F2[i] * distances[i])) + F3[i] * np.exp(-F4[i] * distances[i])
+        return A0 * np.exp(-A1 * r) + A2 * np.exp(-A3 * r)
 
-                elif (distances[i] > 50) and (distances[i] < 600):
-                    W[i] = F5[i] * (np.exp(-F6[i] * distances[i])) + F7[i] * np.exp(-F8[i] * distances[i])
+    # Method for calculating the horizontal distance weights from 50 to 600m
+    def WrB(r, x, y):
+        b00 = 39006;
+        b01 = 15002337;
+        b02 = 2009.24;
+        b03 = 0.01181;
+        b04 = 3.146;
+        b05 = 16.7417;
+        b06 = 3727
+        b10 = 6.031e-5;
+        b11 = 98.5;
+        b12 = 0.0013826
+        b20 = 11747;
+        b21 = 55.033;
+        b22 = 4521;
+        b23 = 0.01998;
+        b24 = 0.00604;
+        b25 = 3347.4;
+        b26 = 0.00475
+        b30 = 1.543e-2;
+        b31 = 13.29;
+        b32 = 1.807e-2;
+        b33 = 0.0011;
+        b34 = 8.81e-5;
+        b35 = 0.0405;
+        b36 = 26.74
 
-                else:
-                    raise ValueError('Input distances are not valid.')
+        B0 = (b00 - b01 / (b02 * y + x - 0.13)) * (b03 - y) * np.exp(-b04 * y) - b05 * x * y + b06
+        B1 = b10 * (x + b11) + b12 * y
+        B2 = (b20 * (1 - b26 * x) * np.exp(-b21 * y * (1 - x * b24)) + b22 - b25 * y) * (2 + x * b23)
+        B3 = ((-b30 + b34 * x) * np.exp(-b31 * y / (1 + b35 * x + b36 * y)) + b32) * (2 + x * b33)
 
+        return B0 * np.exp(-B1 * r) + B2 * np.exp(-B3 * r)
+
+    # Wrapper method for calculating the horizontal distance weights
+    def Wr(r, x, y):
+        if r <= 1:
+            return WrX(r, x, y)
+        elif r <= 50:
+            return WrA(r, x, y)
+        elif r <= 600:
+            return WrB(r, x, y)
         else:
-            raise ValueError('Air humidity values are out of range.')
+            raise ValueError("r must be between 0 and 600m")
 
-        # Combined and normalized weights
-        weights = Wd * W / np.nansum(Wd * W)
+    def rscaled(r, p, y, Hveg = 0):
+        Fp = 0.4922 / (0.86 - np.exp(-p / 1013.25))
+        Fveg = 1 - 0.17 * (1 - np.exp(-0.41 * Hveg)) * (1 + np.exp(-9.25 * y))
+        return r / Fp / Fveg
 
-        theta_new = np.sum(theta * weights)
+    if profiles is None:
+        raise ValueError("Profile ID's must be provided")
 
-        return theta_new, weights
-    elif method == 'Schron_2017':
-        # Horizontal distance weights According to Eq. 6 and Table A1 in Schrön et al. (2017)
-        # Method for calculating the horizontal distance weights from 0 to 1m
-        def WrX(r, x, y):
-            x00 = 3.7
-            a00 = 8735;
-            a01 = 22.689;
-            a02 = 11720;
-            a03 = 0.00978;
-            a04 = 9306;
-            a05 = 0.003632
-            a10 = 2.7925e-2;
-            a11 = 6.6577;
-            a12 = 0.028544;
-            a13 = 0.002455;
-            a14 = 6.851e-5;
-            a15 = 12.2755
-            a20 = 247970;
-            a21 = 23.289;
-            a22 = 374655;
-            a23 = 0.00191;
-            a24 = 258552
-            a30 = 5.4818e-2;
-            a31 = 21.032;
-            a32 = 0.6373;
-            a33 = 0.0791;
-            a34 = 5.425e-4
+    if p is None:
+        raise ValueError("Atmospheric pressure must be provided")
 
-            x0 = x00
-            A0 = (a00 * (1 + a03 * x) * np.exp(-a01 * y) + a02 * (1 + a05 * x) - a04 * y)
-            A1 = ((-a10 + a14 * x) * np.exp(-a11 * y / (1 + a15 * y)) + a12) * (1 + x * a13)
-            A2 = (a20 * (1 + a23 * x) * np.exp(-a21 * y) + a22 - a24 * y)
-            A3 = a30 * np.exp(-a31 * y) + a32 - a33 * y + a34 * x
+    # Rename variables to be consistent with the revised paper
+    r = distances
+    theta_ = np.mean(theta) # Start with the mean value of theta as initial guess
+    bd = np.mean(rhob) # Neutrons are impacted by the bulk density across the whole area and not just the sample area. https://github.com/soilwater/crnpy/issues/9#issuecomment-2003813777
 
-            return ((A0 * (np.exp(-A1 * r)) + A2 * np.exp(-A3 * r)) * (1 - np.exp(-x0 * r)))
+    # The Schrön et al. (2017) procedure (Sect. 3, step 4) evaluates the horizontal weighting
+    # function with a single site air humidity for the calibration period, W_r(h, <theta>, p, Hveg).
+    # A scalar (e.g. mean humidity over the calibration hours) is expected. If an array is
+    # provided, its mean is used.
+    h_ = float(np.mean(h))
+    if np.ndim(h) > 0 and (np.nanmax(h) - np.nanmin(h)) > 1e-6:
+        warnings.warn("A single air humidity value is expected for the calibration period. "
+                      "The mean of the provided values was used.")
 
-        # Method for calculating the horizontal distance weights from 1 to 50m
-        def WrA(r, x, y):
-            a00 = 8735;
-            a01 = 22.689;
-            a02 = 11720;
-            a03 = 0.00978;
-            a04 = 9306;
-            a05 = 0.003632
-            a10 = 2.7925e-2;
-            a11 = 6.6577;
-            a12 = 0.028544;
-            a13 = 0.002455;
-            a14 = 6.851e-5;
-            a15 = 12.2755
-            a20 = 247970;
-            a21 = 23.289;
-            a22 = 374655;
-            a23 = 0.00191;
-            a24 = 258552
-            a30 = 5.4818e-2;
-            a31 = 21.032;
-            a32 = 0.6373;
-            a33 = 0.0791;
-            a34 = 5.425e-4
+    # Vertical distance weights functions
+    def D86(r, bd, y):
+        return 1 / bd * (8.321 + 0.14249 * (0.96655 + np.exp(-0.01 * r)) * (20 + y) / (0.0429 + y))
 
-            A0 = (a00 * (1 + a03 * x) * np.exp(-a01 * y) + a02 * (1 + a05 * x) - a04 * y)
-            A1 = ((-a10 + a14 * x) * np.exp(-a11 * y / (1 + a15 * y)) + a12) * (1 + x * a13)
-            A2 = (a20 * (1 + a23 * x) * np.exp(-a21 * y) + a22 - a24 * y)
-            A3 = a30 * np.exp(-a31 * y) + a32 - a33 * y + a34 * x
+    def Wd(d, r, bd, y):
+        return np.exp(-2 * d / D86(r, bd, y))
 
-            return A0 * np.exp(-A1 * r) + A2 * np.exp(-A3 * r)
+    step = 0
+    diff = 1
+    while diff > tol:
+        step += 1
+        print(f"Step {step}, diff = {diff}", end="\r")
+        # Calculate the scaled distance and D86
+        r = rscaled(distances, p, theta_, Hveg)
 
-        # Method for calculating the horizontal distance weights from 50 to 600m
-        def WrB(r, x, y):
-            b00 = 39006;
-            b01 = 15002337;
-            b02 = 2009.24;
-            b03 = 0.01181;
-            b04 = 3.146;
-            b05 = 16.7417;
-            b06 = 3727
-            b10 = 6.031e-5;
-            b11 = 98.5;
-            b12 = 0.0013826
-            b20 = 11747;
-            b21 = 55.033;
-            b22 = 4521;
-            b23 = 0.01998;
-            b24 = 0.00604;
-            b25 = 3347.4;
-            b26 = 0.00475
-            b30 = 1.543e-2;
-            b31 = 13.29;
-            b32 = 1.807e-2;
-            b33 = 0.0011;
-            b34 = 8.81e-5;
-            b35 = 0.0405;
-            b36 = 26.74
+        # Calculate the vertical average for each profile
+        P = np.unique(profiles)
+        theta_P = []
+        r_stars = []
+        for i in range(len(P)):
+            profile = P[i]
+            idx = profiles == profile
+            depths_P = depth[idx]
+            r_P = r[idx]
+            theta_Pi = theta[idx]
+            # Calculate the vertical distance weights. Penetration depth uses the field-average
+            # soil moisture of the current iteration, D_P = D86(<theta>, r*_P) (Schrön et al., 2017, step 2)
+            Wd_P = Wd(depths_P, r_P, bd, theta_)
+            # Calculate the vertical average of theta
+            theta_P_i = np.sum(Wd_P * theta_Pi) / np.sum(Wd_P)
+            theta_P.append(theta_P_i)
+            r_stars.append(np.mean(r_P))
 
-            B0 = (b00 - b01 / (b02 * y + x - 0.13)) * (b03 - y) * np.exp(-b04 * y) - b05 * x * y + b06
-            B1 = b10 * (x + b11) + b12 * y
-            B2 = (b20 * (1 - b26 * x) * np.exp(-b21 * y * (1 - x * b24)) + b22 - b25 * y) * (2 + x * b23)
-            B3 = ((-b30 + b34 * x) * np.exp(-b31 * y / (1 + b35 * x + b36 * y)) + b32) * (2 + x * b33)
+        # Calculate the horizontal distance weights, W_r(r*, x=air humidity, y=field-average soil moisture)
+        # following Schrön et al. (2017, step 4). Hveg enters only through the scaled distance r*.
+        Wrs = np.array([Wr(r_star, h_, theta_) for r_star in r_stars])
+        theta_new = np.sum(Wrs * theta_P) / np.sum(Wrs)
+        diff = np.abs(theta_new - theta_)
+        theta_ = theta_new
 
-            return B0 * np.exp(-B1 * r) + B2 * np.exp(-B3 * r)
+    print(f"Solution converged after {step} steps, the average soil moisture is {theta_new}")
 
-        # Wrapper method for calculating the horizontal distance weights
-        def Wr(r, x, y):
-            if r <= 1:
-                return WrX(r, x, y)
-            elif r <= 50:
-                return WrA(r, x, y)
-            elif r <= 600:
-                return WrB(r, x, y)
-            else:
-                raise ValueError("r must be between 1 and 600m when using 'Schron_2017' method")
-
-        def rscaled(r, p, y, Hveg = 0):
-            Fp = 0.4922 / (0.86 - np.exp(-p / 1013.25))
-            Fveg = 1 - 0.17 * (1 - np.exp(-0.41 * Hveg)) * (1 + np.exp(-9.25 * y))
-            return r / Fp / Fveg
-
-        if profiles is None:
-            raise ValueError("Profile ID's must be provided when using 'Schron_2017' method")
-
-        # Rename variables to be consistent with the revised paper
-        r = distances
-        theta_ = np.mean(theta) # Start with the mean value of theta as initial guess
-        bd = np.mean(rhob) # Neutrons are impacted by the bulk density across the whole area and not just the sample area. https://github.com/soilwater/crnpy/issues/9#issuecomment-2003813777
-
-        # Vertical distance weights functions
-        def D86(r, bd, y):
-            return 1 / bd * (8.321 + 0.14249 * (0.96655 + np.exp(-0.01 * r)) * (20 + y) / (0.0429 + y))
-
-        def Wd(d, r, bd, y):
-            return np.exp(-2 * d / D86(r, bd, y))
-
-        step = 0
-        diff = 1
-        while diff > tol:
-            step += 1
-            print(f"Step {step}, diff = {diff}", end="\r")
-            # Calculate the scaled distance and D86
-            r = rscaled(distances, p, theta_, Hveg)
-
-            # Calculate the vertical average for each profile
-            P = np.unique(profiles)
-            theta_P = []
-            r_stars = []
-            for i in range(len(P)):
-                profile = P[i]
-                idx = profiles == profile
-                depths_P = depth[idx]
-                r_P = r[idx]
-                theta_Pi = theta[idx]
-                # Calculate the vertical distance weights
-                Wd_P = Wd(depths_P, r_P, bd, theta_Pi)
-                # Calculate the vertical average of theta
-                theta_P_i = np.sum(Wd_P * theta_Pi) / np.sum(Wd_P)
-                theta_P.append(theta_P_i)
-                r_stars.append(np.mean(r_P))
-
-            # Calculate the horizontal distance weights
-            Wrs = np.array([Wr(r_star, theta_p, Hveg) for r_star, theta_p in zip(r_stars, theta_P)])
-            theta_new = np.sum(Wrs * theta_P) / np.sum(Wrs)
-            diff = np.abs(theta_new - theta_)
-            theta_ = theta_new
-
-        print(f"Solution converged after {step} steps, the average soil moisture is {theta_new}")
-
-        return theta_new, [theta_P, r_stars, Wrs]
-    else:
-        raise ValueError(f"Method {method} not recognized. Please use one of the following methods: 'Kohli_2015' or 'Schron_2017'")
+    return theta_new, [theta_P, r_stars, Wrs]
 
 
 def exp_filter(sm, T=1):
-    """Exponential filter to estimate soil moisture in the rootzone from surface observtions.
+    """Exponential filter to estimate soil moisture in the rootzone from surface observations.
 
     Args:
         sm (list or array): Soil moisture in mm of water for the top layer of the soil profile.
@@ -1029,26 +1002,32 @@ def exp_filter(sm, T=1):
     """
 
     # Parameters
-    t_delta = 1
-    sm_min = np.min(sm)
-    sm_max = np.max(sm)
+    sm = np.asarray(sm, dtype=float)
+    sm_min = np.nanmin(sm)
+    sm_max = np.nanmax(sm)
     ms = (sm - sm_min) / (sm_max - sm_min)
 
     # Pre-allocate soil water index array and recursive constant K
     SWI = np.ones_like(ms) * np.nan
     K = np.ones_like(ms) * np.nan
 
-    # Initial conditions
-    SWI[0] = ms[0]
-    K[0] = 1
+    # Initial conditions (Albergel et al., 2008): K = 1 and SWI equal to the first available observation
+    valid = np.where(~np.isnan(ms))[0]
+    if valid.size == 0:
+        return SWI
+    last = valid[0]
+    SWI[last] = ms[last]
+    K[last] = 1
 
-    # Values from 2 to N
-    for n in range(1, len(SWI)):
-        if ~np.isnan(ms[n]) & ~np.isnan(ms[n - 1]):
-            K[n] = K[n - 1] / (K[n - 1] + np.exp(-t_delta / T))
-            SWI[n] = SWI[n - 1] + K[n] * (ms[n] - SWI[n - 1])
-        else:
+    # Recursive formulation, Eqs. 4 and 6 in Albergel et al. (2008). The gain uses the time elapsed since the
+    # last available observation, so missing values (NaN) do not interrupt the recursion.
+    for n in range(last + 1, len(SWI)):
+        if np.isnan(ms[n]):
             continue
+        t_delta = n - last
+        K[n] = K[last] / (K[last] + np.exp(-t_delta / T))
+        SWI[n] = SWI[last] + K[n] * (ms[n] - SWI[last])
+        last = n
 
     # Rootzone storage
     sm_subsurface = SWI * (sm_max - sm_min) + sm_min
@@ -1057,8 +1036,9 @@ def exp_filter(sm, T=1):
 
 
 def cutoff_rigidity(lat, lon):
-    """Function to estimate the approximate cutoff rigidity for any point on Earth according to the
-    tabulated data of Smart and Shea, 2019. The returned value can be used to select the appropriate
+    """Function to estimate the approximate cutoff rigidity for any point on Earth by interpolating the
+    world grid of calculated vertical cutoff rigidities for epoch 1995.0 of Smart and Shea (2008), tabulated
+    every 5 degrees in latitude and 15 degrees in longitude. The returned value can be used to select the appropriate
     neutron monitor station to estimate the cosmic-ray neutron intensity at the location of interest.
 
     Args:
@@ -1067,31 +1047,25 @@ def cutoff_rigidity(lat, lon):
             Typical negative longitudes in the west hemisphere will fall in the range 180 to 360.
 
     Returns:
-        (float): Cutoff rigidity in GV. Error is about +/- 0.3 GV
+        (float): Cutoff rigidity in GV. Compared with 102 neutron monitors the mean absolute error is about 0.2 GV,
+            with the largest deviations (about 1.5 GV) in South America.
 
     Examples:
         Estimate the cutoff rigidity for Newark, NJ, US
 
         >>> zq = cutoff_rigidity(39.68, -75.75)
         >>> print(zq)
-        2.52 GV (Value from NMD is 2.40 GV)
+        2.25 GV (Value from NMDB is 2.40 GV)
 
     References:
-        Hawdon, A., McJannet, D., & Wallace, J. (2014). Calibration and correction procedures
-        for cosmic‐ray neutron soil moisture probes located across Australia. Water Resources Research,
-        50(6), 5029-5043.
-
-        Smart, D. & Shea, Matthew. (2001). Geomagnetic Cutoff Rigidity Computer Program:
-        Theory, Software Description and Example. NASA STI/Recon Technical Report N.
-
-        Shea, M. A., & Smart, D. F. (2019, July). Re-examination of the First Five Ground-Level Events.
-        In International Cosmic Ray Conference (ICRC2019) (Vol. 36, p. 1149).
+        Smart, D. F., & Shea, M. A. (2008). World grid of calculated cosmic ray vertical cutoff rigidities
+        for epoch 1995.0. Proceedings of the 30th International Cosmic Ray Conference (Mérida), 1, 733-736.
     """
     xq = lon
     yq = lat
 
     if xq < 0:
-        xq = xq * -1 + 180
+        xq = xq + 360  # west longitudes expressed on the 0-360 east longitude grid
     Z = np.array(data.cutoff_rigidity)
     x = np.linspace(0, 360, Z.shape[1])
     y = np.linspace(90, -90, Z.shape[0])
@@ -1243,6 +1217,7 @@ def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
 
         if sum(stations["Period available"] == True) == 0:
             print("No stations available for the selected period!")
+            result = stations.reindex(idx_R).head(10).rename_axis(None)
         else:
             stations = stations[stations["Period available"] == True]
             idx_R = (stations['R'] - Rc).abs().argsort()
@@ -1269,7 +1244,8 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
         crnp_timestamps (pd.Series or np.array): Series or array of timestamps in datetime format from the CRNP device
 
     Returns:
-        (pd.Series): Series containing interpolated incoming neutron flux. Length of Series is the same as crnp_timestamps
+        (np.array): Incoming neutron flux matched to each CRNP timestamp. Same length as crnp_timestamps. Periods without
+            NMDB data remain NaN; see the `fill_na` option of `correction_incoming_flux()`.
     """
     # Create a DataFrame from nmdb timestamps and counts
     df_nmdb = pd.DataFrame({'timestamp': nmdb_timestamps, 'counts': nmdb_counts})
@@ -1282,30 +1258,30 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
     # This will match each CRNP timestamp with the nearest NMDB timestamp
     interpolated_flux = df_nmdb.reindex(crnp_timestamps, method='nearest')['counts'].values
 
-    # drop NaN values
-    interpolated_flux = interpolated_flux[~np.isnan(interpolated_flux)]
-
-    assert len(interpolated_flux) == len(
-        crnp_timestamps), "Length of interpolated flux does not match length of CRNP timestamps"
-
     return interpolated_flux
 
 
 def lattice_water(clay_content, total_carbon=None):
-    r"""Estimate the amount of water in the lattice of clay minerals.
+    r"""Estimate the gravimetric lattice water content of the soil, i.e. the mass of water bound in the
+    lattice of clay minerals per mass of dry soil, from pedotransfer functions.
 
     ![img1](img/lattice_water_simple.png) | ![img2](img/lattice_water_multiple.png)
     :-------------------------:|:-------------------------:
     $\omega_{lat} = 0.097 * clay(\%)$ | $\omega_{lat} = -0.028 + 0.077 * clay(\%) + 0.459 * carbon(\%)$
-    Linear regression [lattice water (%) as a function of clay (%)] done with data from Kansas Sate University - Soil Water Processes Lab. |  Multiple linear regression [lattice water (%) as a function of clay (%) and soil carbon (%)] done with data from Soil Water Processes Lab.
+    Linear regression [gravimetric lattice water (% by mass) as a function of clay (% by mass)] done with data from Kansas State University - Soil Water Processes Lab. |  Multiple linear regression [gravimetric lattice water (% by mass) as a function of clay (% by mass) and soil carbon (% by mass)] done with data from Soil Water Processes Lab.
+
+    All quantities are on a mass basis (gravimetric), not a volume basis.
 
     Args:
-        clay_content (float): Clay content in the soil in percent.
-        total_carbon (float, optional): Total carbon content in the soil in percent.
-            If None, the amount of water is estimated based on clay content only.
+        clay_content (float): Clay content of the soil in percent by mass (g of clay per 100 g of dry soil).
+        total_carbon (float, optional): Total carbon content of the soil in percent by mass.
+            If None, the lattice water is estimated from the clay content only.
 
     Returns:
-        (float): Amount of water in the lattice of clay minerals in percent
+        (float): Gravimetric lattice water content in percent by mass (g of water per 100 g of dry soil).
+            Divide by 100 to obtain the g/g fraction expected as `Wlat` by `counts_to_vwc()` and `sensing_depth()`.
+            The clay-only regression has no intercept, so passing the clay content as a fraction returns the
+            lattice water directly as a g/g fraction; the regression with carbon must be used with inputs in percent.
     """
     if total_carbon is None:
         lattice_water = 0.097 * clay_content
@@ -1315,7 +1291,7 @@ def lattice_water(clay_content, total_carbon=None):
 
 
 def latlon_to_utm(lat, lon, utm_zone_number=None, utm_zone_letter=None):
-    """Convert geographic coordinates (lat, lon) to projected coordinates (utm) using the Military Grid Reference System.
+    """Convert geographic coordinates (lat, lon) to projected coordinates in the Universal Transverse Mercator (UTM) system.
 
     Function only applies to non-polar coordinates.
     If further functionality is required, consider using the utm module. See references for more information.
@@ -1391,11 +1367,11 @@ def spatial_average(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=Fa
         try:
             x = np.array(x)
             y = np.array(y)
-        except:
-            raise "Input values cannot be converted to Numpy arrays."
+        except Exception:
+            raise ValueError("Input values cannot be converted to Numpy arrays.")
 
     if len(x) != len(y):
-        raise f"The number of x and y must be equal. Input x has {len(x)} values and y has {len(y)} values."
+        raise ValueError(f"The number of x and y must be equal. Input x has {len(x)} values and y has {len(y)} values.")
 
     # Compute distances
     N = len(x)
@@ -1415,7 +1391,7 @@ def spatial_average(x, y, z, buffer=100, min_neighbours=3, method='mean', rnd=Fa
             elif method == 'median':
                 z_new_val = np.nanmedian(z[idx_within_buffer])
             else:
-                raise f"Method {method} does not exist. Provide either 'mean' or 'median'."
+                raise ValueError(f"Method {method} does not exist. Provide either 'mean' or 'median'.")
         else:
             z_new_val = z[k]  # If there are not enough neighbours, keep the original value
 
@@ -1464,8 +1440,12 @@ def idw(x, y, z, X_pred, Y_pred, neighborhood=1000, p=1):
         # Select points within neighborhood only for interpolation
         idx_neighbors = d < neighborhood
 
-        # Compute interpolated value at point of interest
-        Z_pred[n] = np.sum(z[idx_neighbors] / d[idx_neighbors] ** p) / np.sum(1 / d[idx_neighbors] ** p)
+        # A prediction point that coincides with an observation takes the observed value (exact interpolation)
+        if np.any(d == 0):
+            Z_pred[n] = np.mean(z[d == 0])
+        else:
+            # Compute interpolated value at point of interest
+            Z_pred[n] = np.sum(z[idx_neighbors] / d[idx_neighbors] ** p) / np.sum(1 / d[idx_neighbors] ** p)
 
     return np.reshape(Z_pred, s)
 
@@ -1492,14 +1472,18 @@ def interpolate_2d(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
     """
 
     # Drop NaN values in x y and z
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    z = np.asarray(z, dtype=float)
     idx_nan = np.isnan(x) | np.isnan(y) | np.isnan(z)
-    x = x[~idx_nan]
-    y = y[~idx_nan]
-    z = z[~idx_nan]
 
     if idx_nan.any():
         print(
             f"WARNING: {np.isnan(x).sum()}, {np.isnan(y).sum()}, and {np.isnan(z).sum()} NaN values were dropped from x, y, and z.")
+
+    x = x[~idx_nan]
+    y = y[~idx_nan]
+    z = z[~idx_nan]
 
     # Create 2D grid for interpolation
     Nx = round((np.max(x) - np.min(x)) / dx) + 1
@@ -1516,7 +1500,7 @@ def interpolate_2d(x, y, z, dx=100, dy=100, method='cubic', neighborhood=1000):
         Z_pred = idw(x, y, z, X_pred, Y_pred, neighborhood)
 
     else:
-        raise f"Method {method} does not exist. Provide either 'cubic', 'linear', 'nearest', or 'idw'."
+        raise ValueError(f"Method {method} does not exist. Provide either 'cubic', 'linear', 'nearest', or 'idw'.")
 
     return X_pred, Y_pred, Z_pred
 
@@ -1551,7 +1535,7 @@ def rover_centered_coordinates(x, y):
 
 
 def uncertainty_counts(raw_counts, metric="std", fp=1, fw=1, fi=1):
-    """Function to estimate the uncertainty of raw counts.
+    r"""Function to estimate the uncertainty of raw counts.
 
     Measurements of proportional neutron detector systems are governed by counting statistics that follow a Poissonian probability distribution (Zreda et al., 2012).
     The expected uncertainty in the neutron count rate $N$ is defined by the standard deviation $ \sqrt{N} $ (Jakobi et al., 2020).
@@ -1580,9 +1564,11 @@ def uncertainty_counts(raw_counts, metric="std", fp=1, fw=1, fi=1):
     if metric == "std":
         uncertainty = np.sqrt(raw_counts) * s
     elif metric == "cv":
-        uncertainty = 1 / np.sqrt(raw_counts) * s
+        # sigma_N = s*sqrt(N) and N_cor = s*N (Jakobi et al., 2020, Eq. 7), so the coefficient of
+        # variation sigma_N / N_cor = 1/sqrt(N) does not depend on the correction factors.
+        uncertainty = 1 / np.sqrt(raw_counts)
     else:
-        raise f"Metric {metric} does not exist. Provide either 'std' or 'cv' for standard deviation or coefficient of variation."
+        raise ValueError(f"Metric {metric} does not exist. Provide either 'std' or 'cv' for standard deviation or coefficient of variation.")
     return uncertainty
 
 

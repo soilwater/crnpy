@@ -35,7 +35,7 @@ Ideally dependencies should be installed automatically. If not, you can install 
 
 ```pip install -r requirements.txt```
 
-The CRNPy library is compatible with Python 3.7 and above.
+The CRNPy library is compatible with Python 3.8 and above.
 See [requirements.txt](https://github.com/soilwater/crnpy/blob/main/requirements.txt) for a list of dependencies.
 
 ## Authors

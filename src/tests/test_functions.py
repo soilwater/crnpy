@@ -54,7 +54,7 @@ def test_weighting():
 
 
     # calculate the weighted theta
-    theta_adj, w = crnpy.nrad_weight(h, sm, x, y, profiles=IDs, rhob = bd, method="Schron_2017", p=p, Hveg=Hveg)
+    theta_adj, w = crnpy.nrad_weight(h, sm, x, y, profiles=IDs, rhob = bd, p=p, Hveg=Hveg)
 
     # check that theta_adj is = SM +- 1e-3
     assert np.abs(theta_adj - SM) < 1e-3
@@ -88,8 +88,8 @@ def test_correction_inncoming_neutrons_RcMethods():
     JUNG_atmdepth = 665.18 # From supplementary material of McJannet and Desilets 2023
     fi = crnpy.correction_incoming_flux(reference_neutron_flux, reference_counts, Rc_method='McJannetandDesilets2023', Rc_site=CutoffRigidity, Rc_ref=RcJUNG, site_atmdepth=site_atmdepth, ref_atmdepth=JUNG_atmdepth)
     f0 = 0.5
-    #if the formula for fi is fi = 1 / (tau * f0 + 1 - tau) get tau
-    tau = (1/fi[0] - 1) / (f0 - 1)
+    # fi = tau * f0 + 1 - tau (McJannet & Desilets 2023, Eq. 10, in the library's divide-by-fi convention), so
+    tau = (fi[0] - 1) / (f0 - 1)
     Tau_paper = 0.4753 # From supplementary material of McJannet and Desilets 2023
     assert round(tau,2) == round(Tau_paper,2)
 

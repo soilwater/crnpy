@@ -35,7 +35,7 @@ Ideally dependencies should be installed automatically. If not, you can install 
 
 ```pip install -r requirements.txt```
 
-The CRNPy library is compatible with Python 3.7 and above.
+The CRNPy library is compatible with Python 3.8 and above.
 See [requirements.txt](https://github.com/soilwater/crnpy/blob/main/requirements.txt) for a list of dependencies.
 
 ## Examples
@@ -58,9 +58,39 @@ The Soil Water Processes Lab at Kansas State University combines a range of expe
 ### Contributing
 To contribute to the software, please first fork the repository and create your own branch from `main`. Ensure your code adheres to our established code structure and includes appropriate test/examples coverage. CRNPy source code is located in the `/src/crnpy/` folder, and tests implemented using `pytest` are stored in the `/src/tests/` folder. Submit a pull request with a clear and detailed description of your changes to include them in the main repository.
 
+To build the documentation locally, install the documentation toolchain with `pip install -r requirements-docs.txt` and run `mkdocs build` (or `mkdocs serve`) from the repository root.
+
 ### Reporting Issues
 If you encounter any issues or problems with the software, please report them on our [issues page](https://github.com/soilwater/crnpy/issues). Include a detailed description of the issue, steps to reproduce the problem, any error messages you received, and details about your operating system and software version.
 
 ### Seeking Support
 If you need support, please first refer to the documentation. If you still require assistance, post a question on the [issues page](https://github.com/soilwater/crnpy/issues) with the `question` tag. For private inquiries, you can reach us via email at jperaza@ksu.edu or andrespatrignani@ksu.edu.
+
+## Changelog
+
+### Version 0.7.0
+Changes since version 0.6.1. Items marked **breaking** change the public API.
+
+- **breaking** `nrad_weight()` now implements only the revised footprint weighting of Schrön et al. (2017). The Köhli et al. (2015) weighting and the `method` argument were removed; `profiles` and `p` must be provided. Sample `depth` is in cm, consistent with the penetration depth D86, which the paper defines in cm.
+- Fixed `nrad_weight()`: the horizontal weighting function was evaluated with soil moisture in place of air humidity and vegetation height in place of soil moisture, so air humidity never entered the weights and profiles beyond 50 m received negative weights. Both weighting functions now use the site air humidity and the field-average soil moisture of the current iteration, as in Sect. 3 of Schrön et al. (2017) and its R/MATLAB supplement. Field-average values from earlier versions will differ.
+- Fixed `correction_incoming_flux()` with `Rc_method='McJannetandDesilets2023'`: the factor returned was the reciprocal of what the library's convention (counts divided by `fi`) requires, so the correction acted in the wrong direction. It now returns `tau*(I/Iref) + 1 - tau` following Eq. 10 of McJannet and Desilets (2023), and reduces to `I/Iref` when site and reference coincide.
+- Fixed `correction_road()`: the moisture term had the wrong sign on `p2` and omitted `p5`, which inflated instead of reduced the counts. It now implements Eq. 6 and Table 1 of Schrön et al. (2018) with a new `p5=0.39` argument, and a road width of zero returns the counts unchanged instead of raising an error.
+- `correction_bwe()`: the default `r2_N0` was 0.05, ten times the value of Baatz et al. (2015). The default is now 0.0053 (r2 = 6.4 cph per kg m-2 BWE, N0 = 1210 cph).
+- Fixed `uncertainty_counts(metric='cv')`: the coefficient of variation was multiplied by the correction factors; it is now `1/sqrt(N)` (Jakobi et al., 2020, Eq. 7).
+- `sensing_depth()`: the documentation now states the result is in cm for both methods (Franz et al., 2012, Eq. 5; Schrön et al., 2017, Eq. 4). In the `Schron_2017` method the lattice water is converted to volumetric water equivalent with the bulk density before entering D86 (Schrön et al., 2017, Eq. 2), as already done in the `Franz_2012` method; this changes the Schrön depth by a few percent.
+- `cutoff_rigidity()`: the bundled world grid was replaced by the published grid of calculated vertical cutoff rigidities for epoch 1995.0 of Smart and Shea (2008, Proc. 30th ICRC, 1, 733-736), tabulated every 5 degrees in latitude and 15 degrees in longitude, and west longitudes are now mapped onto the 0-360 east longitude grid (previously they were mirrored, which happened to compensate a shift in the western half of the old table). Against 102 neutron monitors the mean absolute error drops from 0.27 to 0.18 GV. Returned values change by up to a few tenths of a GV, and by more in South America. The function now cites only that source.
+- `lattice_water()`: the documentation now states that inputs and output are gravimetric (percent by mass), and how to convert the result to the g/g fraction used as `Wlat` elsewhere in the library. No change in the calculation.
+- Fixed `exp_filter()`: a single missing value made the rest of the series NaN. The gain now uses the time elapsed since the last available observation (Albergel et al., 2008, Eq. 6), so gaps are skipped and the filter continues. Results are unchanged for series without gaps.
+- Fixed `remove_incomplete_intervals()`: the first row was always removed because its time difference is undefined; it is now kept unless `remove_first=True`.
+- Fixed `smooth_1d()` with a DataFrame and `method='savitzky_golay'`, which raised an error and modified the input in place.
+- Fixed `is_outlier()` when `min_val`/`max_val` are omitted (it raised a type error). The `'range'` method listed in the documentation is now implemented, and `'scaled_mad'` is two-sided (values below the median are also flagged), as in MATLAB `isoutlier`.
+- Fixed `find_neutron_monitor()` when no station has data for the requested period (it raised an error); the ten closest stations are now returned with `Period available` set to False.
+- `get_incoming_neutron_flux()` tries at most three times, pausing five seconds between attempts, when the NMDB endpoint returns a page without the data block, which it does intermittently even when data are available. If no data block is found after three attempts it prints a message suggesting to wait a minute and returns None cleanly (previously a single failed response returned None, which made `find_neutron_monitor()` report every station as unavailable during such spells).
+- `interpolate_incoming_flux()` keeps periods without NMDB data as NaN instead of failing an assertion; use `fill_na` in `correction_incoming_flux()`.
+- `idw()` returns the observed value at prediction points that coincide with an observation instead of NaN.
+- `total_raw_counts()` fills a missing detector with the mean of the other detectors only when more than one detector column is present (the previous check looked at the number of rows).
+- Error messages raised as plain strings in `spatial_average()`, `interpolate_2d()` and `uncertainty_counts()` are now proper `ValueError` exceptions; the NaN warning in `interpolate_2d()` now reports the actual counts.
+- Compatibility with pandas 2.2 and 3: `fill_missing_timestamps()` defaults to the frequency alias `'h'` (the `'H'` alias is deprecated in pandas 2.2 and removed in pandas 3) and the examples use it; datetime columns of any resolution or time zone are accepted; chained in-place assignments and column assignments on filtered frames, which warn in pandas 2 and stop working in pandas 3, were removed from the examples and tests.
+- Added `requirements-docs.txt` with the pinned documentation toolchain (MkDocs 1.x, Material, mkdocstrings, mkdocs-autorefs, mkdocs-jupyter, glightbox); the documentation page on correction routines had six cross-references to non-existent function names, now fixed, and describes the footprint weighting used for calibration.
+- Documentation corrections in `correction_pressure()` (reference pressure and attenuation length), `correction_humidity()` (input is absolute humidity), `counts_to_vwc()` (full equation and gravimetric units of `Wlat` and `Wsoc`, after Hawdon et al., 2014, Eq. 7), `abs_humidity()` (returns absolute humidity), `get_incoming_neutron_flux()` (NMDB acknowledgement, printed with `verbose=True`) and `latlon_to_utm()`.
 

@@ -16,8 +16,8 @@ def hydroinnova_example_mean_value():
     df['timestamp'] = pd.to_datetime(df['Date Time(UTC)'])
 
     # Remove rows with missing coordinates
-    df['LatDec'].replace(0.0, np.nan, inplace=True)
-    df['LongDec'].replace(0.0, np.nan, inplace=True)
+    df['LatDec'] = df['LatDec'].replace(0.0, np.nan)
+    df['LongDec'] = df['LongDec'].replace(0.0, np.nan)
     df.dropna(axis=0, subset=['LatDec', 'LongDec'], inplace=True)
     df.reset_index(drop=True, inplace=True)
 

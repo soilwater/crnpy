@@ -13,3 +13,7 @@ crnpy.egg-info/*
 /.idea
 .idea/*
 src/crnpy.egg-info/*
+
+# Build artifacts and local reference material
+build/
+References/
