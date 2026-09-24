@@ -215,10 +215,10 @@ def _c_road_schron2018(theta_N, theta_road, w, r):
     # Published Eq. 4-6 with Table 1 (F1, F2' and F3 rows) of Schrön et al. 2018.
     p0, p1 = 0.42, 0.50
     p2, p3, p4, p5 = 1.06, 4.00, 0.16, 0.39
-    p6, p7, p8, p9 = 0.94, 1.10, 2.70, 0.01
+    p6, p7, p8, p9, p10 = 0.94, 1.10, 2.70, 0.06, 0.01
     F1 = p0 * (1 - np.exp(-p1 * w))
     F2 = p2 - p3 * theta_road - (p4 + theta_road) / (p5 + theta_N)
-    F3 = p6 * np.exp(-p7 * w ** (-p8) * r ** 4) + (1 - p6) * np.exp(-p9 * r)
+    F3 = p6 * np.exp(-p7 * w ** (-p8) * r ** 4) + p9 * np.exp(-p10 * r)
     return 1 + F1 * F2 * F3
 
 
@@ -472,7 +472,7 @@ class _FakeResponse:
 def test_get_incoming_neutron_flux_retries_then_succeeds(monkeypatch):
     calls = {"n": 0}
 
-    def fake_get(url):
+    def fake_get(url, **kwargs):
         calls["n"] += 1
         return _FakeResponse(_NMDB_BAD if calls["n"] == 1 else _NMDB_GOOD)
 
@@ -487,7 +487,7 @@ def test_get_incoming_neutron_flux_retries_then_succeeds(monkeypatch):
 def test_get_incoming_neutron_flux_gives_up_after_retries(monkeypatch):
     calls = {"n": 0}
 
-    def fake_get(url):
+    def fake_get(url, **kwargs):
         calls["n"] += 1
         return _FakeResponse(_NMDB_BAD)
 

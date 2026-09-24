@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name="crnpy",
-    version="0.7.0",
+    version="0.8.0",
     python_requires=">=3.8",
     packages=['crnpy'],
     package_dir = {"": "src"},

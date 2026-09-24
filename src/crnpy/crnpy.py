@@ -147,7 +147,7 @@ def is_outlier(x, method, window=11, min_val=None, max_val=None):
         (pandas.Series): Boolean indicating outliers.
 
     References:
-        Iglewicz, B. and Hoaglin, D.C., 1993. How to detect and handle outliers (Vol. 16). Asq Press.
+        Iglewicz, B., & Hoaglin, D. C. (1993). How to detect and handle outliers (Vol. 16). ASQC Quality Press.
     """
 
     if not isinstance(x, pd.Series):
@@ -251,9 +251,9 @@ def correction_pressure(pressure, Pref, L):
         (list): fp pressure correction factor.
 
     References:
-        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System, Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.
+        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., & Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079–4099. https://doi.org/10.5194/hess-16-4079-2012
 
-        M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
+        Andreasen, M., Jensen, K. H., Desilets, D., Franz, T. E., Zreda, M., Bogena, H. R., & Looms, M. C. (2017). Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone Journal, 16(8), 1–11. https://doi.org/10.2136/vzj2017.04.0086
     """
 
     # Compute pressure correction factor
@@ -294,9 +294,9 @@ def correction_humidity(abs_humidity, Aref):
         (list): fw correction factor.
 
     References:
-        Rosolem, R., W. J. Shuttleworth, M. Zreda, T. E. Franz, X. Zeng, and S. A. Kurc, 2013: The Effect of Atmospheric Water Vapor on Neutron Count in the Cosmic-Ray Soil Moisture Observing System. J. Hydrometeor., 14, 1659–1671, https://doi.org/10.1175/JHM-D-12-0120.1.
+        Rosolem, R., Shuttleworth, W. J., Zreda, M., Franz, T. E., Zeng, X., & Kurc, S. A. (2013). The effect of atmospheric water vapor on neutron count in the cosmic-ray soil moisture observing system. Journal of Hydrometeorology, 14(5), 1659–1671. https://doi.org/10.1175/JHM-D-12-0120.1
 
-        M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
+        Andreasen, M., Jensen, K. H., Desilets, D., Franz, T. E., Zreda, M., Bogena, H. R., & Looms, M. C. (2017). Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone Journal, 16(8), 1–11. https://doi.org/10.2136/vzj2017.04.0086
     """
     A = abs_humidity
     fw = 1 + 0.0054 * (A - Aref)  # Rosolem et al. (2013); Andreasen et al. (2017) Eq. 3
@@ -343,14 +343,14 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None,
         (list): fi correction factor.
 
     References:
-        Hawdon, A., D. McJannet, and J. Wallace (2014), Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia, Water Resour. Res., 50, 5029–5043, doi:10.1002/2013WR015138.
+        Hawdon, A., McJannet, D., & Wallace, J. (2014). Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029–5043. https://doi.org/10.1002/2013WR015138
 
-        M. Andreasen, K.H. Jensen, D. Desilets, T.E. Franz, M. Zreda, H.R. Bogena, and M.C. Looms. 2017. Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone J. 16(8). doi:10.2136/vzj2017.04.0086
+        Andreasen, M., Jensen, K. H., Desilets, D., Franz, T. E., Zreda, M., Bogena, H. R., & Looms, M. C. (2017). Status and perspectives on the cosmic-ray neutron method for soil moisture estimation and other environmental science applications. Vadose Zone Journal, 16(8), 1–11. https://doi.org/10.2136/vzj2017.04.0086
 
-        McJannet, D. L., & Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59, e2022WR033889. https://doi.org/10.1029/2022WR033889
+        McJannet, D. L., & Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59(4), e2022WR033889. https://doi.org/10.1029/2022WR033889
     """
     if incoming_Ref is None and not isinstance(incoming_neutrons, type(None)):
-        incoming_Ref = incoming_neutrons[0]
+        incoming_Ref = incoming_neutrons.iloc[0] if isinstance(incoming_neutrons, pd.Series) else incoming_neutrons[0]
         warnings.warn('Reference incoming neutron flux not provided. Using first value of incoming neutron flux.')
     fi = incoming_neutrons / incoming_Ref
 
@@ -375,12 +375,16 @@ def correction_incoming_flux(incoming_neutrons, incoming_Ref=None, fill_na=None,
                 'Cutoff rigidity method not found. Valid options are: McJannetandDesilets2023, Hawdonetal2014.')
 
     if fill_na is not None:
-        fi.fillna(fill_na, inplace=True)  # Use a value of 1 for days without data
+        # Use a value of 1 for days without data. Handle both pandas and numpy inputs.
+        if isinstance(fi, pd.Series):
+            fi = fi.fillna(fill_na)
+        else:
+            fi = np.where(np.isnan(fi), fill_na, fi)
 
     return fi
 
 
-def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expand_window=0, verbose=False):
+def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expand_window=0, verbose=False, report_no_data=True):
     """Function to retrieve neutron flux from the Neutron Monitor Database.
 
     Args:
@@ -390,6 +394,7 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
         utc_offset (int): UTC offset in hours. Default is 0.
         expand_window (int): Number of hours to expand the time window to retrieve extra data. Default is 0.
         verbose (bool): Print information about the request. Default is False.
+        report_no_data (bool): Print a message when the station has no data for the selected period. Default is True.
 
     Returns:
         (pandas.DataFrame): Neutron flux in counts per hour and timestamps.
@@ -439,21 +444,40 @@ def get_incoming_neutron_flux(start_date, end_date, station, utc_offset=0, expan
     if verbose:
         print(f"Retrieving data from {url}")
 
-    # The NMDB draw_graph.php endpoint occasionally returns the HTML page without the ASCII data block,
-    # even when data are available, and appears to rate-limit rapid requests. Try at most 3 times, pausing
-    # between attempts, when the 'RCORR_E' marker is missing.
+    # The NMDB draw_graph.php endpoint occasionally returns the HTML page without the ASCII data block
+    # (e.g. a network hiccup or when the server limits rapid requests), but it also returns a definitive
+    # "no data available" page when a station simply has no observations for the requested period. Only the
+    # former is worth retrying; the latter is a valid answer and must not be retried or reported as a failure.
     n_attempts = 3
     wait_seconds = 5
+    r = ''
     for attempt in range(n_attempts):
-        r = requests.get(url).content.decode('utf-8')
+        try:
+            r = requests.get(url, timeout=30).content.decode('utf-8')
+        except requests.exceptions.RequestException as e:
+            r = ''
+            if verbose:
+                print(f"Request to NMDB failed: {e}")
+
+        # Data block present: request succeeded.
         if "RCORR_E" in r:
             break
+
+        # The server explicitly reports that this station has no data for the requested period. This is a
+        # definitive response, not a transient failure, so report it and return without retrying.
+        if "no data available" in r.lower():
+            if report_no_data:
+                print(f"No data available for station '{station}' between "
+                      f"{start_date:%Y-%m-%d %H:%M} and {end_date:%Y-%m-%d %H:%M}.")
+            return None
+
+        # Otherwise the response is empty or unexpected. Wait and retry.
         if attempt < n_attempts - 1:
             print(f"Request to NMDB unsuccessful, retrying in {wait_seconds} seconds "
                   f"(attempt {attempt + 1} of {n_attempts})...")
             time.sleep(wait_seconds)
 
-    # If the data block is still missing after the retries, no data were returned for the request. The NMDB
+    # If the data block is still missing after the retries, the request could not be completed. The NMDB
     # server appears to limit the number of requests per minute, so waiting before trying again usually helps.
     if "RCORR_E" not in r:
         print("Could not retrieve data from NMDB after "
@@ -493,26 +517,26 @@ the origin by a sentence like 'We acknowledge the NMDB database (www.nmdb.eu) fo
     return df_flux
 
 
-def get_reference_neutron_flux(station, date=pd.to_datetime("2011-05-01")):
-    """Function to retrieve reference neutron flux from the Neutron Monitor Database. Default date is 2011-05-01, following previous studies (Zreda et a., 2012, Hawdon et al., 2014, Bogena et al., 2022).
+def get_reference_neutron_flux(station, date):
+    """Function to retrieve reference neutron flux from the Neutron Monitor Database. A reference date of 2011-05-01 is commonly used, following previous studies (Zreda et al., 2012, Hawdon et al., 2014, Bogena et al., 2022), but the station must have data available for the chosen date.
 
     Args:
         station (str): Neutron Monitor station to retrieve data from.
-        date (datetime): Date of the reference neutron flux. Default is 2011-05-01.
+        date (datetime): Date of the reference neutron flux. Required. A value of 2011-05-01 is commonly used, but verify that the selected station has data available for that date.
 
     Returns:
         (float): Reference neutron flux in counts per hour.
 
     References:
-        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., & Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079-4099.
+        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., & Rosolem, R. (2012). COSMOS: The cosmic-ray soil moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079–4099. https://doi.org/10.5194/hess-16-4079-2012
 
-        Hawdon, A., McJannet, D., & Wallace, J. (2014). Calibration and correction procedures for cosmic‐ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029-5043.
+        Hawdon, A., McJannet, D., & Wallace, J. (2014). Calibration and correction procedures for cosmic-ray neutron soil moisture probes located across Australia. Water Resources Research, 50(6), 5029–5043. https://doi.org/10.1002/2013WR015138
 
-        Bogena, H. R., Schrön, M., Jakobi, J., Ney, P., Zacharias, S., Andreasen, M., ... & Vereecken, H. (2022). COSMOS-Europe: a European network of cosmic-ray neutron soil moisture sensors. Earth System Science Data, 14(3), 1125-1151.
+        Bogena, H. R., Schrön, M., Jakobi, J., Ney, P., Zacharias, S., Andreasen, M., … & Vereecken, H. (2022). COSMOS-Europe: A European network of cosmic-ray neutron soil moisture sensors. Earth System Science Data, 14(3), 1125–1151. https://doi.org/10.5194/essd-14-1125-2022
 
 """
 
-    # Get flux for 2011-05-01
+    # Get flux for the requested reference date
     df_flux = get_incoming_neutron_flux(date, date + pd.Timedelta(hours=24), station=station)
     if df_flux is None:
         warnings.warn(f"Reference neutron flux for {station} not available. Returning NaN.")
@@ -534,12 +558,12 @@ def smooth_1d(values, window=5, order=3, method='moving_median'):
         (pd.DataFrame): DataFrame with smoothed values.
 
     References:
-        Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020.
-        Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9.
-        doi.org/10.3389/frwa.2020.00009
+        Franz, T. E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L., & Wagner, W. (2020).
+        Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, 9.
+        https://doi.org/10.3389/frwa.2020.00009
 
         Savitzky, A., & Golay, M. J. (1964). Smoothing and differentiation of data by simplified least squares procedures.
-        Analytical chemistry, 36(8), 1627-1639.
+        Analytical Chemistry, 36(8), 1627–1639. https://doi.org/10.1021/ac60214a047
     """
 
     if not isinstance(values, pd.Series) and not isinstance(values, pd.DataFrame):
@@ -582,9 +606,9 @@ def correction_bwe(counts, bwe, r2_N0=0.0053):
         (array or pd.Series or pd.DataFrame): Array of corrected neutron counts for biomass effects.
 
     References:
-        Baatz, R., H. R. Bogena, H.-J. Hendricks Franssen, J. A. Huisman, C. Montzka, and H. Vereecken (2015),
-        An empirical vegetation correction for soil water content quantification using cosmic ray probes,
-        Water Resour. Res., 51, 2030–2046, doi:10.1002/2014WR016443.
+        Baatz, R., Bogena, H. R., Hendricks Franssen, H.-J., Huisman, J. A., Montzka, C., & Vereecken, H. (2015).
+        An empirical vegetation correction for soil water content quantification using cosmic ray probes.
+        Water Resources Research, 51(4), 2030–2046. https://doi.org/10.1002/2014WR016443
     """
 
     return counts / (1 - bwe * r2_N0)
@@ -603,19 +627,19 @@ def biomass_to_bwe(biomass_dry, biomass_fresh, fWE=0.494):
         (array or pd.Series or pd.DataFrame): Biomass water equivalent in kg m-2.
 
     References:
-        Wahbi, A., Avery, W. (2018). In Situ Destructive Sampling. In:
-        Cosmic Ray Neutron Sensing: Estimation of Agricultural Crop Biomass Water Equivalent.
-        Springer, Cham. https://doi.org/10.1007/978-3-319-69539-6_2
+        Wahbi, A., & Avery, W. (2018). In situ destructive sampling. In Cosmic ray neutron sensing:
+        Estimation of agricultural crop biomass water equivalent (pp. 5–9). Springer.
+        https://doi.org/10.1007/978-3-319-69539-6_2
     """
     return (biomass_fresh - biomass_dry) + fWE * biomass_dry
 
 
 def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0.12, p0=0.42, p1=0.5, p2=1.06, p3=4,
-                    p4=0.16, p5=0.39, p6=0.94, p7=1.10, p8=2.70, p9=0.01):
+                    p4=0.16, p5=0.39, p6=0.94, p7=1.10, p8=2.70, p9=0.06, p10=0.01):
     """Function to correct for road effects in neutron counts.
-    following the approach described in Schrön et al., 2018. The parameters p0 to p9 of the correction function
+    following the approach described in Schrön et al., 2018. The parameters p0 to p10 of the correction function
     default to the values of Table 1 in Schrön et al. (2018): p0 and p1 for the geometry term, p2 to p5 for the
-    moisture term, and p6 to p9 for the distance term.
+    moisture term, and p6 to p10 for the distance term.
 
     Args:
         counts (array or pd.Series or pd.DataFrame): Array of epithermal neutron counts.
@@ -629,7 +653,7 @@ def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0
 
     References:
         Schrön, M., Rosolem, R., Köhli, M., Piussi, L., Schröter, I., Iwema, J., et al. (2018). Cosmic-ray neutron rover surveys
-        of field soil moisture and the influence of roads. Water Resources Research, 54, 6441–6459.
+        of field soil moisture and the influence of roads. Water Resources Research, 54(9), 6441–6459.
         https://doi.org/10.1029/2017WR021719
     """
     road_width = np.asarray(road_width, dtype=float)
@@ -640,7 +664,7 @@ def correction_road(counts, theta_N, road_width, road_distance=0.0, theta_road=0
     # For a road width of zero F1 = 0 and no correction is applied (Schrön et al., 2018, requirement 4);
     # the width is replaced by 1 m inside F3 only to avoid raising zero to a negative power.
     width_safe = np.where(road_width > 0, road_width, 1.0)
-    F3 = p6 * np.exp(-p7 * (width_safe ** -p8) * road_distance ** 4) + (1 - p6) * np.exp(-p9 * road_distance)
+    F3 = p6 * np.exp(-p7 * (width_safe ** -p8) * road_distance ** 4) + p9 * np.exp(-p10 * road_distance)
 
     C_roads = 1 + F1 * F2 * F3
 
@@ -672,12 +696,11 @@ def counts_to_vwc(counts, N0, Wlat, Wsoc, bulk_density, a0=0.0808, a1=0.372, a2=
         (array or pd.Series or pd.DataFrame): Volumetric water content in m3 m-3.
 
     References:
-        Desilets, D., M. Zreda, and T.P.A. Ferré. 2010. Nature’s neutron probe:
-        Land surface hydrology at an elusive scale with cosmic rays. Water Resour. Res. 46:W11505.
-        doi.org/10.1029/2009WR008726
+        Desilets, D., Zreda, M., & Ferré, T. P. A. (2010). Nature’s neutron probe: Land surface hydrology at an
+        elusive scale with cosmic rays. Water Resources Research, 46(11), W11505. https://doi.org/10.1029/2009WR008726
 
-        Hawdon, A., D. McJannet, and J. Wallace (2014), Calibration and correction procedures for cosmic-ray neutron
-        soil moisture probes located across Australia, Water Resour. Res., 50, 5029–5043, doi:10.1002/2013WR015138.
+        Hawdon, A., McJannet, D., & Wallace, J. (2014). Calibration and correction procedures for cosmic-ray neutron
+        soil moisture probes located across Australia. Water Resources Research, 50(6), 5029–5043. https://doi.org/10.1002/2013WR015138
     """
 
     # Convert neutron counts into vwc
@@ -703,17 +726,19 @@ def sensing_depth(vwc, pressure, p_ref, bulk_density, Wlat, dist=None, method='S
         (array or pd.Series or pd.DataFrame): Estimated sensing depth in cm.
 
     References:
-        Franz, T.E., Zreda, M., Ferre, T.P.A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X. and Shuttleworth, W.J., 2012.
+        Franz, T. E., Zreda, M., Ferré, T. P. A., Rosolem, R., Zweck, C., Stillman, S., Zeng, X., & Shuttleworth, W. J. (2012).
         Measurement depth of the cosmic ray soil moisture probe affected by hydrogen from various sources.
-        Water Resources Research, 48(8). doi.org/10.1029/2012WR011871
+        Water Resources Research, 48(8), W08515. https://doi.org/10.1029/2012WR011871
 
         Schrön, M., Köhli, M., Scheiffele, L., Iwema, J., Bogena, H. R., Lv, L., et al. (2017).
         Improving calibration and validation of cosmic-ray neutron sensors in the light of spatial sensitivity.
-        Hydrol. Earth Syst. Sci. 21, 5009–5030. doi.org/10.5194/hess-21-5009-2017
+        Hydrology and Earth System Sciences, 21, 5009–5030. https://doi.org/10.5194/hess-21-5009-2017
     """
 
     # Determine sensing depth (D86)
     if method == 'Schron_2017':
+        if dist is None:
+            raise ValueError("The 'Schron_2017' method requires the `dist` argument (list of radial distances in m).")
         # See Appendix A of Schrön et al. (2017)
         Fp = 0.4922 / (0.86 - np.exp(-1 * pressure / p_ref))
         results = []
@@ -749,7 +774,7 @@ def abs_humidity(relative_humidity, temp):
         (float): Absolute humidity (g m^-3)
 
     References:
-        Campbell, G. S., & Norman, J. M. (1998). An Introduction to Environmental Biophysics, 2nd ed. Springer, New York.
+        Campbell, G. S., & Norman, J. M. (1998). An introduction to environmental biophysics (2nd ed.). Springer.
     """
 
     ### Atmospheric water vapor factor
@@ -786,15 +811,15 @@ def nrad_weight(h, theta, distances, depth, profiles=None, rhob=1.4, p=None, Hve
         weights (list): [theta_P, r_stars, Wrs] with the vertically averaged soil moisture, the scaled distance and the horizontal weight of each profile.
 
     References:
-        Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., and Zacharias, S. (2015).
+        Köhli, M., Schrön, M., Zreda, M., Schmidt, U., Dietrich, P., & Zacharias, S. (2015).
         Footprint characteristics revised for field-scale soil moisture monitoring with cosmic-ray
-        neutrons. Water Resour. Res. 51, 5772–5790. doi:10.1002/2015WR017169
+        neutrons. Water Resources Research, 51(7), 5772–5790. https://doi.org/10.1002/2015WR017169
 
         Schrön, M., Köhli, M., Scheiffele, L., Iwema, J., Bogena, H. R., Lv, L.,
         Martini, E., Baroni, G., Rosolem, R., Weimar, J., Mai, J., Cuntz, M., Rebmann, C.,
-        Oswald, S. E., Dietrich, P., Schmidt, U., and Zacharias, S.: Improving calibration and
-        validation of cosmic-ray neutron sensors in the light of spatial sensitivity,
-        Hydrol. Earth Syst. Sci., 21, 5009–5030, https://doi.org/10.5194/hess-21-5009-2017, 2017.
+        Oswald, S. E., Dietrich, P., Schmidt, U., & Zacharias, S. (2017). Improving calibration and
+        validation of cosmic-ray neutron sensors in the light of spatial sensitivity.
+        Hydrology and Earth System Sciences, 21, 5009–5030. https://doi.org/10.5194/hess-21-5009-2017
     """
 
     # Horizontal distance weights According to Eq. 6 and Table A1 in Schrön et al. (2017)
@@ -990,14 +1015,15 @@ def exp_filter(sm, T=1):
         sm_subsurface (list or array): Subsurface soil moisture in the same units as the input.
 
     References:
-        Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J.C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B. and Martin, E., 2008.
-        From near-surface to root-zone soil moisture using an exponential filter: an assessment of the method based on in-situ observations and model
-        simulations. Hydrology and Earth System Sciences, 12(6), pp.1323-1337.
+        Albergel, C., Rüdiger, C., Pellarin, T., Calvet, J. C., Fritz, N., Froissard, F., Suquia, D., Petitpa, A., Piguet, B., & Martin, E. (2008).
+        From near-surface to root-zone soil moisture using an exponential filter: An assessment of the method based on in-situ observations and model
+        simulations. Hydrology and Earth System Sciences, 12(6), 1323–1337. https://doi.org/10.5194/hess-12-1323-2008
 
-        Franz, T.E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L. and Wagner, W., 2020.
-        Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, p.9.
+        Franz, T. E., Wahbi, A., Zhang, J., Vreugdenhil, M., Heng, L., Dercon, G., Strauss, P., Brocca, L., & Wagner, W. (2020).
+        Practical data products from cosmic-ray neutron sensing for hydrological applications. Frontiers in Water, 2, 9.
+        https://doi.org/10.3389/frwa.2020.00009
 
-        Rossini, P. and Patrignani, A., 2021. Predicting rootzone soil moisture from surface observations in cropland using an exponential filter.
+        Rossini, P., & Patrignani, A. (2021). Predicting rootzone soil moisture from surface observations in cropland using an exponential filter.
         Soil Science Society of America Journal.
     """
 
@@ -1005,6 +1031,11 @@ def exp_filter(sm, T=1):
     sm = np.asarray(sm, dtype=float)
     sm_min = np.nanmin(sm)
     sm_max = np.nanmax(sm)
+
+    # A constant series has no dynamic range to normalize; the rootzone equals the surface value.
+    if sm_max == sm_min:
+        return sm.copy()
+
     ms = (sm - sm_min) / (sm_max - sm_min)
 
     # Pre-allocate soil water index array and recursive constant K
@@ -1059,7 +1090,7 @@ def cutoff_rigidity(lat, lon):
 
     References:
         Smart, D. F., & Shea, M. A. (2008). World grid of calculated cosmic ray vertical cutoff rigidities
-        for epoch 1995.0. Proceedings of the 30th International Cosmic Ray Conference (Mérida), 1, 733-736.
+        for epoch 1995.0. Proceedings of the 30th International Cosmic Ray Conference (Mérida), 1, 733–736.
     """
     xq = lon
     yq = lat
@@ -1089,9 +1120,9 @@ def atmospheric_depth(elevation, latitude):
         (float): Atmospheric depth in g/cm2
 
     References:
-        Atmosphere, U. S. (1976). US standard atmosphere. National Oceanic and Atmospheric Administration.
+        National Oceanic and Atmospheric Administration. (1976). U.S. standard atmosphere, 1976. U.S. Government Printing Office.
 
-        McJannet, D. L., & Desilets, D. (2023). Incoming Neutron Flux Corrections for Cosmic‐Ray Soil and Snow Sensors Using the Global Neutron Monitor Network. Water Resources Research, 59(4), e2022WR033889.
+        McJannet, D. L., & Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59(4), e2022WR033889. https://doi.org/10.1029/2022WR033889
     """
 
     density_of_rock = 2670  # Density of rock in kg/m3
@@ -1136,7 +1167,7 @@ def location_factor(site_atmospheric_depth, site_Rc, reference_atmospheric_depth
         (float): Location-dependent correction factor.
 
     References:
-        McJannet, D. L., & Desilets, D. (2023). Incoming Neutron Flux Corrections for Cosmic‐Ray Soil and Snow Sensors Using the Global Neutron Monitor Network. Water Resources Research, 59(4), e2022WR033889.
+        McJannet, D. L., & Desilets, D. (2023). Incoming neutron flux corrections for cosmic-ray soil and snow sensors using the global neutron monitor network. Water Resources Research, 59(4), e2022WR033889. https://doi.org/10.1029/2022WR033889
 
     """
 
@@ -1173,27 +1204,27 @@ def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
         verbose (bool): If True, print a expanded output of the incoming neutron flux data.
 
     Returns:
-        (list): List of top five stations with closes cutoff rigidity.
+        (pandas.DataFrame): DataFrame with up to ten candidate stations with the closest cutoff rigidity.
             User needs to select station according to site altitude.
 
     Examples:
         >>> from crnpy import crnpy
         >>> Rc = 2.40 # 2.40 Newark, NJ, US
         >>> crnpy.find_neutron_monitor(Rc)
-        Select a station with an altitude similar to that of your location. For more information go to: 'https://www.nmdb.eu/nest/help.php#helpstations
-
-        Your cutoff rigidity is 2.4 GV
-                STID                          NAME     R  Altitude_m
-        40   NEWK                        Newark  2.40          50
-        33   MOSC                        Moscow  2.43         200
-        27   KIEL                          Kiel  2.36          54
-        28  KIEL2                        KielRT  2.36          54
-        31   MCRL  Mobile Cosmic Ray Laboratory  2.46         200
-        32   MGDN                       Magadan  2.10         220
-        42   NVBK                   Novosibirsk  2.91         163
-        26   KGSN                      Kingston  1.88          65
-        9    CLMX                        Climax  3.00        3400
-        57   YKTK                       Yakutsk  1.65         105
+        Select a station with an altitude similar to that of your location.
+        Your cutoff rigidity is 2.4 GV.
+        For more information go to: https://www.nmdb.eu/nest/help.php#helpstations
+            STID                          NAME     R  Altitude_m
+        0   NEWK                        Newark  2.40          50
+        1   MOSC                        Moscow  2.43         200
+        2   KIEL                          Kiel  2.36          54
+        3  KIEL2                        KielRT  2.36          54
+        4   MCRL  Mobile Cosmic Ray Laboratory  2.46         200
+        5   MGDN                       Magadan  2.10         220
+        6   NVBK                   Novosibirsk  2.91         163
+        7   KGSN                      Kingston  1.88          65
+        8   CLMX                        Climax  3.00        3400
+        9   YKTK                       Yakutsk  1.65         105
 
     References:
         https://www.nmdb.eu/nest/help.php#helpstations
@@ -1210,42 +1241,51 @@ def find_neutron_monitor(Rc, start_date=None, end_date=None, verbose=False):
         for i in range(10):
             station = stations.iloc[idx_R[i]]["STID"]
             try:
-                if get_incoming_neutron_flux(start_date, end_date, station, verbose=verbose) is not None:
+                # Suppress the per-station "no data" message: the user did not choose these tentative
+                # stations, so only the ones with available data are reported below.
+                if get_incoming_neutron_flux(start_date, end_date, station,
+                                             verbose=verbose, report_no_data=False) is not None:
                     stations.iloc[idx_R[i], -1] = True
-            except:
+            except Exception:
                 pass
 
         if sum(stations["Period available"] == True) == 0:
-            print("No stations available for the selected period!")
-            result = stations.reindex(idx_R).head(10).rename_axis(None)
+            print(f"No neutron monitors with available data were found for your cutoff rigidity of {Rc} GV "
+                  "and selected period.")
+            print("For more information go to: https://www.nmdb.eu/nest/help.php#helpstations")
+            result = stations.reindex(idx_R).head(10).drop(columns="Period available").reset_index(drop=True)
         else:
             stations = stations[stations["Period available"] == True]
             idx_R = (stations['R'] - Rc).abs().argsort()
-            result = stations.iloc[idx_R.iloc[:10]]
+            result = stations.iloc[idx_R.iloc[:10]].drop(columns="Period available").reset_index(drop=True)
+            print(f"Based on your cutoff rigidity of {Rc} GV, these are some of the reference neutron monitors "
+                  "that have available data for your period.")
+            print("For more information go to: https://www.nmdb.eu/nest/help.php#helpstations")
     else:
-        result = stations.reindex(idx_R).head(10).rename_axis(None)
+        result = stations.reindex(idx_R).head(10).reset_index(drop=True)
+        print("Select a station with an altitude similar to that of your location.")
+        print(f"Your cutoff rigidity is {Rc} GV.")
+        print("For more information go to: https://www.nmdb.eu/nest/help.php#helpstations")
 
-    # Print results
-    print('')
-    print(
-        """Select a station with an altitude similar to that of your location. For more information go to: 'https://www.nmdb.eu/nest/help.php#helpstations""")
-    print('')
-    print(f"Your cutoff rigidity is {Rc} GV")
-    print(result)
+    # Return the DataFrame (displayed as a table by notebooks) rather than also printing it, to avoid
+    # showing the results twice.
     return result
 
 
-def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
+def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps, tolerance=pd.Timedelta(hours=1)):
     """Function to interpolate incoming neutron flux to match the timestamps of the observations.
 
     Args:
         nmdb_timestamps (pd.Series or np.array): Series or array of timestamps in datetime format from the NMDB
         nmdb_counts (pd.Series or np.array): Series or array of incoming neutron flux counts from the NMDB
         crnp_timestamps (pd.Series or np.array): Series or array of timestamps in datetime format from the CRNP device
+        tolerance (pd.Timedelta): Maximum time difference allowed when matching a CRNP timestamp to the nearest NMDB
+            timestamp. CRNP timestamps with no NMDB observation within this window are left as NaN. Default is 1 hour
+            (the NMDB resolution requested by `get_incoming_neutron_flux()`).
 
     Returns:
         (np.array): Incoming neutron flux matched to each CRNP timestamp. Same length as crnp_timestamps. Periods without
-            NMDB data remain NaN; see the `fill_na` option of `correction_incoming_flux()`.
+            NMDB data within `tolerance` remain NaN; see the `fill_na` option of `correction_incoming_flux()`.
     """
     # Create a DataFrame from nmdb timestamps and counts
     df_nmdb = pd.DataFrame({'timestamp': nmdb_timestamps, 'counts': nmdb_counts})
@@ -1254,9 +1294,10 @@ def interpolate_incoming_flux(nmdb_timestamps, nmdb_counts, crnp_timestamps):
     # Set the Timestamp column as the index
     df_nmdb.set_index('timestamp', inplace=True)
 
-    # Reindex the DataFrame to the timestamps from the CRNP device using the nearest method
-    # This will match each CRNP timestamp with the nearest NMDB timestamp
-    interpolated_flux = df_nmdb.reindex(crnp_timestamps, method='nearest')['counts'].values
+    # Reindex the DataFrame to the timestamps from the CRNP device using the nearest method.
+    # This matches each CRNP timestamp with the nearest NMDB timestamp, but only within `tolerance`,
+    # so CRNP timestamps outside the NMDB coverage remain NaN instead of taking a far-away value.
+    interpolated_flux = df_nmdb.reindex(crnp_timestamps, method='nearest', tolerance=tolerance)['counts'].values
 
     return interpolated_flux
 
@@ -1443,9 +1484,10 @@ def idw(x, y, z, X_pred, Y_pred, neighborhood=1000, p=1):
         # A prediction point that coincides with an observation takes the observed value (exact interpolation)
         if np.any(d == 0):
             Z_pred[n] = np.mean(z[d == 0])
-        else:
+        elif np.any(idx_neighbors):
             # Compute interpolated value at point of interest
             Z_pred[n] = np.sum(z[idx_neighbors] / d[idx_neighbors] ** p) / np.sum(1 / d[idx_neighbors] ** p)
+        # else: no observations within the neighborhood, leave the pre-allocated NaN
 
     return np.reshape(Z_pred, s)
 
@@ -1552,11 +1594,11 @@ def uncertainty_counts(raw_counts, metric="std", fp=1, fw=1, fi=1):
         uncertainty (float): Uncertainty of raw counts.
 
     References:
-        Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With
-        Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010
+        Jakobi, J., Huisman, J. A., Schrön, M., Fiedler, J., Brogi, C., Vereecken, H., & Bogena, H. R. (2020). Error estimation for soil moisture
+        measurements with cosmic ray neutron sensing and implications for rover surveys. Frontiers in Water, 2, 10. https://doi.org/10.3389/frwa.2020.00010
 
-        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., and Rosolem, R.: COSMOS: the COsmic-ray Soil Moisture Observing System,
-        Hydrol. Earth Syst. Sci., 16, 4079–4099, https://doi.org/10.5194/hess-16-4079-2012, 2012.
+        Zreda, M., Shuttleworth, W. J., Zeng, X., Zweck, C., Desilets, D., Franz, T., & Rosolem, R. (2012). COSMOS: The cosmic-ray soil
+        moisture observing system. Hydrology and Earth System Sciences, 16(11), 4079–4099. https://doi.org/10.5194/hess-16-4079-2012
 
     """
 
@@ -1593,8 +1635,8 @@ def uncertainty_vwc(raw_counts, N0, bulk_density, fp=1, fw=1, fi=1, a0=0.0808, a
         sigma_VWC (float): Uncertainty in terms of volumetric water content.
 
     References:
-        Jakobi J, Huisman JA, Schrön M, Fiedler J, Brogi C, Vereecken H and Bogena HR (2020) Error Estimation for Soil Moisture Measurements With
-        Cosmic Ray Neutron Sensing and Implications for Rover Surveys. Front. Water 2:10. doi: 10.3389/frwa.2020.00010
+        Jakobi, J., Huisman, J. A., Schrön, M., Fiedler, J., Brogi, C., Vereecken, H., & Bogena, H. R. (2020). Error estimation for soil moisture
+        measurements with cosmic ray neutron sensing and implications for rover surveys. Frontiers in Water, 2, 10. https://doi.org/10.3389/frwa.2020.00010
     """
 
     Ncorr = raw_counts * fw / (fp * fi)
