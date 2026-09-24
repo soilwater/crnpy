@@ -2,34 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://soilwater.github.io/crnpy/</loc>
-         <lastmod>2026-09-03</lastmod>
+         <lastmod>2026-09-24</lastmod>
     </url>
     <url>
          <loc>https://soilwater.github.io/crnpy/correction_routines/</loc>
-         <lastmod>2026-09-03</lastmod>
+         <lastmod>2026-09-24</lastmod>
     </url>
     <url>
          <loc>https://soilwater.github.io/crnpy/reference/</loc>
-         <lastmod>2026-09-03</lastmod>
+         <lastmod>2026-09-24</lastmod>
     </url>
     <url>
          <loc>https://soilwater.github.io/crnpy/sensor_description/</loc>
-         <lastmod>2026-09-03</lastmod>
+         <lastmod>2026-09-24</lastmod>
     </url>
     <url>
          <loc>https://soilwater.github.io/crnpy/examples/calibration/calibration/</loc>
-         <lastmod>2026-09-03</lastmod>
+         <lastmod>2026-09-24</lastmod>
     </url>
     <url>
          <loc>https://soilwater.github.io/crnpy/examples/rover/Hydroinnova_rover_example/</loc>
-         <lastmod>2026-09-03</lastmod>
+         <lastmod>2026-09-24</lastmod>
     </url>
     <url>
          <loc>https://soilwater.github.io/crnpy/examples/stationary/ccros_workshop_2024_example_stationary_detector/</loc>
-         <lastmod>2026-09-03</lastmod>
+         <lastmod>2026-09-24</lastmod>
     </url>
     <url>
          <loc>https://soilwater.github.io/crnpy/examples/stationary/example_RDT_station/</loc>
-         <lastmod>2026-09-03</lastmod>
+         <lastmod>2026-09-24</lastmod>
     </url>
 </urlset>
